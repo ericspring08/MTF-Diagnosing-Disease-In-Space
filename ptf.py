@@ -9,6 +9,7 @@ import warnings
 import configparser
 from pathlib import Path
 import os
+import shutil
 
 # Arg Parse
 from argparse import ArgumentParser
@@ -61,6 +62,9 @@ script_dir = os.path.dirname(__file__)
 results_dir = os.path.join(script_dir, 'Results/')
 
 if not os.path.isdir(results_dir):
+    os.makedirs(results_dir)
+else:
+    shutil.rmtree(results_dir)
     os.makedirs(results_dir)
 
 # get testing models
@@ -163,40 +167,39 @@ with Progress() as progress:
             results_VHD.append(balanced_accuracy_score(predictions_VHD, y_VHD_test))
             results_Cath.append(balanced_accuracy_score(predictions_Cath, y_cath_test))
 
-    # Generate graphs?
-    if args.graphs:
-        progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
-        x_axis = list(models.keys())
-        y_axis = {
-            'VHD': results_VHD,
-            'Cath': results_Cath
-        }
+        # Generate graphs?
+        if args.graphs:
+            progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
+            x_axis = list(models.keys())
+            y_axis = {
+                'VHD': results_VHD,
+                'Cath': results_Cath
+            }
 
-        x = np.arange(len(x_axis))  # the label locations
-        width = 0.3  # the width of the bars
-        multiplier = 0
+            x = np.arange(len(x_axis))  # the label locations
+            width = 0.3  # the width of the bars
+            multiplier = 0
 
 
-        fig, ax = plt.subplots()
-        fig.set_figheight(12)
-        fig.set_figwidth(20)
+            fig, ax = plt.subplots()
+            fig.set_figheight(12)
+            fig.set_figwidth(20)
 
-        for attribute, measurement in y_axis.items():
-            offset = width * multiplier
-            rects = ax.bar(x + offset, measurement, width, label=attribute)
-            ax.bar_label(rects, padding=0)
+            for attribute, measurement in y_axis.items():
+                offset = width * multiplier
+                rects = ax.bar(x + offset, measurement, width, label=attribute)
+                ax.bar_label(rects, padding=0)
 
-            multiplier += 1
-        progress.advance(progresstotal, advance=1)
+                multiplier += 1
+            progress.advance(progresstotal, advance=1)
 
-        # Add some text for labels, title and custom x-axis tick labels, etc.
-        ax.set_ylabel('Balanced Accuracy')
-        ax.set_xlabel('Model')
-        ax.set_title('Balanced Accuracy Scores')
-        ax.set_xticks(x + width/2, x_axis)
-        ax.legend(loc='best', ncols=2)
-
-        plt.savefig(f'Results/Chart{trial}.png')
-        plt.close(fig)
+            # Add some text for labels, title and custom x-axis tick labels, etc.
+            ax.set_ylabel('Balanced Accuracy')
+            ax.set_xlabel('Model')
+            ax.set_title('Balanced Accuracy Scores')
+            ax.set_xticks(x + width/2, x_axis)
+            ax.legend(loc='best', ncols=2)
+            plt.savefig(f'Results/Chart{trial}.png')
+            plt.close(fig)
 
 print(f'Experiment Ended\nResults located in: {os.getcwd()}/Results')
