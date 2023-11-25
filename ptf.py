@@ -8,6 +8,7 @@ from sklearn.gaussian_process.kernels import RBF
 import warnings
 import configparser
 from pathlib import Path
+import os
 
 # Arg Parse
 from argparse import ArgumentParser
@@ -15,6 +16,9 @@ from argparse import ArgumentParser
 # Visualization
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+# Progress Bar
+from rich.progress import Progress
 
 # Models
 from sklearn.svm import SVC
@@ -52,6 +56,13 @@ config.read(config_path)
 data_path = config.get('Data', 'CAD')
 df = pd.read_csv(data_path)
 
+# generate results directory
+script_dir = os.path.dirname(__file__)
+results_dir = os.path.join(script_dir, 'Results/')
+
+if not os.path.isdir(results_dir):
+    os.makedirs(results_dir)
+
 # get testing models
 model_options = {
     'SVC': SVC(),
@@ -80,76 +91,81 @@ else:
             value: model_options.get(value)
         })
 
-# preprocess
-# mappings
-# Sex
-sex_map = {
-    'Male': 0,
-    'Fmale': 1,
-}
-# Yes and No Map
-yn_map = {
-    'N': 0, 
-    'Y': 1,
-}
-# VHD Map
-vhd_map = {
-    'N': 0,
-    'mild': 1,
-    'Moderate': 2,
-    'Severe': 3,
-}
-# Cath Map
-cath_map = {
-    'Normal': 0,
-    'Cad': 1,
-}
+total = 10
+if args.graphs:
+    # graph
+    total += 10 * args.trials * len(models)
+else:
+    # no graph
+    total += 10 * args.trails * len(models) + args.trials
 
-yn_features = ['Obesity', 'CRF', 'CVA', 'Airway disease', 'Thyroid Disease', 'CHF', 'DLP', 'Weak Peripheral Pulse', 'Lung rales', 'Systolic Murmur', 'Diastolic Murmur', 'Dyspnea', 'Atypical', 'Nonanginal', 'Exertional CP', 'LowTH Ang', 'LVH', 'Poor R Progression']
-for feature in yn_features:
-    df[feature] = df[feature].map(yn_map)
-df['Sex'] = df['Sex'].map(sex_map)
-df['VHD'] = df['VHD'].map(vhd_map)
-df['Cath'] = df['Cath'].map(cath_map)
+with Progress() as progress:
+    progresstotal = progress.add_task('[green]Progress', total=total)
 
-## Data set size
-print(f'The data set has {df.shape[0]} rows and {df.shape[1]} columns')
+    # preprocess
+    # mappings
+    # Sex
+    sex_map = {
+        'Male': 0,
+        'Fmale': 1,
+    }
+    # Yes and No Map
+    yn_map = {
+        'N': 0, 
+        'Y': 1,
+    }
+    # VHD Map
+    vhd_map = {
+        'N': 0,
+        'mild': 1,
+        'Moderate': 2,
+        'Severe': 3,
+    }
+    # Cath Map
+    cath_map = {
+        'Normal': 0,
+        'Cad': 1,
+    }
 
-for trial in range(0, args.trials):
-    print('='*60)
-    print(f'TRIAL {trial}')
-    # Generate test and train suites
-    x_train, x_test, y_VHD_train, y_VHD_test = train_test_split(df.iloc[:, 0:11], df.VHD, test_size=0.2)
-    _, _, y_cath_train, y_cath_test = train_test_split(df.iloc[:, 0:11], df.Cath, test_size=0.2)
+    yn_features = ['Obesity', 'CRF', 'CVA', 'Airway disease', 'Thyroid Disease', 'CHF', 'DLP', 'Weak Peripheral Pulse', 'Lung rales', 'Systolic Murmur', 'Diastolic Murmur', 'Dyspnea', 'Atypical', 'Nonanginal', 'Exertional CP', 'LowTH Ang', 'LVH', 'Poor R Progression']
+    for feature in yn_features:
+        df[feature] = df[feature].map(yn_map)
+    df['Sex'] = df['Sex'].map(sex_map)
+    df['VHD'] = df['VHD'].map(vhd_map)
+    df['Cath'] = df['Cath'].map(cath_map)
 
-    # predictions and models
+    ## Data set size
+    progress.advance(progresstotal, advance=10)
 
-    results_VHD = []
-    results_Cath = []
+    for trial in range(0, args.trials):
+        # Generate test and train suites
+        progress.update(progresstotal, description="STAGE: Split Data")
+        x_train, x_test, y_VHD_train, y_VHD_test = train_test_split(df.iloc[:, 0:11], df.VHD, test_size=0.2)
+        _, _, y_cath_train, y_cath_test = train_test_split(df.iloc[:, 0:11], df.Cath, test_size=0.2)
 
-    for model_name, model_object in models.items():
-        # fit model 
-        model_VHD = model_object.fit(x_train, y_VHD_train)
-        model_Cath = model_object.fit(x_train, y_cath_train)
+        # predictions and models
 
-        predictions_VHD = model_VHD.predict(x_test)
-        predictions_Cath = model_Cath.predict(x_test)
+        results_VHD = []
+        results_Cath = []
 
-        print('-'*60)
-        print(f'{model_name} - VHD')
-        print(f'accuracy: {accuracy_score(predictions_VHD, y_VHD_test)}')
-        print(f'balanced accuracy: {balanced_accuracy_score(predictions_VHD, y_VHD_test)}')
-        print('-'*60)
-        print(f'{model_name} - Cath')
-        print(f'accuracy: {accuracy_score(predictions_Cath, y_cath_test)}')
-        print(f'balanced accuracy: {balanced_accuracy_score(predictions_Cath, y_cath_test)}')
-        print('-'*60)
+        for model_name, model_object in models.items():
+            # fit model 
+            progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, {model_name}, VHD')
+            model_VHD = model_object.fit(x_train, y_VHD_train)
+            predictions_VHD = model_VHD.predict(x_test)
+            progress.advance(progresstotal, advance=5)
 
-        results_VHD.append(balanced_accuracy_score(predictions_VHD, y_VHD_test))
-        results_Cath.append(balanced_accuracy_score(predictions_Cath, y_cath_test))
+            progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, {model_name}, Cath')
+            model_Cath = model_object.fit(x_train, y_cath_train)
+            predictions_Cath = model_Cath.predict(x_test)
+
+            progress.advance(progresstotal, advance=5)
+            results_VHD.append(balanced_accuracy_score(predictions_VHD, y_VHD_test))
+            results_Cath.append(balanced_accuracy_score(predictions_Cath, y_cath_test))
 
     # Generate graphs?
     if args.graphs:
+        progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
         x_axis = list(models.keys())
         y_axis = {
             'VHD': results_VHD,
@@ -171,6 +187,7 @@ for trial in range(0, args.trials):
             ax.bar_label(rects, padding=0)
 
             multiplier += 1
+        progress.advance(progresstotal, advance=1)
 
         # Add some text for labels, title and custom x-axis tick labels, etc.
         ax.set_ylabel('Balanced Accuracy')
@@ -179,5 +196,7 @@ for trial in range(0, args.trials):
         ax.set_xticks(x + width/2, x_axis)
         ax.legend(loc='best', ncols=2)
 
-        plt.savefig(f'Chart{trial}.png')
+        plt.savefig(f'Results/Chart{trial}.png')
         plt.close(fig)
+
+print(f'Experiment Ended\nResults located in: {os.getcwd()}/Results')
