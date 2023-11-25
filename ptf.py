@@ -35,10 +35,11 @@ from sklearn.metrics import accuracy_score
 warnings.filterwarnings('ignore')
 
 parser = ArgumentParser()
-parser.add_argument("-c", '--config')
-parser.add_argument("-a", '--all', action='store_true')
-parser.add_argument('-m','--models', nargs='+')  
-parser.add_argument('-t', '--trials', type=int)
+parser.add_argument("-c", '--config', help="Path of Configuration File (.ini)")
+parser.add_argument("-a", '--all', action='store_true', help="Select all models")
+parser.add_argument('-m','--models', nargs='+', help='Model options are: SVC, GradientBoosting, GaussianNB, DecisionTree, KNeighbors, AdaBoost, RandomForest, MLPClassifier, GaussianProcess, QuadraticDiscriminantAnalysis')
+parser.add_argument('-t', '--trials', type=int, help="Number of trials")
+parser.add_argument('-g', '--graphs', action="store_true", help="Generate graphs")
 
 args = parser.parse_args()
 
@@ -73,6 +74,8 @@ if args.all:
 else:
     # only use choosen models
     for value in args.models:
+        if value not in model_option_names:
+            raise Exception(f'Selected model not a available option: {value}')
         models.update({
             value: model_options.get(value)
         })
@@ -144,3 +147,37 @@ for trial in range(0, args.trials):
 
         results_VHD.append(balanced_accuracy_score(predictions_VHD, y_VHD_test))
         results_Cath.append(balanced_accuracy_score(predictions_Cath, y_cath_test))
+
+    # Generate graphs?
+    if args.graphs:
+        x_axis = list(models.keys())
+        y_axis = {
+            'VHD': results_VHD,
+            'Cath': results_Cath
+        }
+
+        x = np.arange(len(x_axis))  # the label locations
+        width = 0.3  # the width of the bars
+        multiplier = 0
+
+
+        fig, ax = plt.subplots()
+        fig.set_figheight(12)
+        fig.set_figwidth(20)
+
+        for attribute, measurement in y_axis.items():
+            offset = width * multiplier
+            rects = ax.bar(x + offset, measurement, width, label=attribute)
+            ax.bar_label(rects, padding=0)
+
+            multiplier += 1
+
+        # Add some text for labels, title and custom x-axis tick labels, etc.
+        ax.set_ylabel('Balanced Accuracy')
+        ax.set_xlabel('Model')
+        ax.set_title('Balanced Accuracy Scores')
+        ax.set_xticks(x + width/2, x_axis)
+        ax.legend(loc='best', ncols=2)
+
+        plt.savefig(f'Chart{trial}.png')
+        plt.close(fig)
