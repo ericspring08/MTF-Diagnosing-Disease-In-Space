@@ -7,7 +7,6 @@ import numpy as np
 from sklearn.gaussian_process.kernels import RBF
 import warnings
 import configparser
-from pathlib import Path
 import os
 import shutil
 import time
@@ -18,7 +17,6 @@ from argparse import ArgumentParser
 
 # Visualization
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Progress Bar
 from rich.progress import Progress
@@ -30,7 +28,6 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from catboost import CatBoostClassifier
 
@@ -53,9 +50,9 @@ model_options = {
     'KNeighbors': KNeighborsClassifier(n_neighbors=5),
     'AdaBoost': AdaBoostClassifier(),
     'RandomForest': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42),
-    'MLPClassifier': MLPClassifier(alpha=1, max_iter=1000, random_state=42),
+    'MLP': MLPClassifier(alpha=1, max_iter=1000, random_state=42),
     'QuadraticDiscriminantAnalysis': QuadraticDiscriminantAnalysis(),
-    'CatBoostClassifier': CatBoostClassifier(verbose=False)
+    'CatBoost': CatBoostClassifier(verbose=False),
 }
 
 model_list_str = ''
