@@ -32,10 +32,7 @@ from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
 # Metrics
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import balanced_accuracy_score
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, jaccard_score, f1_score, balanced_accuracy_score
 
 warnings.filterwarnings('ignore')
 
@@ -141,6 +138,16 @@ with Progress() as progress:
     ## Data set size
     progress.advance(progresstotal, advance=10)
 
+    full_results = []
+    title_row = ['Trial #']
+    metrics = ['accuracy', 'balanced accuracy', 'f1 score', 'jaccard score']
+    for model_name in models.keys():
+        for metric in metrics:
+            title_row.append(f'{model_name} - VHD - {metric}')
+            title_row.append(f'{model_name} - Cath - {metric}')
+
+    full_results.append(title_row)
+
     for trial in range(0, args.trials):
         # Generate test and train suites
         progress.update(progresstotal, description="STAGE: Split Data")
@@ -151,6 +158,9 @@ with Progress() as progress:
 
         results_VHD = []
         results_Cath = []
+
+        # trial #, accuracy VHD, accuracy Cath, balanced accuracy VHD, balanced accuracy Cath, f1 VHD, f1 Cath, jaccard VHD, jaccard Cath
+        trial_stats = [trial] 
 
         for model_name, model_object in models.items():
             # fit model 
@@ -163,9 +173,20 @@ with Progress() as progress:
             model_Cath = model_object.fit(x_train, y_cath_train)
             predictions_Cath = model_Cath.predict(x_test)
 
+            trial_stats.append(accuracy_score(predictions_VHD, y_VHD_test))
+            trial_stats.append(accuracy_score(predictions_Cath, y_cath_test))
+            trial_stats.append(balanced_accuracy_score(predictions_VHD, y_VHD_test))
+            trial_stats.append(balanced_accuracy_score(predictions_Cath, y_cath_test))
+            trial_stats.append(f1_score(predictions_VHD, y_VHD_test, average="weighted"))
+            trial_stats.append(f1_score(predictions_Cath, y_cath_test, average="weighted"))
+            trial_stats.append(jaccard_score(predictions_VHD, y_VHD_test, average="weighted"))
+            trial_stats.append(jaccard_score(predictions_Cath, y_cath_test, average="weighted"))
+
             progress.advance(progresstotal, advance=5)
             results_VHD.append(balanced_accuracy_score(predictions_VHD, y_VHD_test))
             results_Cath.append(balanced_accuracy_score(predictions_Cath, y_cath_test))
+
+        full_results.append(trial_stats)
 
         # Generate graphs?
         if args.graphs:
@@ -201,5 +222,9 @@ with Progress() as progress:
             ax.legend(loc='best', ncols=2)
             plt.savefig(f'Results/Chart{trial}.png')
             plt.close(fig)
+
+# save stats into csv
+metrics_df = pd.DataFrame(full_results)
+metrics_df.to_csv('Results/stats.csv', header=False, index=False)
 
 print(f'Experiment Ended\nResults located in: {os.getcwd()}/Results')
