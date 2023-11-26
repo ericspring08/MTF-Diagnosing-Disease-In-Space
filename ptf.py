@@ -11,6 +11,7 @@ from pathlib import Path
 import os
 import shutil
 import time
+from art import text2art
 
 # Arg Parse
 from argparse import ArgumentParser
@@ -31,17 +32,42 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from catboost import CatBoostClassifier
 
 # Metrics
 from sklearn.metrics import accuracy_score, jaccard_score, f1_score, balanced_accuracy_score
 
+title = text2art("PTF", font="3d_diagonal")
+print(title)
+print("Prototype Training Platform")
+print("By Eric Zhang, 2023")
+print('-'*100)
 warnings.filterwarnings('ignore')
 start_time = time.perf_counter()
+
+model_options = {
+    'SVC': SVC(),
+    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=5, random_state=0),
+    'GaussianNB': GaussianNB(),
+    'DecisionTree': DecisionTreeClassifier(),
+    'KNeighbors': KNeighborsClassifier(n_neighbors=5),
+    'AdaBoost': AdaBoostClassifier(),
+    'RandomForest': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42),
+    'MLPClassifier': MLPClassifier(alpha=1, max_iter=1000, random_state=42),
+    'QuadraticDiscriminantAnalysis': QuadraticDiscriminantAnalysis(),
+    'CatBoostClassifier': CatBoostClassifier(verbose=False)
+}
+
+model_list_str = ''
+for index, i in enumerate(list(model_options.keys())):
+    model_list_str += i
+    if index != len(model_options)-1:
+        model_list_str += ', '
 
 parser = ArgumentParser()
 parser.add_argument("-c", '--config', help="Path of Configuration File (.ini)")
 parser.add_argument("-a", '--all', action='store_true', help="Select all models")
-parser.add_argument('-m','--models', nargs='+', help='Model options are: SVC, GradientBoosting, GaussianNB, DecisionTree, KNeighbors, AdaBoost, RandomForest, MLPClassifier, GaussianProcess, QuadraticDiscriminantAnalysis')
+parser.add_argument('-m','--models', nargs='+', help=f'Model options are: {model_list_str}')
 parser.add_argument('-t', '--trials', type=int, help="Number of trials")
 parser.add_argument('-g', '--graphs', action="store_true", help="Generate graphs")
 
@@ -67,17 +93,7 @@ else:
     os.makedirs(results_dir)
 
 # get testing models
-model_options = {
-    'SVC': SVC(),
-    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=5, random_state=0),
-    'GaussianNB': GaussianNB(),
-    'DecisionTree': DecisionTreeClassifier(),
-    'KNeighbors': KNeighborsClassifier(n_neighbors=5),
-    'AdaBoost': AdaBoostClassifier(),
-    'RandomForest': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42),
-    'MLPClassifier': MLPClassifier(alpha=1, max_iter=1000, random_state=42),
-    'QuadraticDiscriminantAnalysis': QuadraticDiscriminantAnalysis()
-}
+
 model_option_names = model_options.keys()
 
 models = {}
@@ -230,5 +246,6 @@ metrics_df.to_csv('Results/stats.csv', header=False, index=False)
 
 end_time = time.perf_counter()
 elapsed_time = end_time - start_time
+print('-'*100)
 print("Elapsed time: ", elapsed_time)
 print(f'Experiment Ended\nResults located in: {os.getcwd()}/Results')
