@@ -10,6 +10,7 @@ import configparser
 from pathlib import Path
 import os
 import shutil
+import time
 
 # Arg Parse
 from argparse import ArgumentParser
@@ -35,6 +36,7 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.metrics import accuracy_score, jaccard_score, f1_score, balanced_accuracy_score
 
 warnings.filterwarnings('ignore')
+start_time = time.perf_counter()
 
 parser = ArgumentParser()
 parser.add_argument("-c", '--config', help="Path of Configuration File (.ini)")
@@ -74,7 +76,6 @@ model_options = {
     'AdaBoost': AdaBoostClassifier(),
     'RandomForest': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42),
     'MLPClassifier': MLPClassifier(alpha=1, max_iter=1000, random_state=42),
-    'GaussianProcess': GaussianProcessClassifier(1.0 * RBF(1.0), random_state=42),
     'QuadraticDiscriminantAnalysis': QuadraticDiscriminantAnalysis()
 }
 model_option_names = model_options.keys()
@@ -95,10 +96,10 @@ else:
 total = 10
 if args.graphs:
     # graph
-    total += 10 * args.trials * len(models)
+    total += 10 * args.trials * len(models) + args.trials
 else:
     # no graph
-    total += 10 * args.trails * len(models) + args.trials
+    total += 10 * args.trials * len(models)
 
 with Progress() as progress:
     progresstotal = progress.add_task('[green]Progress', total=total)
@@ -227,4 +228,7 @@ with Progress() as progress:
 metrics_df = pd.DataFrame(full_results)
 metrics_df.to_csv('Results/stats.csv', header=False, index=False)
 
+end_time = time.perf_counter()
+elapsed_time = end_time - start_time
+print("Elapsed time: ", elapsed_time)
 print(f'Experiment Ended\nResults located in: {os.getcwd()}/Results')
