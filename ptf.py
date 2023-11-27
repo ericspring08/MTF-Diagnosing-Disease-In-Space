@@ -39,7 +39,7 @@ from lightgbm import LGBMClassifier
 
 
 # Metrics
-from sklearn.metrics import accuracy_score, jaccard_score, f1_score, balanced_accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, f1_score, balanced_accuracy_score
 
 title = text2art("PTF", font="3d_diagonal")
 print(title)
@@ -165,9 +165,10 @@ with Progress() as progress:
     progress.advance(progresstotal, advance=10)
 
     full_results = []
-    averages = [0]*len(models)
+    averages_accuracy = [0]*len(models)
+    averages_precision = [0]*len(models)
     title_row = ['Trial #']
-    metrics = ['accuracy', 'balanced accuracy', 'f1 score', 'jaccard score']
+    metrics = ['accuracy', 'balanced accuracy', 'f1 score', 'precision']
     for model_name in models.keys():
         for metric in metrics:
             title_row.append(f'{model_name} - {metric}')
@@ -198,45 +199,51 @@ with Progress() as progress:
             trial_stats.append(accuracy_score(predictions, y_test))
             trial_stats.append(balanced_accuracy_score(predictions, y_test))
             trial_stats.append(f1_score(predictions, y_test, average="weighted"))
-            trial_stats.append(jaccard_score(predictions, y_test, average="weighted"))
+            trial_stats.append(precision_score(predictions, y_test, average="weighted"))
 
             progress.advance(progresstotal, advance=5)
             results.append(balanced_accuracy_score(predictions, y_test))
-            averages[indexcounter] += balanced_accuracy_score(predictions, y_test)
+            averages_accuracy[indexcounter] += balanced_accuracy_score(predictions, y_test)
+            averages_precision[indexcounter] += precision_score(predictions, y_test, average="weighted")
             indexcounter+=1
 
         full_results.append(trial_stats)
 
         
-    for i in range(0, len(averages)):
-        averages[i] /= args.trials
+    for i in range(0, len(averages_accuracy)):
+        averages_accuracy[i] /= args.trials
+        averages_precision[i] /= args.trials
 
     # Generate graphs?
     if args.graphs:
-        progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
-        x_axis = list(models.keys())
-        y_axis = averages
+        metric_averages = [averages_accuracy, averages_precision]
+        metric_names_graph = ['Balanced Accuracy', 'Precision']
 
-        data = pd.DataFrame(
-            dict(
-                models=x_axis,
-                balanced_accuracy=y_axis
+        for index, metric_names_graph in enumerate(metric_names_graph):
+            progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
+            x_axis = list(models.keys())
+            y_axis = metric_averages[index]
+
+            data = pd.DataFrame(
+                dict(
+                    models=x_axis,
+                    balanced_accuracy=y_axis
+                )
             )
-        )
 
-        data = data.sort_values('balanced_accuracy')
-        
-        plt.figure(figsize=(30, 20))
-        plt.bar('models', 'balanced_accuracy', data=data, width=0.8)
+            data = data.sort_values('balanced_accuracy')
+            
+            plt.figure(figsize=(30, 20))
+            plt.bar('models', 'balanced_accuracy', data=data, width=0.8)
 
-        addlabels(list(data['models']), list(data['balanced_accuracy']))
+            addlabels(list(data['models']), list(data['balanced_accuracy']))
 
-        plt.title("Average Balanced Accuracy")
-        plt.xlabel("Model")
-        plt.ylabel("Balanced Accuracy")
+            plt.title(f'Average {metric_names_graph}')
+            plt.xlabel("Model")
+            plt.ylabel(metric_names_graph)
 
-        # Add some text for labels, title and custom x-axis tick labels, etc.
-        plt.savefig(f'Results/Chart.png')
+            # Add some text for labels, title and custom x-axis tick labels, etc.
+            plt.savefig(f'Results/{metric_names_graph}_Chart.png')
 
 # save stats into csv
 metrics_df = pd.DataFrame(full_results)
