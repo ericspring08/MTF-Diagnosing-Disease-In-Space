@@ -211,11 +211,20 @@ with Progress() as progress:
         progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
         x_axis = list(models.keys())
         y_axis = averages
+
+        data = pd.DataFrame(
+            dict(
+                models=x_axis,
+                balanced_accuracy=y_axis
+            )
+        )
+
+        data = data.sort_values('balanced_accuracy')
         
         plt.figure(figsize=(30, 20))
-        plt.bar(x_axis, y_axis, width=0.5)
+        plt.bar('models', 'balanced_accuracy', data=data, width=0.8)
 
-        addlabels(x_axis, y_axis)
+        addlabels(list(data['models']), list(data['balanced_accuracy']))
 
         plt.title("Average Balanced Accuracy")
         plt.xlabel("Model")
