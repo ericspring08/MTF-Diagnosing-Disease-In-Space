@@ -55,7 +55,7 @@ model_options = {
     'AdaBoost': AdaBoostClassifier(),
     'RandomForest': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42),
     'MLP': MLPClassifier(alpha=2, max_iter=1000, random_state=42),
-    'QuadraticDiscriminantAnalysis': QuadraticDiscriminantAnalysis(),
+    'QDA': QuadraticDiscriminantAnalysis(),
     'CatBoost': CatBoostClassifier(iterations=2,
                           learning_rate=1,
                           depth=2, verbose=False),
@@ -127,6 +127,10 @@ else:
     # no graph
     total += 10 * args.trials * len(models)
 
+def addlabels(x,y):
+    for i in range(len(x)):
+        plt.text(i,y[i],y[i])
+
 with Progress() as progress:
     progresstotal = progress.add_task('[green]Progress', total=total)
 
@@ -156,6 +160,7 @@ with Progress() as progress:
     progress.advance(progresstotal, advance=10)
 
     full_results = []
+    averages = [0]*len(models)
     title_row = ['Trial #']
     metrics = ['accuracy', 'balanced accuracy', 'f1 score', 'jaccard score']
     for model_name in models.keys():
@@ -175,6 +180,7 @@ with Progress() as progress:
 
         # trial #, accuracy VHD, accuracy Cath, balanced accuracy VHD, balanced accuracy Cath, f1 VHD, f1 Cath, jaccard VHD, jaccard Cath
         trial_stats = [trial] 
+        indexcounter = 0
 
         for model_name, model_object in models.items():
             # fit model 
@@ -182,7 +188,7 @@ with Progress() as progress:
 
             progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, {model_name}, VHD')
             predictions = model.predict(x_test)
-            progress.advance(progresstotal, 10)
+            progress.advance(progresstotal, 5)
 
             trial_stats.append(accuracy_score(predictions, y_test))
             trial_stats.append(balanced_accuracy_score(predictions, y_test))
@@ -191,20 +197,32 @@ with Progress() as progress:
 
             progress.advance(progresstotal, advance=5)
             results.append(balanced_accuracy_score(predictions, y_test))
+            averages[indexcounter] += balanced_accuracy_score(predictions, y_test)
+            indexcounter+=1
 
         full_results.append(trial_stats)
 
-        # Generate graphs?
-        if args.graphs:
-            progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
-            x_axis = list(models.keys())
-            y_axis = results
-            
-            plt.figure(figsize=(30, 20))
-            plt.bar(x_axis, y_axis, width=0.5)
+        
+    for i in range(0, len(averages)):
+        averages[i] /= args.trials
 
-            # Add some text for labels, title and custom x-axis tick labels, etc.
-            plt.savefig(f'Results/Chart{trial}.png')
+    # Generate graphs?
+    if args.graphs:
+        progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
+        x_axis = list(models.keys())
+        y_axis = averages
+        
+        plt.figure(figsize=(30, 20))
+        plt.bar(x_axis, y_axis, width=0.5)
+
+        addlabels(x_axis, y_axis)
+
+        plt.title("Average Balanced Accuracy")
+        plt.xlabel("Model")
+        plt.ylabel("Balanced Accuracy")
+
+        # Add some text for labels, title and custom x-axis tick labels, etc.
+        plt.savefig(f'Results/Chart.png')
 
 # save stats into csv
 metrics_df = pd.DataFrame(full_results)
