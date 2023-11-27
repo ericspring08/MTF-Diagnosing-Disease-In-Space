@@ -1,7 +1,8 @@
 # Prep
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, Normalizer
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder 
+from sklearn.compose import ColumnTransformer
 
 # Utility
 import numpy as np
@@ -65,7 +66,6 @@ model_options = {
     'SGDOneClassSVM': SGDOneClassSVM(),
     'Dummy': DummyClassifier(),
     'HistGradientBoosting': HistGradientBoostingClassifier(),
-    'ComplementNB': ComplementNB()
 }
 
 model_list_str = ''
@@ -127,42 +127,30 @@ else:
     # no graph
     total += 10 * args.trials * len(models)
 
-scaler = Normalizer()
-
 with Progress() as progress:
     progresstotal = progress.add_task('[green]Progress', total=total)
 
-    # preprocess
-    # mappings
-    # Sex
-    sex_map = {
-        'Male': 0,
-        'Fmale': 1,
-    }
-    # Yes and No Map
-    yn_map = {
-        'N': 0, 
-        'Y': 1,
-    }
-    # VHD Map
-    vhd_map = {
-        'N': 0,
-        'mild': 1,
-        'Moderate': 2,
-        'Severe': 3,
-    }
-    # Cath Map
-    cath_map = {
-        'Normal': 0,
-        'Cad': 1,
-    }
+    numerical_columns = ["Age", "Weight", "Length", "BMI", "BP", "PR", "FBS", "CR", "TG", "LDL", "HDL",	"BUN", "ESR", "HB",	"K", "Na", "WBC", "Lymph", "Neut", "PLT", "EF-TTE"]
+    categorical_columns = ["Sex", "DM", "HTN", "Current Smoker", "EX-Smoker", "FH", "Obesity", "CRF", "CVA", "Airway disease", "Thyroid Disease", "CHF", "DLP", "Edema", "Weak Peripheral Pulse", "Lung rales", "Systolic Murmur", "Diastolic Murmur", "Typical Chest Pain", "Dyspnea", "Function Class", "Atypical", "Nonanginal", "Exertional CP", "LowTH Ang", "Q Wave", "St Elevation", "St Depression", "Tinversion", "LVH", "Poor R Progression", "VHD", "Cath"] 
 
-    yn_features = ['Obesity', 'CRF', 'CVA', 'Airway disease', 'Thyroid Disease', 'CHF', 'DLP', 'Weak Peripheral Pulse', 'Lung rales', 'Systolic Murmur', 'Diastolic Murmur', 'Dyspnea', 'Atypical', 'Nonanginal', 'Exertional CP', 'LowTH Ang', 'LVH', 'Poor R Progression']
-    for feature in yn_features:
-        df[feature] = df[feature].map(yn_map)
-    df['Sex'] = df['Sex'].map(sex_map)
-    df['VHD'] = df['VHD'].map(vhd_map)
-    df['Cath'] = df['Cath'].map(cath_map)
+    preprocessor = ColumnTransformer(transformers = [('ohe',
+                                                  OneHotEncoder(handle_unknown = 'ignore',
+                                                                       sparse_output = False),
+                                                  categorical_columns),
+                                                 ('scaler',
+                                                  StandardScaler(),
+                                                  numerical_columns)],
+                                 remainder = 'passthrough',
+                                 verbose_feature_names_out = False).set_output(transform = 'pandas')
+
+    y_df = df['Cath']
+    df.drop('Cath', axis=1)
+    x_df = preprocessor.fit_transform(df)
+    # Maper
+    map_label = {'Cad':1,
+                'Normal':0}
+    # We map the target variable
+    y_df = y_df.map(map_label)
 
     ## Data set size
     progress.advance(progresstotal, advance=10)
@@ -172,51 +160,37 @@ with Progress() as progress:
     metrics = ['accuracy', 'balanced accuracy', 'f1 score', 'jaccard score']
     for model_name in models.keys():
         for metric in metrics:
-            title_row.append(f'{model_name} - VHD - {metric}')
-            title_row.append(f'{model_name} - Cath - {metric}')
+            title_row.append(f'{model_name} - {metric}')
 
     full_results.append(title_row)
 
     for trial in range(0, args.trials):
         # Generate test and train suites
         progress.update(progresstotal, description="STAGE: Split Data")
-        x_train, x_test, y_VHD_train, y_VHD_test = train_test_split(df.iloc[:, 0:11], df.VHD, test_size=0.2)
-        _, _, y_cath_train, y_cath_test = train_test_split(df.iloc[:, 0:11], df.Cath, test_size=0.2)
-
-        x_train = scaler.fit_transform(x_train)
-        x_test = scaler.fit_transform(x_test)
+        x_train, x_test, y_train, y_test = train_test_split(x_df, y_df, test_size=0.2)
 
         # predictions and models
 
-        results_VHD = []
-        results_Cath = []
+        results = []
 
         # trial #, accuracy VHD, accuracy Cath, balanced accuracy VHD, balanced accuracy Cath, f1 VHD, f1 Cath, jaccard VHD, jaccard Cath
         trial_stats = [trial] 
 
         for model_name, model_object in models.items():
             # fit model 
+            model = model_object.fit(x_train, y_train)
+
             progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, {model_name}, VHD')
-            model_VHD = model_object.fit(x_train, y_VHD_train)
-            predictions_VHD = model_VHD.predict(x_test)
-            progress.advance(progresstotal, advance=5)
+            predictions = model.predict(x_test)
+            progress.advance(progresstotal, 10)
 
-            progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, {model_name}, Cath')
-            model_Cath = model_object.fit(x_train, y_cath_train)
-            predictions_Cath = model_Cath.predict(x_test)
-
-            trial_stats.append(accuracy_score(predictions_VHD, y_VHD_test))
-            trial_stats.append(accuracy_score(predictions_Cath, y_cath_test))
-            trial_stats.append(balanced_accuracy_score(predictions_VHD, y_VHD_test))
-            trial_stats.append(balanced_accuracy_score(predictions_Cath, y_cath_test))
-            trial_stats.append(f1_score(predictions_VHD, y_VHD_test, average="weighted"))
-            trial_stats.append(f1_score(predictions_Cath, y_cath_test, average="weighted"))
-            trial_stats.append(jaccard_score(predictions_VHD, y_VHD_test, average="weighted"))
-            trial_stats.append(jaccard_score(predictions_Cath, y_cath_test, average="weighted"))
+            trial_stats.append(accuracy_score(predictions, y_test))
+            trial_stats.append(balanced_accuracy_score(predictions, y_test))
+            trial_stats.append(f1_score(predictions, y_test, average="weighted"))
+            trial_stats.append(jaccard_score(predictions, y_test, average="weighted"))
 
             progress.advance(progresstotal, advance=5)
-            results_VHD.append(balanced_accuracy_score(predictions_VHD, y_VHD_test))
-            results_Cath.append(balanced_accuracy_score(predictions_Cath, y_cath_test))
+            results.append(balanced_accuracy_score(predictions, y_test))
 
         full_results.append(trial_stats)
 
@@ -224,36 +198,13 @@ with Progress() as progress:
         if args.graphs:
             progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
             x_axis = list(models.keys())
-            y_axis = {
-                'VHD': results_VHD,
-                'Cath': results_Cath
-            }
-
-            x = np.arange(len(x_axis))  # the label locations
-            width = 0.3  # the width of the bars
-            multiplier = 0
-
-
-            fig, ax = plt.subplots()
-            fig.set_figheight(12)
-            fig.set_figwidth(20)
-
-            for attribute, measurement in y_axis.items():
-                offset = width * multiplier
-                rects = ax.bar(x + offset, measurement, width, label=attribute)
-                ax.bar_label(rects, padding=0)
-
-                multiplier += 1
-            progress.advance(progresstotal, advance=1)
+            y_axis = results
+            
+            plt.figure(figsize=(30, 20))
+            plt.bar(x_axis, y_axis, width=0.5)
 
             # Add some text for labels, title and custom x-axis tick labels, etc.
-            ax.set_ylabel('Balanced Accuracy')
-            ax.set_xlabel('Model')
-            ax.set_title('Balanced Accuracy Scores')
-            ax.set_xticks(x + width/2, x_axis)
-            ax.legend(loc='best', ncols=2)
             plt.savefig(f'Results/Chart{trial}.png')
-            plt.close(fig)
 
 # save stats into csv
 metrics_df = pd.DataFrame(full_results)
