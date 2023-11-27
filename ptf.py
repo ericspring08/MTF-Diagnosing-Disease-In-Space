@@ -1,6 +1,7 @@
 # Prep
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, Normalizer
 
 # Utility
 import numpy as np
@@ -24,7 +25,7 @@ from rich.progress import Progress
 # Models
 from sklearn.svm import SVC
 from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, RandomForestClassifier, ExtraTreesClassifier, BaggingClassifier, HistGradientBoostingClassifier 
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import GaussianNB, CategoricalNB, ComplementNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
@@ -61,7 +62,8 @@ model_options = {
     'PassiveAggressive': PassiveAggressiveClassifier(),
     'SGDOneClassSVM': SGDOneClassSVM(),
     'Dummy': DummyClassifier(),
-    'HistGradientBoosting': HistGradientBoostingClassifier()
+    'HistGradientBoosting': HistGradientBoostingClassifier(),
+    'ComplementNB': ComplementNB()
 }
 
 model_list_str = ''
@@ -123,6 +125,8 @@ else:
     # no graph
     total += 10 * args.trials * len(models)
 
+scaler = Normalizer()
+
 with Progress() as progress:
     progresstotal = progress.add_task('[green]Progress', total=total)
 
@@ -176,6 +180,9 @@ with Progress() as progress:
         progress.update(progresstotal, description="STAGE: Split Data")
         x_train, x_test, y_VHD_train, y_VHD_test = train_test_split(df.iloc[:, 0:11], df.VHD, test_size=0.2)
         _, _, y_cath_train, y_cath_test = train_test_split(df.iloc[:, 0:11], df.Cath, test_size=0.2)
+
+        x_train = scaler.fit_transform(x_train)
+        x_test = scaler.fit_transform(x_test)
 
         # predictions and models
 
