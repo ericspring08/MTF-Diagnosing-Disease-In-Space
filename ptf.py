@@ -23,13 +23,15 @@ from rich.progress import Progress
 
 # Models
 from sklearn.svm import SVC
-from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, RandomForestClassifier, ExtraTreesClassifier, BaggingClassifier, HistGradientBoostingClassifier 
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from catboost import CatBoostClassifier
+from sklearn.linear_model import RidgeClassifier, PassiveAggressiveClassifier, SGDOneClassSVM
+from sklearn.dummy import DummyClassifier
 
 # Metrics
 from sklearn.metrics import accuracy_score, jaccard_score, f1_score, balanced_accuracy_score
@@ -53,6 +55,13 @@ model_options = {
     'MLP': MLPClassifier(alpha=1, max_iter=1000, random_state=42),
     'QuadraticDiscriminantAnalysis': QuadraticDiscriminantAnalysis(),
     'CatBoost': CatBoostClassifier(verbose=False),
+    'ExtraTrees': ExtraTreesClassifier(),
+    'Bagging': BaggingClassifier(),
+    'Ridge': RidgeClassifier(),
+    'PassiveAggressive': PassiveAggressiveClassifier(),
+    'SGDOneClassSVM': SGDOneClassSVM(),
+    'Dummy': DummyClassifier(),
+    'HistGradientBoosting': HistGradientBoostingClassifier()
 }
 
 model_list_str = ''
