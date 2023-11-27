@@ -34,6 +34,9 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from catboost import CatBoostClassifier
 from sklearn.linear_model import RidgeClassifier, PassiveAggressiveClassifier, SGDOneClassSVM
 from sklearn.dummy import DummyClassifier
+from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
+
 
 # Metrics
 from sklearn.metrics import accuracy_score, jaccard_score, f1_score, balanced_accuracy_score
@@ -66,6 +69,8 @@ model_options = {
     'SGDOneClassSVM': SGDOneClassSVM(),
     'Dummy': DummyClassifier(),
     'HistGradientBoosting': HistGradientBoostingClassifier(),
+    'XGB': XGBClassifier(),
+    'LGBM': LGBMClassifier(verbose=-1) 
 }
 
 model_list_str = ''
