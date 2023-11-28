@@ -39,7 +39,7 @@ from lightgbm import LGBMClassifier
 
 
 # Metrics
-from sklearn.metrics import accuracy_score, precision_score, f1_score, balanced_accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, balanced_accuracy_score
 
 title = text2art("PTF", font="3d_diagonal")
 print(title)
@@ -134,7 +134,7 @@ else:
 
 def addlabels(x,y):
     for i in range(len(x)):
-        plt.text(i,y[i],y[i])
+        plt.text(0.01 + y[i],i,y[i])
 
 with Progress() as progress:
     progresstotal = progress.add_task('[green]Progress', total=total)
@@ -165,11 +165,12 @@ with Progress() as progress:
     progress.advance(progresstotal, advance=10)
 
     full_results = []
+    averages_balanced_accuracy = [0]*len(models)
     averages_accuracy = [0]*len(models)
     averages_precision = [0]*len(models)
     averages_fit_time = [0]*len(models)
     title_row = ['Trial #']
-    metrics = ['accuracy', 'balanced accuracy', 'f1 score', 'precision', 'time to fit']
+    metrics = ['accuracy', 'balanced accuracy', 'precision', 'time to fit']
     for model_name in models.keys():
         for metric in metrics:
             title_row.append(f'{model_name} - {metric}')
@@ -183,9 +184,6 @@ with Progress() as progress:
 
         # predictions and models
 
-        results = []
-
-        # trial #, accuracy VHD, accuracy Cath, balanced accuracy VHD, balanced accuracy Cath, f1 VHD, f1 Cath, jaccard VHD, jaccard Cath
         trial_stats = [trial] 
         indexcounter = 0
 
@@ -203,15 +201,14 @@ with Progress() as progress:
 
             trial_stats.append(accuracy_score(predictions, y_test))
             trial_stats.append(balanced_accuracy_score(predictions, y_test))
-            trial_stats.append(f1_score(predictions, y_test, average="weighted"))
             trial_stats.append(precision_score(predictions, y_test, average="weighted"))
             trial_stats.append(time_to_fit)
 
             progress.advance(progresstotal, advance=5)
-            results.append(balanced_accuracy_score(predictions, y_test))
-            averages_accuracy[indexcounter] += balanced_accuracy_score(predictions, y_test)
+            averages_balanced_accuracy[indexcounter] += balanced_accuracy_score(predictions, y_test)
             averages_precision[indexcounter] += precision_score(predictions, y_test, average="weighted")
             averages_fit_time[indexcounter] += time_to_fit
+            averages_accuracy[indexcounter] += accuracy_score(predictions, y_test)
             indexcounter+=1
 
         full_results.append(trial_stats)
@@ -221,11 +218,12 @@ with Progress() as progress:
         averages_accuracy[i] /= args.trials
         averages_precision[i] /= args.trials
         averages_fit_time[i] /= args.trials
+        averages_balanced_accuracy[i] /= args.trials
 
     # Generate graphs?
     if args.graphs:
-        metric_averages = [averages_accuracy, averages_precision, averages_fit_time]
-        metric_names_graph = ['Balanced Accuracy', 'Precision', 'Time To Fit']
+        metric_averages = [averages_balanced_accuracy, averages_precision, averages_fit_time, averages_accuracy]
+        metric_names_graph = ['Balanced Accuracy', 'Precision', 'Time To Fit (NS)', 'Accuracy']
 
         for index, metric_names_graph in enumerate(metric_names_graph):
             progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
@@ -242,13 +240,14 @@ with Progress() as progress:
             data = data.sort_values('balanced_accuracy')
             
             plt.figure(figsize=(30, 20))
-            plt.bar('models', 'balanced_accuracy', data=data, width=0.8)
+            plt.barh('models', 'balanced_accuracy', data=data, height=0.8)
 
             addlabels(list(data['models']), list(data['balanced_accuracy']))
 
             plt.title(f'Average {metric_names_graph}')
             plt.xlabel("Model")
             plt.ylabel(metric_names_graph)
+            plt.margins(x=0.1)
 
             # Add some text for labels, title and custom x-axis tick labels, etc.
             plt.savefig(f'Results/{metric_names_graph}_Chart.png')
