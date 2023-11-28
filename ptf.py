@@ -21,7 +21,7 @@ from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 
 # Progress Bar
-from rich.progress import Progress
+from rich.progress import Progress, BarColumn, TimeElapsedColumn, TextColumn, SpinnerColumn
 
 # Models
 from sklearn.svm import SVC
@@ -136,7 +136,7 @@ def addlabels(x,y):
     for i in range(len(x)):
         plt.text(0.01 + y[i],i,y[i])
 
-with Progress() as progress:
+with Progress(SpinnerColumn(), BarColumn(), TimeElapsedColumn(), TextColumn('[green]{task.description}')) as progress:
     progresstotal = progress.add_task('[green]Progress', total=total)
 
     numerical_columns = ["Age", "Weight", "Length", "BMI", "BP", "PR", "FBS", "CR", "TG", "LDL", "HDL",	"BUN", "ESR", "HB",	"K", "Na", "WBC", "Lymph", "Neut", "PLT", "EF-TTE"]
