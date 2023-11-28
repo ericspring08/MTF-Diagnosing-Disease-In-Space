@@ -167,8 +167,9 @@ with Progress() as progress:
     full_results = []
     averages_accuracy = [0]*len(models)
     averages_precision = [0]*len(models)
+    averages_fit_time = [0]*len(models)
     title_row = ['Trial #']
-    metrics = ['accuracy', 'balanced accuracy', 'f1 score', 'precision']
+    metrics = ['accuracy', 'balanced accuracy', 'f1 score', 'precision', 'time to fit']
     for model_name in models.keys():
         for metric in metrics:
             title_row.append(f'{model_name} - {metric}')
@@ -190,7 +191,11 @@ with Progress() as progress:
 
         for model_name, model_object in models.items():
             # fit model 
+            time_before_fit = time.perf_counter_ns()
             model = model_object.fit(x_train, y_train)
+            time_after_fit = time.perf_counter_ns()
+
+            time_to_fit = time_after_fit - time_before_fit
 
             progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, {model_name}, VHD')
             predictions = model.predict(x_test)
@@ -200,11 +205,13 @@ with Progress() as progress:
             trial_stats.append(balanced_accuracy_score(predictions, y_test))
             trial_stats.append(f1_score(predictions, y_test, average="weighted"))
             trial_stats.append(precision_score(predictions, y_test, average="weighted"))
+            trial_stats.append(time_to_fit)
 
             progress.advance(progresstotal, advance=5)
             results.append(balanced_accuracy_score(predictions, y_test))
             averages_accuracy[indexcounter] += balanced_accuracy_score(predictions, y_test)
             averages_precision[indexcounter] += precision_score(predictions, y_test, average="weighted")
+            averages_fit_time[indexcounter] += time_to_fit
             indexcounter+=1
 
         full_results.append(trial_stats)
@@ -213,11 +220,12 @@ with Progress() as progress:
     for i in range(0, len(averages_accuracy)):
         averages_accuracy[i] /= args.trials
         averages_precision[i] /= args.trials
+        averages_fit_time[i] /= args.trials
 
     # Generate graphs?
     if args.graphs:
-        metric_averages = [averages_accuracy, averages_precision]
-        metric_names_graph = ['Balanced Accuracy', 'Precision']
+        metric_averages = [averages_accuracy, averages_precision, averages_fit_time]
+        metric_names_graph = ['Balanced Accuracy', 'Precision', 'Time To Fit']
 
         for index, metric_names_graph in enumerate(metric_names_graph):
             progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
