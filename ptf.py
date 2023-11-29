@@ -13,6 +13,7 @@ import os
 import shutil
 import time
 from art import text2art
+from csv import writer
 
 # Arg Parse
 from argparse import ArgumentParser
@@ -69,9 +70,10 @@ model_options = {
     'SGDOneClassSVM': SGDOneClassSVM(),
     'Dummy': DummyClassifier(),
     'HistGradientBoosting': HistGradientBoostingClassifier(),
-    'XGB': XGBClassifier(),
-    'LGBM': LGBMClassifier(verbose=-1) 
 }
+
+predictions_ops = ['cath', 'lad', 'lcx', 'rca', 'vhd']
+metrics = ['accuracy', 'balanced accuracy', 'precision', 'time to fit']
 
 model_list_str = ''
 for index, i in enumerate(list(model_options.keys())):
@@ -127,10 +129,10 @@ else:
 total = 10
 if args.graphs:
     # graph
-    total += 10 * args.trials * len(models) + args.trials
+    total += 10 * args.trials * len(models) * len(predictions_ops) + args.trials
 else:
     # no graph
-    total += 10 * args.trials * len(models)
+    total += 10 * args.trials * len(models) * len(predictions_ops)
 
 def addlabels(x,y):
     for i in range(len(x)):
@@ -152,112 +154,131 @@ with Progress(SpinnerColumn(), BarColumn(), TimeElapsedColumn(), TextColumn('[gr
                                  remainder = 'passthrough',
                                  verbose_feature_names_out = False).set_output(transform = 'pandas')
 
-    y_df = df['Cath']
+    y_cath = df['Cath']
+    y_lad = df['LAD']
+    y_lcx = df['LCX']
+    y_rca = df['RCA']
+    y_vhd = df['VHD']
     df.drop('Cath', axis=1)
     df.drop('LAD', axis=1)
     df.drop('LCX', axis=1)
     df.drop('RCA', axis=1)
+    df.drop('VHD', axis=1)
     x_df = preprocessor.fit_transform(df)
     # Maper
-    map_label = {'CAD':1,
+    map_label_cad = {'CAD':1,
                 'Normal':0}
+    map_label_sub = {
+        'Normal': 0, 
+        'Stenotic': 1
+    }
+    map_label_vhd = {
+        'N': 0,
+        'mild': 1, 
+        'Moderate': 2,
+        'Severe': 3
+    }
     # We map the target variable
-    y_df = y_df.map(map_label)
+    y_cath = y_cath.map(map_label_cad)
+    y_lad = y_lad.map(map_label_sub)
+    y_lcx = y_lcx.map(map_label_sub)
+    y_rca = y_rca.map(map_label_sub)
+    y_vhd = y_vhd.map(map_label_vhd)
+
 
     ## Data set size
     progress.advance(progresstotal, advance=10)
 
     full_results = []
-    averages_balanced_accuracy = [0]*len(models)
-    averages_accuracy = [0]*len(models)
-    averages_precision = [0]*len(models)
-    averages_fit_time = [0]*len(models)
-    title_row = ['Trial #']
-    metrics = ['accuracy', 'balanced accuracy', 'precision', 'time to fit']
-    for model_name in models.keys():
-        for metric in metrics:
-            title_row.append(f'{model_name} - {metric}')
+    averages = np.zeros((len(predictions_ops), len(metrics), len(models)))
 
-    full_results.append(title_row)
+    title_row = ['Trial #']
+    for model_name in models.keys():
+        for prediction_op in predictions_ops:
+            for metric in metrics:
+                title_row.append(f'{prediction_op} - {model_name} - {metric}')
+
+    full_results.append(title_row) 
 
     for trial in range(0, args.trials):
         # Generate test and train suites
         progress.update(progresstotal, description="STAGE: Split Data")
-        x_train, x_test, y_train, y_test = train_test_split(x_df, y_df, test_size=0.2)
+        pred_ops_df = pd.DataFrame({'cath': y_cath, 'lad': y_lad, 'lcx': y_lcx, 'rca': y_rca, 'vhd': y_vhd})
+        x_train, x_test, y_train, y_test = train_test_split(x_df, pred_ops_df, test_size=0.2)
 
         # predictions and models
 
-        trial_stats = [trial] 
-        indexcounter = 0
+        trial_stats = [trial]
 
-        for model_name, model_object in models.items():
-            # fit model 
-            time_before_fit = time.perf_counter_ns()
-            model = model_object.fit(x_train, y_train)
-            time_after_fit = time.perf_counter_ns()
+        for index, (model_name, model_object) in enumerate(models.items()):
 
-            time_to_fit = time_after_fit - time_before_fit
+            for index2, prediction_op in enumerate(predictions_ops):
+                # fit model 
+                time_before_fit = time.perf_counter_ns()
+                model = model_object.fit(x_train, y_train[prediction_op])
+                time_after_fit = time.perf_counter_ns()
 
-            progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, {model_name}, VHD')
-            predictions = model.predict(x_test)
-            progress.advance(progresstotal, 5)
+                time_to_fit = time_after_fit - time_before_fit
 
-            trial_stats.append(accuracy_score(predictions, y_test))
-            trial_stats.append(balanced_accuracy_score(predictions, y_test))
-            trial_stats.append(precision_score(predictions, y_test, average="weighted"))
-            trial_stats.append(time_to_fit)
+                progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, {model_name}, {prediction_op}')
+                predictions = model.predict(x_test)
+                progress.advance(progresstotal, 5)
 
-            progress.advance(progresstotal, advance=5)
-            averages_balanced_accuracy[indexcounter] += balanced_accuracy_score(predictions, y_test)
-            averages_precision[indexcounter] += precision_score(predictions, y_test, average="weighted")
-            averages_fit_time[indexcounter] += time_to_fit
-            averages_accuracy[indexcounter] += accuracy_score(predictions, y_test)
-            indexcounter+=1
+                trial_stats.append(accuracy_score(predictions, y_test[prediction_op]))
+                trial_stats.append(balanced_accuracy_score(predictions, y_test[prediction_op]))
+                trial_stats.append(precision_score(predictions, y_test[prediction_op], average="weighted"))
+                trial_stats.append(time_to_fit)
+
+                progress.advance(progresstotal, advance=5)
+                averages[index2][0][index] += accuracy_score(predictions, y_test[prediction_op])
+                averages[index2][1][index] += balanced_accuracy_score(predictions, y_test[prediction_op])
+                averages[index2][2][index] += precision_score(predictions, y_test[prediction_op], average="weighted")
+                averages[index2][3][index] += time_to_fit
 
         full_results.append(trial_stats)
-
         
-    for i in range(0, len(averages_accuracy)):
-        averages_accuracy[i] /= args.trials
-        averages_precision[i] /= args.trials
-        averages_fit_time[i] /= args.trials
-        averages_balanced_accuracy[i] /= args.trials
+    for i in range(len(averages)):
+        for j in range(len(averages[0])):
+            for k in range(len(averages[0][0])):
+                averages[i][j][k] /= args.trials 
 
     # Generate graphs?
     if args.graphs:
-        metric_averages = [averages_balanced_accuracy, averages_precision, averages_fit_time, averages_accuracy]
-        metric_names_graph = ['Balanced Accuracy', 'Precision', 'Time To Fit (NS)', 'Accuracy']
+        metric_names_graphs= ['Accuracy', 'Balanced Accuracy', 'Precision', 'Time To Fit (NS)']
+        progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
 
-        for index, metric_names_graph in enumerate(metric_names_graph):
-            progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, Generate Graphs')
-            x_axis = list(models.keys())
-            y_axis = metric_averages[index]
+        for index, metric_names_graph in enumerate(metric_names_graphs):
+            for index2, prediction_op in enumerate(predictions_ops):
+                x_axis = list(models.keys())
+                y_axis = averages[index2][index]
 
-            data = pd.DataFrame(
-                dict(
-                    models=x_axis,
-                    balanced_accuracy=y_axis
+                data = pd.DataFrame(
+                    dict(
+                        models=x_axis,
+                        balanced_accuracy=y_axis
+                    )
                 )
-            )
 
-            data = data.sort_values('balanced_accuracy')
-            
-            plt.figure(figsize=(30, 20))
-            plt.barh('models', 'balanced_accuracy', data=data, height=0.8)
+                data = data.sort_values('balanced_accuracy')
+                
+                plt.figure(figsize=(30, 20))
+                plt.barh(list(data['models']), list(data['balanced_accuracy']), height=0.8)
 
-            addlabels(list(data['models']), list(data['balanced_accuracy']))
+                addlabels(list(data['models']), list(data['balanced_accuracy']))
 
-            plt.title(f'Average {metric_names_graph}')
-            plt.xlabel("Model")
-            plt.ylabel(metric_names_graph)
-            plt.margins(x=0.1)
+                plt.title(f'Average {metric_names_graph}')
+                plt.ylabel("Model")
+                plt.xlabel(metric_names_graph)
+                plt.margins(x=0.1)
 
-            # Add some text for labels, title and custom x-axis tick labels, etc.
-            plt.savefig(f'Results/{metric_names_graph}_Chart.png')
+                # Add some text for labels, title and custom x-axis tick labels, etc.
+                plt.savefig(f'Results/{metric_names_graph}_{prediction_op}.png')
 
 # save stats into csv
-metrics_df = pd.DataFrame(full_results)
-metrics_df.to_csv('Results/stats.csv', header=False, index=False)
+with open(f'Results/stats.csv',"w+") as my_csv:
+    csvWriter = writer(my_csv,delimiter=',')
+    csvWriter.writerows(full_results)
+    my_csv.close()
 
 end_time = time.perf_counter()
 elapsed_time = end_time - start_time
