@@ -72,7 +72,7 @@ model_options = {
     'HistGradientBoosting': HistGradientBoostingClassifier(),
 }
 
-predictions_ops = ['cath', 'lad', 'lcx', 'rca', 'vhd']
+predictions_ops = ['cath', 'lad', 'lcx', 'rca', 'vhd', 'rwma']
 metrics = ['accuracy', 'balanced accuracy', 'precision', 'time to fit']
 
 model_list_str = ''
@@ -159,11 +159,13 @@ with Progress(SpinnerColumn(), BarColumn(), TimeElapsedColumn(), TextColumn('[gr
     y_lcx = df['LCX']
     y_rca = df['RCA']
     y_vhd = df['VHD']
+    y_rwma = df['Region RWMA']
     df.drop('Cath', axis=1)
     df.drop('LAD', axis=1)
     df.drop('LCX', axis=1)
     df.drop('RCA', axis=1)
     df.drop('VHD', axis=1)
+    df.drop('Region RWMA', axis=1)
     x_df = preprocessor.fit_transform(df)
     # Maper
     map_label_cad = {'CAD':1,
@@ -203,7 +205,7 @@ with Progress(SpinnerColumn(), BarColumn(), TimeElapsedColumn(), TextColumn('[gr
     for trial in range(0, args.trials):
         # Generate test and train suites
         progress.update(progresstotal, description="STAGE: Split Data")
-        pred_ops_df = pd.DataFrame({'cath': y_cath, 'lad': y_lad, 'lcx': y_lcx, 'rca': y_rca, 'vhd': y_vhd})
+        pred_ops_df = pd.DataFrame({'cath': y_cath, 'lad': y_lad, 'lcx': y_lcx, 'rca': y_rca, 'vhd': y_vhd, 'rwma': y_rwma})
         x_train, x_test, y_train, y_test = train_test_split(x_df, pred_ops_df, test_size=0.2)
 
         # predictions and models
