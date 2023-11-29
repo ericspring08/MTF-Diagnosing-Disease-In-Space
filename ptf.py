@@ -70,6 +70,8 @@ model_options = {
     'SGDOneClassSVM': SGDOneClassSVM(),
     'Dummy': DummyClassifier(),
     'HistGradientBoosting': HistGradientBoostingClassifier(),
+    'LGBM': LGBMClassifier(),
+    'XGB': XGBClassifier()
 }
 
 predictions_ops = ['cath', 'lad', 'lcx', 'rca', 'vhd', 'rwma']
@@ -217,12 +219,28 @@ with Progress(SpinnerColumn(), BarColumn(), TimeElapsedColumn(), TextColumn('[gr
             for index2, prediction_op in enumerate(predictions_ops):
                 # fit model 
                 time_before_fit = time.perf_counter_ns()
-                model = model_object.fit(x_train, y_train[prediction_op])
-                time_after_fit = time.perf_counter_ns()
+                
+                model = None
+                if model_name == 'LGBM':
+                    if prediction_op == 'vhd' or prediction_op == 'rwma':
+                        model = LGBMClassifier(objective="multiclass", verbose=-1)
+                    else:
+                        model = LGBMClassifier(objective="binary", verbose=-1)
+                elif model_name == 'XGB':
+                    if prediction_op == 'vhd' or prediction_op == 'rwma':
+                        model = XGBClassifier(objective="multi:softmax", num_class=4)
+                    else:
+                        model = XGBClassifier()
+                else:
+                    model = model_object
 
+                model.fit(x_train, y_train[prediction_op])
+
+                time_after_fit = time.perf_counter_ns()
                 time_to_fit = time_after_fit - time_before_fit
 
                 progress.update(progresstotal, description=f'STAGE: TRIAL {trial}, {model_name}, {prediction_op}')
+
                 predictions = model.predict(x_test)
                 progress.advance(progresstotal, 5)
 
