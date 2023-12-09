@@ -98,12 +98,13 @@ config = configparser.ConfigParser()
 config.read(config_path)
 
 # get data file location
-data_path = config.get('Data', 'CAD')
+data_path = config.get('Settings', 'CAD')
+results_path = config.get('Settings', 'Results')
 df = pd.read_csv(data_path)
 
 # generate results directory
 script_dir = os.path.dirname(__file__)
-results_dir = os.path.join(script_dir, 'Results/')
+results_dir = os.path.join(script_dir, results_path)
 
 if not os.path.isdir(results_dir):
     os.makedirs(results_dir)
@@ -292,10 +293,10 @@ with Progress(SpinnerColumn(), BarColumn(), TimeElapsedColumn(), TextColumn('[gr
                 plt.margins(x=0.1)
 
                 # Add some text for labels, title and custom x-axis tick labels, etc.
-                plt.savefig(f'Results/{metric_names_graph}_{prediction_op}.png')
+                plt.savefig(f'{results_path}/{metric_names_graph}_{prediction_op}.png')
 
 # save stats into csv
-with open(f'Results/stats.csv',"w+") as my_csv:
+with open(f'{results_path}/stats.csv',"w+") as my_csv:
     csvWriter = writer(my_csv,delimiter=',')
     csvWriter.writerows(full_results)
     my_csv.close()
@@ -304,4 +305,4 @@ end_time = time.perf_counter()
 elapsed_time = end_time - start_time
 print('-'*100)
 print("Elapsed time: ", elapsed_time)
-print(f'Experiment Ended\nResults located in: {os.getcwd()}/Results')
+print(f'Experiment Ended\nResults located at {results_path}')
