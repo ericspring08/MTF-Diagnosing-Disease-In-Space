@@ -5,14 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e3ce7bc2-b5c2-418a-85c4-40894f7b3286" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/NasaHutch23.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Analysis.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Analysis.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ptf.py" beforeDir="false" afterPath="$PROJECT_DIR$/ptf.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/score.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/score.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +61,9 @@
       <workItem from="1702162369067" duration="138000" />
       <workItem from="1702172113123" duration="2011000" />
       <workItem from="1702177578510" duration="622000" />
-      <workItem from="1702184660630" duration="1278000" />
+      <workItem from="1702184660630" duration="1349000" />
+      <workItem from="1702189612792" duration="330000" />
+      <workItem from="1702224985818" duration="655000" />
     </task>
     <servers />
   </component>
