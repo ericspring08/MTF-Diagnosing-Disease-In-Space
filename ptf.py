@@ -137,6 +137,7 @@ else:
     # no graph
     total += 10 * args.trials * len(models) * len(predictions_ops)
 
+# Add labels to bar graph
 def addlabels(x,y):
     for i in range(len(x)):
         plt.text(0.01 + y[i],i,y[i])
@@ -145,8 +146,7 @@ with Progress(SpinnerColumn(), BarColumn(), TimeElapsedColumn(), TextColumn('[gr
     progresstotal = progress.add_task('[green]Progress', total=total)
 
     numerical_columns = ["Age", "Weight", "Length", "BMI", "BP", "PR", "FBS", "CR", "TG", "LDL", "HDL",	"BUN", "ESR", "HB",	"K", "Na", "WBC", "Lymph", "Neut", "PLT", "EF-TTE"]
-    categorical_columns = ["Sex", "DM", "HTN", "Current Smoker", "EX-Smoker", "FH", "Obesity", "CRF", "CVA", "Airway disease", "Thyroid Disease", "CHF", "DLP", "Edema", "Weak Peripheral Pulse", "Lung rales", "Systolic Murmur", "Diastolic Murmur", "Typical Chest Pain", "Dyspnea", "Function Class", "Atypical", "Nonanginal", "Exertional CP", "LowTH Ang", "Q Wave", "St Elevation", "St Depression", "Tinversion", "LVH", "Poor R Progression", "VHD", "Cath", "BBB", "LAD", "LCX", "RCA"] 
-
+    categorical_columns = ["Sex", "DM", "HTN", "Current Smoker", "EX-Smoker", "FH", "Obesity", "CRF", "CVA", "Airway disease", "Thyroid Disease", "CHF", "DLP", "Edema", "Weak Peripheral Pulse", "Lung rales", "Systolic Murmur", "Diastolic Murmur", "Typical Chest Pain", "Dyspnea", "Function Class", "Atypical", "Nonanginal", "Exertional CP", "LowTH Ang", "Q Wave", "St Elevation", "St Depression", "Tinversion", "LVH", "Poor R Progression", "VHD", "Cath", "BBB", "LAD", "LCX", "RCA"]
     preprocessor = ColumnTransformer(transformers = [('ohe',
                                                   OneHotEncoder(handle_unknown = 'ignore',
                                                                        sparse_output = False),
