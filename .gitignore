@@ -2,3 +2,4 @@ env
 catboost_info
 Results
 .idea
+.DS_Store
