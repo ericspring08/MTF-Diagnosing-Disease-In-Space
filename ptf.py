@@ -1,5 +1,7 @@
 # Imports
 # Prep
+from pprint import pprint
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
@@ -15,6 +17,7 @@ import shutil
 import time
 from art import text2art
 from csv import writer
+import json
 
 # Arg Parse
 from argparse import ArgumentParser
@@ -47,14 +50,15 @@ parser.add_argument("-m", "--models", nargs="+", help="Specify a model to use", 
 
 args = parser.parse_args()
 
-if args.config:
-    config = configparser.ConfigParser()
-    config.read(args.config)
+config = json.load(open(args.config))
 
-data_set_path = config.get("Locations", "Dataset")
-results_path = config.get("Locations", "Results")
-outputs_selection = list(config.get("ExpConfig", "Outputs").split(","))
-metrics_selection = list(config.get("ExpConfig", "Metrics").split(","))
+# Config
+dataset_path = config["location"]["dataset"]
+results_path = config["location"]["results"]
+outputs_selection = config["experiment"]["outputs"]
+metrics_selection = config["experiment"]["metrics"]
+categorical_features = config["experiment"]["categorical"]
+numerical_features = config["experiment"]["numerical"]
 
 # Create Results Folder if it doesn't exist
 if not os.path.exists(results_path):
@@ -77,7 +81,7 @@ else:
 total = 0
 
 # Load Data
-dataset = pd.read_csv(data_set_path)
+dataset = pd.read_csv(dataset_path)
 
 # Get Outputs extracted and remove after
 outputs = {}
@@ -88,4 +92,20 @@ dataset = dataset.drop(outputs_selection, axis=1)
 
 # Normalize Inputs
 scaler = StandardScaler()
-onehot = OneHotEncoder()
+onehot = OneHotEncoder(handle_unknown = 'ignore',
+                       sparse_output = False)
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("scaler", scaler, numerical_features),
+        ("ohe", onehot, categorical_features)
+    ],
+    remainder="passthrough",
+    verbose_feature_names_out=False
+).set_output(transform="pandas")
+
+dataset = preprocessor.fit_transform(dataset)
+
+# Map the outputs
+for key, value in config['outputs'].items():
+    outputs[key] = outputs[key].map(config["outputs"][key])
