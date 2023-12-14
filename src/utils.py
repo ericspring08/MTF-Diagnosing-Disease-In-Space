@@ -1,4 +1,9 @@
 # Models
+# Mathematical
+import math
+import statistics as st
+
+# Machine Learning Models
 from sklearn.svm import SVC
 from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, RandomForestClassifier, ExtraTreesClassifier, BaggingClassifier, HistGradientBoostingClassifier
 from sklearn.naive_bayes import GaussianNB, CategoricalNB, ComplementNB
@@ -12,7 +17,31 @@ from sklearn.dummy import DummyClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 
+# Metrics
+from sklearn.metrics import accuracy_score, precision_score, balanced_accuracy_score, f1_score
 
+# Functions
+def add_text_label(ax, labels):
+    for i, txt in enumerate(labels):
+        ax.annotate(txt, (i, 0.5))
+
+def get_model(model_name):
+    return model_options[model_name]
+
+def get_metric(metric_name):
+    return metric_options[metric_name]
+
+def ammp(accuracy, precision, time_to_fit):
+    accuracy_reciprocal_sum = sum(accuracy.rdiv(1))
+    precision_reciprocal_sum = sum(precision.rdiv(1))
+    trials_num = len(accuracy)
+    accuracy_sum = sum(accuracy)
+    # Divide by 1000000 to convert nanoseconds to milliseconds
+    time_to_fit_ms = st.mean(time_to_fit/1000000)
+
+    return 0.14 * (trials_num / precision_reciprocal_sum) + 0.85 * (accuracy_sum / trials_num) - (0.01 * math.log(time_to_fit_ms, 12))
+
+# Variables
 model_options = {
     'SVC': SVC(),
     'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=5, random_state=0),
@@ -37,4 +66,10 @@ model_options = {
     'XGB': XGBClassifier()
 }
 
-metrics = ['accuracy', 'precision', 'balanced_accuracy']
+metric_options = {
+    'accuracy': accuracy_score,
+    'precision': precision_score,
+    'balanced_accuracy': balanced_accuracy_score,
+    'f1': f1_score,
+    'ammp': ammp
+}

@@ -53,7 +53,8 @@ if args.config:
 
 data_set_path = config.get("Locations", "Dataset")
 results_path = config.get("Locations", "Results")
-outputs = list(config.get("Dataset", "Outputs").split(","))[0]
+outputs_selection = list(config.get("ExpConfig", "Outputs").split(","))
+metrics_selection = list(config.get("ExpConfig", "Metrics").split(","))
 
 # Create Results Folder if it doesn't exist
 if not os.path.exists(results_path):
@@ -77,4 +78,14 @@ total = 0
 
 # Load Data
 dataset = pd.read_csv(data_set_path)
-print(dataset.head())
+
+# Get Outputs extracted and remove after
+outputs = {}
+for value in outputs_selection:
+    outputs[value] = dataset[value]
+
+dataset = dataset.drop(outputs_selection, axis=1)
+
+# Normalize Inputs
+scaler = StandardScaler()
+onehot = OneHotEncoder()
