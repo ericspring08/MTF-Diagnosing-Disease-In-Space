@@ -1,9 +1,5 @@
 # Imports
 # Prep
-from pprint import pprint
-
-import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
@@ -34,6 +30,9 @@ from sklearn.metrics import accuracy_score, precision_score, balanced_accuracy_s
 # Import Utilities
 from src.utils import *
 
+# Import Main Loop
+from src.loop import *
+
 title = text2art("PTF", font="3d_diagonal")
 print(title)
 print("Prototype Training Platform")
@@ -59,12 +58,13 @@ outputs_selection = config["experiment"]["outputs"]
 metrics_selection = config["experiment"]["metrics"]
 categorical_features = config["experiment"]["categorical"]
 numerical_features = config["experiment"]["numerical"]
+trials = config["experiment"]["trials"]
 
 # Create Results Folder if it doesn't exist
 if not os.path.exists(results_path):
     os.makedirs(results_path)
 
-models = {}
+models = model_options
 
 # Model Selection
 if args.models:
@@ -109,3 +109,6 @@ dataset = preprocessor.fit_transform(dataset)
 # Map the outputs
 for key, value in config['outputs'].items():
     outputs[key] = outputs[key].map(config["outputs"][key])
+
+# Main Loop
+data_results = main_loop(dataset, outputs, models, metrics_selection, trials)

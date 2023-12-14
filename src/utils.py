@@ -31,6 +31,8 @@ def get_model(model_name):
 def get_metric(metric_name):
     return metric_options[metric_name]
 
+def calculate_metric(predictions, actual, metric_name):
+    return get_metric(metric_name)(predictions, actual)
 def ammp(accuracy, precision, time_to_fit):
     accuracy_reciprocal_sum = sum(accuracy.rdiv(1))
     precision_reciprocal_sum = sum(precision.rdiv(1))
@@ -62,7 +64,7 @@ model_options = {
     'SGDOneClass': SGDOneClassSVM(),
     'Dummy': DummyClassifier(),
     'HGB': HistGradientBoostingClassifier(),
-    'LGBM': LGBMClassifier(),
+    'LGBM': LGBMClassifier(verbose=-1),
     'XGB': XGBClassifier()
 }
 
