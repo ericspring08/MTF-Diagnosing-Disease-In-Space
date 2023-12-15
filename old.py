@@ -52,13 +52,13 @@ start_time = time.perf_counter()
 
 model_options = {
     'SVC': SVC(),
-    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=5, random_state=0),
+    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=10, random_state=0),
     'GaussianNB': GaussianNB(),
     'DecisionTree': DecisionTreeClassifier(),
     'KNeighbors': KNeighborsClassifier(n_neighbors=5),
     'AdaBoost': AdaBoostClassifier(),
     'RandomForest': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42),
-    'MLP': MLPClassifier(alpha=2, max_iter=1000, random_state=42),
+    'MLP': MLPClassifier(alpha=2, max_iter=500, random_state=42),
     'QDA': QuadraticDiscriminantAnalysis(),
     'CatBoost': CatBoostClassifier(iterations=2,
                           learning_rate=1,
@@ -146,7 +146,7 @@ with Progress(SpinnerColumn(), BarColumn(), TimeElapsedColumn(), TextColumn('[gr
     progresstotal = progress.add_task('[green]Progress', total=total)
 
     numerical_columns = ["Age", "Weight", "Length", "BMI", "BP", "PR", "FBS", "CR", "TG", "LDL", "HDL",	"BUN", "ESR", "HB",	"K", "Na", "WBC", "Lymph", "Neut", "PLT", "EF-TTE"]
-    categorical_columns = ["Sex", "DM", "HTN", "Current Smoker", "EX-Smoker", "FH", "Obesity", "CRF", "CVA", "Airway disease", "Thyroid Disease", "CHF", "DLP", "Edema", "Weak Peripheral Pulse", "Lung rales", "Systolic Murmur", "Diastolic Murmur", "Typical Chest Pain", "Dyspnea", "Function Class", "Atypical", "Nonanginal", "Exertional CP", "LowTH Ang", "Q Wave", "St Elevation", "St Depression", "Tinversion", "LVH", "Poor R Progression", "VHD", "Cath", "BBB", "LAD", "LCX", "RCA"]
+    categorical_columns = ["Sex", "DM", "HTN", "Current Smoker", "EX-Smoker", "FH", "Obesity", "CRF", "CVA", "Airway disease", "Thyroid Disease", "CHF", "DLP", "Edema", "Weak Peripheral Pulse", "Lung rales", "Systolic Murmur", "Diastolic Murmur", "Typical Chest Pain", "Dyspnea", "Function Class", "Atypical", "Nonanginal", "Exertional CP", "LowTH Ang", "Q Wave", "St Elevation", "St Depression", "Tinversion", "LVH", "Poor R Progression", "BBB"]
     preprocessor = ColumnTransformer(transformers = [('ohe',
                                                   OneHotEncoder(handle_unknown = 'ignore',
                                                                        sparse_output = False),
@@ -163,12 +163,12 @@ with Progress(SpinnerColumn(), BarColumn(), TimeElapsedColumn(), TextColumn('[gr
     y_rca = df['RCA']
     y_vhd = df['VHD']
     y_rwma = df['Region RWMA']
-    df.drop('Cath', axis=1)
-    df.drop('LAD', axis=1)
-    df.drop('LCX', axis=1)
-    df.drop('RCA', axis=1)
-    df.drop('VHD', axis=1)
-    df.drop('Region RWMA', axis=1)
+    df = df.drop('Cath', axis=1)
+    df = df.drop('LAD', axis=1)
+    df = df.drop('LCX', axis=1)
+    df = df.drop('RCA', axis=1)
+    df = df.drop('VHD', axis=1)
+    df = df.drop('Region RWMA', axis=1)
     x_df = preprocessor.fit_transform(df)
     # Maper
     map_label_cad = {'CAD':1,
@@ -234,6 +234,8 @@ with Progress(SpinnerColumn(), BarColumn(), TimeElapsedColumn(), TextColumn('[gr
                         model = XGBClassifier()
                 else:
                     model = model_object
+
+                print(x_train.columns)
 
                 model.fit(x_train, y_train[prediction_op])
 

@@ -29,6 +29,7 @@ from sklearn.metrics import accuracy_score, precision_score, balanced_accuracy_s
 
 # Import Utilities
 from src.utils import *
+from models import *
 
 # Import Main Loop
 from src.loop import *
@@ -91,24 +92,20 @@ for value in outputs_selection:
 dataset = dataset.drop(outputs_selection, axis=1)
 
 # Normalize Inputs
-scaler = StandardScaler()
-onehot = OneHotEncoder(handle_unknown = 'ignore',
-                       sparse_output = False)
+preprocessor = ColumnTransformer(transformers = [('ohe',
+                                                  OneHotEncoder(handle_unknown='ignore',
+                                                                sparse_output=False),
+                                                  categorical_features),
+                                                 ('scaler',
+                                                  StandardScaler(),
+                                                  numerical_features)],
+                                 remainder='passthrough',
+                                 verbose_feature_names_out=False).set_output(transform = 'pandas')
+x_dataset = preprocessor.fit_transform(dataset)
 
-preprocessor = ColumnTransformer(
-    transformers=[
-        ("scaler", scaler, numerical_features),
-        ("ohe", onehot, categorical_features)
-    ],
-    remainder="passthrough",
-    verbose_feature_names_out=False
-).set_output(transform="pandas")
-
-dataset = preprocessor.fit_transform(dataset)
-
-# Map the outputs
+# Map the outputs to dictionary
 for key, value in config['outputs'].items():
-    outputs[key] = outputs[key].map(config["outputs"][key])
+    outputs[key] = outputs[key].map(value)
 
 # Main Loop
-data_results = main_loop(dataset, outputs, models, metrics_selection, trials)
+data_results = main_loop(x_dataset, outputs, models, metrics_selection, trials)
