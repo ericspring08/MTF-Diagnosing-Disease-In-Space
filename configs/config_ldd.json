@@ -1,0 +1,20 @@
+{
+  "location": {
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/data/LDD.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/ldd_results/"
+  },
+  "experiment": {
+    "metrics": ["accuracy", "precision", "recall", "f1", "train_time"],
+    "outputs": ["Risk"],
+    "numerical": ["FVC", "FEC1", "AGE"],
+    "categorical": ["smoke", "PEFR", "O2", "ABG-P-O2", "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseaes"],
+    "models": "all", 
+    "trials": 2
+  },
+  "outputs": {
+    "Risk": {
+      "F": 0,
+      "T": 1
+    }
+  }
+}
