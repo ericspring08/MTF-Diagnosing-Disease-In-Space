@@ -1,0 +1,16 @@
+{
+  "location": {
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/data/HDI.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/hdi_results/"
+  },
+  "experiment": {
+    "metrics": ["accuracy", "precision", "recall", "f1", "train_time"],
+    "outputs": ["HeartDiseaseorAttack"],
+    "numerical": ["BMI", "GenHlth", "MentHlth", "PhysHlth", "Age", "Education", "Income"],
+    "categorical": ["HighBP", "HighChol", "CholCheck", "Smoker", "Stroke", "Diabetes", "PhysActivity", "Fruits", "Veggies", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "GenHlth", "DiffWalk", "Sex", "Education"],
+    "models": ["Dummy", "DecisionTree"],
+    "trials": 2
+  },
+  "outputs": {
+  }
+}

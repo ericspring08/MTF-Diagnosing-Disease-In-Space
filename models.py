@@ -12,7 +12,6 @@ from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 
 model_options = {
-
     'SVC': SVC(),
     'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=5, random_state=0),
     'GaussianNB': GaussianNB(),
@@ -30,7 +29,7 @@ model_options = {
     'Ridge': RidgeClassifier(),
     'PA': PassiveAggressiveClassifier(),
     'SGDOneClass': SGDOneClassSVM(),
-    'Dummy': DummyClassifier(),
+    'Dummy': DummyClassifier(strategy="uniform"),
     'HGB': HistGradientBoostingClassifier(),
     'LGBM': LGBMClassifier(verbose=-1),
     'XGB': XGBClassifier()
