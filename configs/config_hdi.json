@@ -8,8 +8,8 @@
     "outputs": ["HeartDiseaseorAttack"],
     "numerical": ["BMI", "GenHlth", "MentHlth", "PhysHlth", "Age", "Education", "Income"],
     "categorical": ["HighBP", "HighChol", "CholCheck", "Smoker", "Stroke", "Diabetes", "PhysActivity", "Fruits", "Veggies", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "GenHlth", "DiffWalk", "Sex", "Education"],
-    "models": ["Dummy", "DecisionTree"],
-    "trials": 2
+    "models": ["MLP", "Dummy", "CatBoost", "GradientBoosting", "LGBM", "XGB"],
+    "trials": 1
   },
   "outputs": {
   }

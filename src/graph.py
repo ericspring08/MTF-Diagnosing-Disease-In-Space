@@ -8,18 +8,67 @@ import os
 
 def graph(args):
     output_location = args.output
-    # Create folder if doesn't exist 
+    df = pd.read_csv(args.file)
+    total_tasks = len(df['output'].unique()) * len(df['metric'].unique()) * len(df['model'].unique())
+
+    # Create folder if doesn't exist
     if not os.path.exists(output_location):
         os.makedirs(output_location)
+    if not os.path.exists(os.path.join(output_location, 'distributions')):
+        os.makedirs(os.path.join(output_location, 'distributions'))
+        # Create folder for every output
+        for output in df['output'].unique():
+            os.makedirs(os.path.join(output_location, 'distributions', output))
+            # Create folder for every metric
+            for metric in df['metric'].unique():
+                os.makedirs(os.path.join(output_location, 'distributions', output, metric))
+
+    if not os.path.exists(os.path.join(output_location, 'rankings')):
+        os.makedirs(os.path.join(output_location, 'rankings'))
+        # Create folder for every output
+        for output in df['output'].unique():
+            os.makedirs(os.path.join(output_location, 'rankings', output))
 
     with Progress() as progress:
-        def generate_rank_graphs(df):
+        def generate_distribution_graphs(data):
             plt.figure(figsize=(20, 10))
-            outputs = df['output'].unique()
+            # Generate histogram for combination of output, metric, model
+            outputs = data['output'].unique()
+            # Go through every output
+            for output in outputs:
+                df_output = data[data['output'] == output]
+
+                # Go through every metric
+                for metric in df_output['metric'].unique():
+                    curr_time = datetime.now().strftime("%H:%M:%S")
+                    progress.console.print(f'[{curr_time}] Distribution Graph - {output} - {metric}')
+                    df_metric = df_output[df_output['metric'] == metric]
+
+                    # Go through every model
+                    for model in df_metric['model'].unique():
+                        df_model = df_metric[df_metric['model'] == model]
+
+                        # Get the average of all the individual results of every trial of that model, output, metric combination
+                        value = [n.strip() for n in df_model['value'].values[0][1:-1].split(',')]
+                        # Convert string values to float
+                        value = [float(n) for n in value]
+                        # Plot the histogram
+                        plt.title(f'{output} - {metric} - {model}')
+                        plt.hist(value, bins=20)
+                        plt.xlabel(metric)
+                        plt.ylabel('Frequency')
+                        plt.grid()
+                        plt.savefig(os.path.join(output_location, 'distributions', output, metric, f'{output}_{metric}_{model}.png'))
+                        plt.clf()
+                        progress.update(main_task, advance=1)
+
+        def generate_rank_graphs(data):
+            plt.figure(figsize=(20, 10))
+            outputs = data['output'].unique()
 
             # Go through every output
             for output in outputs:
-                df_output = df[df['output'] == output]
+                df_output = data[data['output'] == output]
 
                 # Go through every metric
                 for metric in df_output['metric'].unique():
@@ -51,17 +100,12 @@ def graph(args):
                     plt.grid(axis='x')
                     plt.xlabel(metric)
                     plt.ylabel('Model')
-                    plt.savefig(os.path.join(output_location, f'{output}_{metric}.png'))
+                    plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}.png'))
                     plt.clf()
-                    progress.update(main_task, advance=1/len(outputs)/len(df_metric['metric'].unique()))
+                    progress.update(main_task, advance=1)
 
-        main_task = progress.add_task("[red]Graphing Results", total=1)
-        # TODO: Implement graphing of results.csv file
-        # Read in results.csv file
-        df = pd.read_csv(args.file)
+        main_task = progress.add_task("[red]Graphing Results", total=total_tasks)
 
         # Generate graphs
         generate_rank_graphs(df)
-        
-
-        
+        generate_distribution_graphs(df)

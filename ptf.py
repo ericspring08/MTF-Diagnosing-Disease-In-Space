@@ -40,7 +40,6 @@ def run_experiment(config_path):
         config = json.load(open(config_path))
     except:
         raise FileExistsError("Error loading config file. Please check your spelling and try again.")
-        exit()
 
     # Config
     dataset_path = config["location"]["dataset"]
