@@ -91,6 +91,9 @@ def run_experiment(config_path):
             verbose_feature_names_out=False).set_output(transform = 'pandas')
     x_dataset = preprocessor.fit_transform(dataset)
 
+    # Handle null values
+    x_dataset = pd.DataFrame(x_dataset).fillna(axis=1, method='ffill')
+
     # Map the outputs to dictionary
     for key, value in config['outputs'].items():
         outputs[key] = outputs[key].map(value)
