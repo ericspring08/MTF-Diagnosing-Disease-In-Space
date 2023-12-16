@@ -6,11 +6,11 @@ from models import *
 from src.save import ModelResults
 from datetime import datetime
 
-from rich.progress import Progress
+from rich.progress import Progress, TimeElapsedColumn, ProgressColumn, SpinnerColumn, BarColumn, TextColumn
 
 def main_loop(inputs, outputs, models, metrics_selection, trials, results_path, config_path):
     total_progress_amount = trials * len(outputs) * len(models)
-    with Progress() as progress:
+    with Progress(SpinnerColumn(), *Progress.get_default_columns(), TimeElapsedColumn()) as progress:
         main_task = progress.add_task(f"[red]{config_path}", total=total_progress_amount)
 
         outputs = pd.DataFrame(outputs)
@@ -40,10 +40,13 @@ def main_loop(inputs, outputs, models, metrics_selection, trials, results_path, 
                     train_time = (time_after_fit - time_before_fit)
 
                     # Predict
+                    before_predict = time.perf_counter_ns()
                     y_pred = model.predict(x_test)
+                    after_predict = time.perf_counter_ns()
+                    predict_time = (after_predict - before_predict)
 
                     # Calculate Metrics
-                    performance = get_metric(y_pred, y_test[output], metrics_selection, train_time)
+                    performance = get_metric(y_pred, y_test[output], metrics_selection, train_time, predict_time)
 
                     # Save Results
                     for metric, value in performance.items():

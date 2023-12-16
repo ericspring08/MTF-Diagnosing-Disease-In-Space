@@ -21,7 +21,7 @@ def ammp(accuracy, precision, time_to_fit):
 
     return 0.14 * (trials_num / precision_reciprocal_sum) + 0.85 * (accuracy_sum / trials_num) - (0.01 * math.log(time_to_fit_ms, 12))
 
-def get_metric(y_pred, y_test, metrics, train_time):
+def get_metric(y_pred, y_test, metrics, train_time, predict_time):
     global metric_params
     global metric_options
 
@@ -32,6 +32,9 @@ def get_metric(y_pred, y_test, metrics, train_time):
         if metric == "train_time":
             # Train Time Metric
             all_metrics[metric] = train_time
+        elif metric == "predict_time":
+            # Predict Time Metric
+            all_metrics[metric] = predict_time
         elif metric == "ammp":
             # AMMP Metric
             all_metrics[metric] = ammp(accuracy_score(y_pred, y_test), precision_score(y_pred, y_test), train_time)
@@ -56,6 +59,7 @@ metric_options = {
     'f1': f1_score,
     'ammp': None,
     'train_time': None,
+    'predict_time': None,
     'recall': recall_score
 }
 
@@ -66,5 +70,6 @@ metric_params = {
     'f1': {'average': 'weighted'},
     'recall': {'average': 'weighted'},
     'ammp': {},
-    'train_time': {}
+    'train_time': {},
+    'predict_time': {}
 }

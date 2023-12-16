@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from statistics import mean
-from rich.progress import Progress
+from rich.progress import Progress, TimeElapsedColumn, SpinnerColumn
 from datetime import datetime
 import os
 
@@ -18,18 +18,25 @@ def graph(args):
         os.makedirs(os.path.join(output_location, 'distributions'))
         # Create folder for every output
         for output in df['output'].unique():
-            os.makedirs(os.path.join(output_location, 'distributions', output))
+            if not os.path.exists(os.path.join(output_location, 'distributions', output)):
+                os.makedirs(os.path.join(output_location, 'distributions', output))
             # Create folder for every metric
             for metric in df['metric'].unique():
-                os.makedirs(os.path.join(output_location, 'distributions', output, metric))
+                if not os.path.exists(os.path.join(output_location, 'distributions', output, metric)):
+                    os.makedirs(os.path.join(output_location, 'distributions', output, metric))
 
     if not os.path.exists(os.path.join(output_location, 'rankings')):
         os.makedirs(os.path.join(output_location, 'rankings'))
         # Create folder for every output
         for output in df['output'].unique():
-            os.makedirs(os.path.join(output_location, 'rankings', output))
+            if not os.path.exists(os.path.join(output_location, 'rankings', output)):
+                os.makedirs(os.path.join(output_location, 'rankings', output))
 
-    with Progress() as progress:
+    with Progress(
+        SpinnerColumn(),
+        *Progress.get_default_columns(),
+        TimeElapsedColumn()
+    ) as progress:
         def generate_distribution_graphs(data):
             plt.figure(figsize=(20, 10))
             # Generate histogram for combination of output, metric, model

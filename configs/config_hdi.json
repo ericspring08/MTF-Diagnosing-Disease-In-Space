@@ -4,12 +4,12 @@
     "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/hdi_results/"
   },
   "experiment": {
-    "metrics": ["accuracy", "precision", "recall", "f1", "train_time"],
+    "metrics": ["accuracy", "precision", "recall", "f1", "train_time", "predict_time"],
     "outputs": ["HeartDiseaseorAttack"],
     "numerical": ["BMI", "GenHlth", "MentHlth", "PhysHlth", "Age", "Education", "Income"],
     "categorical": ["HighBP", "HighChol", "CholCheck", "Smoker", "Stroke", "Diabetes", "PhysActivity", "Fruits", "Veggies", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "GenHlth", "DiffWalk", "Sex", "Education"],
-    "models": ["MLP", "Dummy", "CatBoost", "GradientBoosting", "LGBM", "XGB"],
-    "trials": 1
+    "models": ["MLP", "Dummy", "CatBoost", "GradientBoosting", "LGBM", "XGB", "RandomForest", "DecisionTree", "KNeighbors"],
+    "trials": 2
   },
   "outputs": {
   }
