@@ -8,10 +8,10 @@ from datetime import datetime
 
 from rich.progress import Progress, BarColumn, TimeElapsedColumn, TextColumn, SpinnerColumn
 
-def main_loop(inputs, outputs, models, metrics_selection, trials, results_path):
+def main_loop(inputs, outputs, models, metrics_selection, trials, results_path, config_path):
     total_progress_amount = trials * len(outputs) * len(models)
     with Progress() as progress:
-        main_task = progress.add_task("[red]Main Loop", total=total_progress_amount)
+        main_task = progress.add_task(f"[red]{config_path}", total=total_progress_amount)
 
         outputs = pd.DataFrame(outputs)
         models_results = ModelResults(models, outputs, metrics_selection)

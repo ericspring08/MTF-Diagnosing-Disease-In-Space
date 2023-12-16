@@ -9,7 +9,7 @@
     "numerical": ["age", "trestbps", "thalach", "oldpeak"],
     "categorical": ["sex", "cp", "fbs", "restecg", "exang", "slope", "ca", "thal"],
     "models": "all", 
-    "trials": 2
+    "trials": 20
   },
   "outputs": {
     

@@ -30,9 +30,14 @@ start_time = time.perf_counter()
 
 # Experiment
 def experiment(args):
+    for config in args.config:
+        print(f"Running experiment {config}")
+        run_experiment(config)
+        print('-'*100)
+def run_experiment(config_path):
     # Load Config
     try:
-        config = json.load(open(args.config))
+        config = json.load(open(config_path))
     except:
         raise FileExistsError("Error loading config file. Please check your spelling and try again.")
         exit()
@@ -73,8 +78,6 @@ def experiment(args):
         outputs[value] = dataset[value]
 
     dataset = dataset.drop(outputs_selection, axis=1)
-    means = dataset.mean()
-    dataset.fillna(means, inplace=True)
 
     # Normalize Inputs
     preprocessor = ColumnTransformer(
@@ -94,7 +97,7 @@ def experiment(args):
         outputs[key] = outputs[key].map(value)
 
     # Main Loop
-    data_results = main_loop(x_dataset, outputs, models_to_use, metrics_selection, trials, results_path)
+    data_results = main_loop(x_dataset, outputs, models_to_use, metrics_selection, trials, results_path, config_path)
 
     # Print Ending Message
     print(f"Finished in {time.perf_counter() - start_time} seconds.")
@@ -107,7 +110,7 @@ subparsers = parser.add_subparsers(dest="command")
 
 # Subcommand for analysis
 parser_experiment = subparsers.add_parser("experiment", help="Run an experiment")
-parser_experiment.add_argument("config", help="Specify an experiment config file (.json) to run")
+parser_experiment.add_argument("config", help="Specify an experiment config file (.json) to run", nargs="+")
 parser_experiment.set_defaults(func=experiment)
 
 parser_graph = subparsers.add_parser("graph", help="Analyze a results file")
