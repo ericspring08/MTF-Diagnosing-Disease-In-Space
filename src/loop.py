@@ -6,7 +6,7 @@ from models import *
 from src.save import ModelResults
 from datetime import datetime
 
-from rich.progress import Progress, BarColumn, TimeElapsedColumn, TextColumn, SpinnerColumn
+from rich.progress import Progress
 
 def main_loop(inputs, outputs, models, metrics_selection, trials, results_path, config_path):
     total_progress_amount = trials * len(outputs) * len(models)
@@ -49,4 +49,5 @@ def main_loop(inputs, outputs, models, metrics_selection, trials, results_path, 
                     for metric, value in performance.items():
                         models_results.add_result(model_name, output, metric, value)
                     progress.update(main_task, advance=1)
-        models_results.save_results_averages_csv(results_path + "/results.csv")
+        models_results.save_results_raw_csv(results_path + "/results_raw.csv")
+        models_results.save_results_averages_csv(results_path + "/results_average.csv")
