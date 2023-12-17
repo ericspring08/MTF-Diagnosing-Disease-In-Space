@@ -4,4 +4,4 @@ Results
 .idea
 .DS_Store
 __pycache__
-*nosave
+nosave*
