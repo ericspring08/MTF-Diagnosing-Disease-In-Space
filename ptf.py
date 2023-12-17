@@ -24,16 +24,18 @@ title = text2art("PTF", font="3d_diagonal")
 print(title)
 print("Prototype Training Platform")
 print("By Eric Zhang, 2023")
-print('-'*100)
+print('-' * 100)
 warnings.filterwarnings('ignore')
 start_time = time.perf_counter()
+
 
 # Experiment
 def experiment(args):
     for config in args.config:
         print(f"Running experiment {config}")
         main_loop(config)
-        print('-'*100)
+        print('-' * 100)
+
 
 # Parser
 parser = ArgumentParser(description="Prototype Training Platform")
