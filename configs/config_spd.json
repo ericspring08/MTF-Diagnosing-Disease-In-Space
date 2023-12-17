@@ -1,0 +1,16 @@
+{
+  "location": {
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/data/spd.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/spd_results/"
+  },
+  "experiment": {
+    "metrics": ["accuracy", "precision", "recall", "f1", "train_time"],
+    "outputs": ["stroke"],
+    "numerical": ["age", "avg_glucose_level", "bmi"],
+    "categorical": ["gender","hypertension", "heart_disease", "ever_married", "work_type", "Residence_type", "smoking_status"],
+    "models": "all",
+    "trials": 2
+  },
+  "outputs": {
+  }
+}

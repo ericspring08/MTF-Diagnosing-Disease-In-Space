@@ -1,0 +1,19 @@
+{
+  "location": {
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/data/TDF.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/tdf_results/"
+  },
+  "experiment": {
+    "metrics": ["accuracy", "precision", "recall", "f1", "train_time"],
+    "outputs": ["target"],
+    "numerical": ["Age", "Weight", "Length", "BMI", "BP", "PR", "FBS", "CR", "TG", "LDL", "HDL",	"BUN", "ESR", "HB",	"K", "Na", "WBC", "Lymph", "Neut", "PLT", "EF-TTE"],
+    "categorical": ["Sex", "DM", "HTN", "Current Smoker", "EX-Smoker", "FH", "Obesity", "CRF", "CVA", "Airway disease", "Thyroid Disease", "CHF", "DLP", "Edema", "Weak Peripheral Pulse", "Lung rales", "Systolic Murmur", "Diastolic Murmur", "Typical Chest Pain", "Dyspnea", "Function Class", "Atypical", "Nonanginal", "Exertional CP", "LowTH Ang", "Q Wave", "St Elevation", "St Depression", "Tinversion", "LVH", "Poor R Progression", "BBB"],
+    "models": "all", 
+    "trials": 2
+  },
+  "outputs": {
+    "target": {
+
+    }
+  }
+}
