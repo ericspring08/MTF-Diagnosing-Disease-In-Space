@@ -15,7 +15,7 @@ def graph(args):
     if not os.path.exists(output_location):
         os.makedirs(output_location)
     if args.distribution:
-        total_tasks += len(df['output'].unique()) * len(df['metric'].unique()) * len(df['models'].unique())
+        total_tasks += len(df['output'].unique()) * len(df['metric'].unique()) * len(df['model'].unique())
         if not os.path.exists(os.path.join(output_location, 'distributions')):
             os.makedirs(os.path.join(output_location, 'distributions'))
             # Create folder for every output
