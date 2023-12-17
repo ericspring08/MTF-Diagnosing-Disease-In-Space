@@ -9,7 +9,7 @@
     "numerical": ["FVC", "FEC1", "AGE"],
     "categorical": ["smoke", "PEFR", "O2", "ABG-P-O2", "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseaes"],
     "models": "all", 
-    "trials": 30
+    "trials": 1
   },
   "outputs": {
     "Risk": {

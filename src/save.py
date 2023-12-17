@@ -21,7 +21,10 @@ class ModelResults:
         for model in self.results:
             for output in self.results[model]:
                 for metric in self.results[model][output]:
-                    self.results[model][output][metric] = sum(self.results[model][output][metric]) / len(self.results[model][output][metric])
+                    if len(self.results[model][output][metric]) == 0:
+                        self.results[model][output][metric] = 0
+                    else:
+                        self.results[model][output][metric] = sum(self.results[model][output][metric]) / len(self.results[model][output][metric])
         df = pd.DataFrame.from_dict(self.results)
         df.to_csv(path, index=False)
 

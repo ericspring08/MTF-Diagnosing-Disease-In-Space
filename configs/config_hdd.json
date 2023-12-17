@@ -1,15 +1,15 @@
 {
   "location": {
     "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/data/hdd.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/hdd_results/"
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/nosave_hdd_results/"
   },
   "experiment": {
     "metrics": ["accuracy", "precision", "recall", "f1", "train_time"],
     "outputs": ["target"],
     "numerical": ["age", "trestbps", "thalach", "oldpeak"],
     "categorical": ["sex", "cp", "fbs", "restecg", "exang", "slope", "ca", "thal"],
-    "models": "all", 
-    "trials": 20
+    "models": "all",
+    "trials": 1
   },
   "outputs": {
     
