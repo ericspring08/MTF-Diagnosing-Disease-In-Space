@@ -9,7 +9,7 @@
     "numerical": ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DiabetesPedigreeFunction", "Age"],
     "categorical": [],
     "models": "all",
-    "trials": 1
+    "trials": 20
   },
   "outputs": {
   }
