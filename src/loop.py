@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
@@ -90,7 +91,7 @@ def main_loop(config_path):
     total_progress_amount = trials * len(outputs) * len(models_to_use)
     with Progress(SpinnerColumn(), *Progress.get_default_columns(), TimeElapsedColumn()) as progress:
         builtins.print = progress.console.print
-        logging.log = progress.console.log
+        sys.stdout.write = progress.console.print
 
         main_task = progress.add_task(f"[red]{config_path}", total=total_progress_amount)
 
@@ -109,9 +110,10 @@ def main_loop(config_path):
                     try:
                         # Special cases for some models that require multiclass specification
                         if model_name == "LGBM" and outputs[output].nunique() > 2:
-                            model = LGBMClassifier(objective="multiclass", verbose = -1)
+                            model.set_params(objective="multiclass")
                         elif model_name == "XGB" and outputs[output].nunique() > 2:
-                            model = XGBClassifier(objective="multi:softmax", num_class=outputs[output].nunique())
+                            model.set_params(objective="multi:softmax")
+                            model.set_params(num_classes=outputs[output].nunique())
 
                         # Train Model
                         time_before_fit = time.perf_counter_ns()
