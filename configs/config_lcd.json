@@ -1,0 +1,16 @@
+{
+  "location": {
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/data/LCD.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/lcd_results/"
+  },
+  "experiment": {
+    "metrics": ["accuracy", "precision", "recall", "f1", "train_time", "predict_time"],
+    "outputs": ["LUNG_CANCER"],
+    "numerical": ["AGE"],
+    "categorical": ["GENDER","SMOKING", "YELLOW_FINGERS", "ANXIETY", "PEER_PRESSURE", "CHRONIC DISEASE", "FATIGUE ", "ALLERGY ", "WHEEZING", "ALCOHOL CONSUMING", "COUGHING", "SHORTNESS OF BREATH", "SWALLOWING DIFFICULTY", "CHEST PAIN"],
+    "models": "all",
+    "trials": 1
+  },
+  "outputs": {
+  }
+}

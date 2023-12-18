@@ -14,6 +14,8 @@ from src.save import ModelResults
 from datetime import datetime
 
 from rich.progress import Progress, TimeElapsedColumn, ProgressColumn, SpinnerColumn, BarColumn, TextColumn
+import builtins
+import logging
 
 def main_loop(config_path):
     start_time = time.perf_counter()
@@ -87,6 +89,9 @@ def main_loop(config_path):
 
     total_progress_amount = trials * len(outputs) * len(models_to_use)
     with Progress(SpinnerColumn(), *Progress.get_default_columns(), TimeElapsedColumn()) as progress:
+        builtins.print = progress.console.print
+        logging.log = progress.console.log
+
         main_task = progress.add_task(f"[red]{config_path}", total=total_progress_amount)
 
         outputs = pd.DataFrame(outputs)
