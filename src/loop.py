@@ -59,6 +59,14 @@ def main_loop(config_path):
 
     dataset = dataset.drop(outputs_selection, axis=1)
 
+    # Loop through categorical features and fill null values with most frequent
+    for feature in categorical_features:
+        dataset[feature] = dataset[feature].fillna(dataset[feature].value_counts().index[0])
+
+    # Loop through numerical features and fill null values with mean
+    for feature in numerical_features:
+        dataset[feature] = dataset[feature].fillna(dataset[feature].mean())
+
     # Normalize Inputs
     preprocessor = ColumnTransformer(
         transformers =
@@ -71,9 +79,6 @@ def main_loop(config_path):
         remainder='passthrough',
         verbose_feature_names_out=False).set_output(transform = 'pandas')
     x_dataset = preprocessor.fit_transform(dataset)
-
-    # Handle null values
-    x_dataset = pd.DataFrame(x_dataset).fillna(axis=1, method='ffill')
 
     # Map the outputs to dictionary
     for key, value in config['outputs'].items():
@@ -123,8 +128,8 @@ def main_loop(config_path):
                         # Save Results
                         for metric, value in performance.items():
                             models_results.add_result(model_name, output, metric, value)
-                    except:
-                        print(f"[{datetime.now().strftime('%H:%M:%S')}] Error with {model_name} on {output}.")
+                    except Exception as e:
+                        print(f"[{datetime.now().strftime('%H:%M:%S')}] Error with {model_name} on {output}, {e}")
                     progress.update(main_task, advance=1)
         models_results.save_results_raw_csv(results_path + "/results_raw.csv")
         models_results.save_results_averages_csv(results_path + "/results_average.csv")
