@@ -1,7 +1,7 @@
 {
   "location": {
-    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/data/TDF.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/tdf_results/"
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/ptf/data/TDF.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/ptf/results/tdf_results/"
   },
   "experiment": {
     "metrics": ["accuracy", "precision", "recall", "f1", "train_time"],

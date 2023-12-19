@@ -1,7 +1,7 @@
 {
   "location": {
-    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/data/KDD.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/kdd_results/"
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/ptf/data/KDD.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/ptf/results/kdd_results/"
   },
   "experiment": {
     "metrics": ["accuracy", "precision", "recall", "f1", "train_time", "predict_time"],
