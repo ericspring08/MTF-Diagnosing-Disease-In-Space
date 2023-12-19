@@ -1,22 +1,10 @@
-import json
-import os
-import sys
-
-from sklearn.compose import ColumnTransformer
-from sklearn.model_selection import train_test_split
-import pandas as pd
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-
-import models
-from src.utils import *
+from ptf.ptf import *
 import time
-from models import *
-from src.save import ModelResults
+from ptf.ptf import ModelResults
 from datetime import datetime
 
-from rich.progress import Progress, TimeElapsedColumn, ProgressColumn, SpinnerColumn, BarColumn, TextColumn
-import builtins
-import logging
+from rich.progress import Progress, TimeElapsedColumn, SpinnerColumn
+
 
 def main_loop(config_path):
     start_time = time.perf_counter()
@@ -90,8 +78,6 @@ def main_loop(config_path):
 
     total_progress_amount = trials * len(outputs) * len(models_to_use)
     with Progress(SpinnerColumn(), *Progress.get_default_columns(), TimeElapsedColumn()) as progress:
-        builtins.print = progress.console.print
-        sys.stdout.write = progress.console.print
 
         main_task = progress.add_task(f"[red]{config_path}", total=total_progress_amount)
 

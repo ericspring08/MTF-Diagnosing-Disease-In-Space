@@ -5,3 +5,4 @@ Results
 .DS_Store
 __pycache__
 nosave*
+node_modules
