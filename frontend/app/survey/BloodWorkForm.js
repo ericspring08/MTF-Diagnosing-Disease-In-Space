@@ -23,7 +23,7 @@ const BloodWorkForm = () => {
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto mt-8">
       <div className="mb-4">
-        <label htmlFor="cholesterol" className="block text-gray-700 font-semibold mb-2">
+        <label htmlFor="cholesterol" className="block text-gray-700 font-semibold mb-2 dark:text-gray-100">
           Cholesterol
         </label>
         <input
@@ -37,7 +37,7 @@ const BloodWorkForm = () => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="wbcCount" className="block text-gray-700 font-semibold mb-2">
+        <label htmlFor="wbcCount" className="block text-gray-700 font-semibold mb-2 dark:text-gray-100">
           WBC Count
         </label>
         <input
