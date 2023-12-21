@@ -1,5 +1,5 @@
 import React from 'react';
-import BloodWorkForm from '../app/BloodWorkForm';
+import BloodWorkForm from './BloodWorkForm';
 
 const BloodWorkPage = () => {
   return (
