@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 
 const HeartDiseaseForm = () => {
+  const heartLink = 'https://nasahunch.vercel.app/cardio';
   const [formData, setFormData] = useState({
     age: '',
     weight: '',
@@ -121,14 +123,16 @@ const HeartDiseaseForm = () => {
       </div>
       <div className="mt-6">
       </div>
-      <div className="mt-6">
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-        >
-          Submit
-        </button>
-      </div>
+      <Link href={heartLink}>
+        <div className="mt-6">
+          <button
+           type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+          >
+            Next
+          </button>
+        </div>
+      </Link>
     </form>
   );
 };
