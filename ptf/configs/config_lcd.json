@@ -8,7 +8,7 @@
     "outputs": ["LUNG_CANCER"],
     "numerical": ["AGE"],
     "categorical": ["GENDER","SMOKING", "YELLOW_FINGERS", "ANXIETY", "PEER_PRESSURE", "CHRONIC DISEASE", "FATIGUE ", "ALLERGY ", "WHEEZING", "ALCOHOL CONSUMING", "COUGHING", "SHORTNESS OF BREATH", "SWALLOWING DIFFICULTY", "CHEST PAIN"],
-    "models": ["Dummy"],
+    "models": "all",
     "trials": 1
   },
   "outputs": {
