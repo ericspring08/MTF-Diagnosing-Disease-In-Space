@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import BloodWorkForm from './BloodWorkForm2';
+import BloodWorkForm from './BloodWorkForm';
 
 const BloodWorkPage = () => {
   return (
