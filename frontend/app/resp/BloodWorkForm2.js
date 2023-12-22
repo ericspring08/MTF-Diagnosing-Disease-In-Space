@@ -2,60 +2,9 @@ import React, { useState } from 'react';
 
 const HeartDiseaseForm = () => {
   const [formData, setFormData] = useState({
-    age: '',
-    weight: '',
-    sex: '',
-    bmi: '',
-    dm: '',
-    htn: '',
-    currentSmoker: '',
-    exSmoker: '',
-    fh: '',
-    obesity: '',
-    crf: '',
-    cva: '',
-    airwayDisease: '',
-    thyroidDisease: '',
-    chf: '',
-    dlp: '',
-    bp: '',
-    pr: '',
-    edema: '',
-    weakPeripheralPulse: '',
-    lungRales: '',
-    systolicMurmur: '',
-    diastolicMurmur: '',
-    typicalChestPain: '',
-    dyspnea: '',
-    functionClass: '',
-    atypical: '',
-    nonanginalCP: '',
-    exertionalCP: '',
-    lowThAng: '',
-    eCG: '',
-    qWave: '',
-    stElevation: '',
-    stDepression: '',
-    tInversion: '',
-    lvh: '',
-    poorRProgression: '',
-    fbs: '',
-    cr: '',
-    tg: '',
-    ldl: '',
-    hdl: '',
-    bun: '',
-    esr: '',
-    hb: '',
-    k: '',
-    na: '',
-    wbc: '',
-    lymph: '',
-    neut: '',
-    plt: '',
-    ef: '',
-    regionWithRwma: '',
-    vhd: '',
+    asthma: '',
+    o2Saturation: '',
+    pefr: '',
   });
 
   const handleChange = (e) => {
@@ -68,58 +17,55 @@ const HeartDiseaseForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData); 
+    console.log(formData);
+    // Add your submission logic here
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto mt-8">
       <div className="mb-4">
-        <label htmlFor="age" className="block text-gray-700 font-semibold mb-2">
-          Age
-        </label>
-        <input
-          type="number"
-          id="age"
-          name="age"
-          value={formData.age}
-          onChange={handleChange}
-          placeholder="Enter age"
-          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-        />
-      </div>
-      {/* Weight */}
-      <div className="mb-4">
-        <label htmlFor="weight" className="block text-gray-700 font-semibold mb-2">
-          Weight
-        </label>
-        <input
-          type="number"
-          id="weight"
-          name="weight"
-          value={formData.weight}
-          onChange={handleChange}
-          placeholder="Enter weight"
-          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-        />
-      </div>
-      {/* Sex */}
-      <div className="mb-4">
-        <label htmlFor="sex" className="block text-gray-700 font-semibold mb-2">
-          Sex
+        <label htmlFor="asthma" className="block text-gray-700 font-semibold mb-2">
+          Asthma
         </label>
         <select
-          id="sex"
-          name="sex"
-          value={formData.sex}
+          id="asthma"
+          name="asthma"
+          value={formData.asthma}
           onChange={handleChange}
           className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         >
-          <option value="">Select sex</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="">Do you have asthma?</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
         </select>
       </div>
-      <div className="mt-6">
+      <div className="mb-4">
+        <label htmlFor="o2Saturation" className="block text-gray-700 font-semibold mb-2">
+          O2 Saturation Level
+        </label>
+        <input
+          type="number"
+          id="o2Saturation"
+          name="o2Saturation"
+          value={formData.o2Saturation}
+          onChange={handleChange}
+          placeholder="Enter O2 saturation level"
+          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+        />
+      </div>
+      <div className="mb-4">
+        <label htmlFor="pefr" className="block text-gray-700 font-semibold mb-2">
+          PEFR
+        </label>
+        <input
+          type="number"
+          id="pefr"
+          name="pefr"
+          value={formData.pefr}
+          onChange={handleChange}
+          placeholder="Enter PEFR"
+          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+        />
       </div>
       <div className="mt-6">
         <button
