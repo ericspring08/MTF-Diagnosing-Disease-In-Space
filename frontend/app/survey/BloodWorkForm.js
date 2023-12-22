@@ -124,7 +124,7 @@ const HeartDiseaseForm = () => {
       {/*new attribute*/}
       <div className="mb-4">
         <label htmlFor="Current Smoker" className="block text-gray-700 font-semibold mb-2">
-          Sex
+          Current Smoker
         </label>
         <select
           id="currentsmoker"
