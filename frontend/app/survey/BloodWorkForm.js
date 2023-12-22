@@ -56,7 +56,6 @@ const HeartDiseaseForm = () => {
     ef: '',
     regionWithRwma: '',
     vhd: '',
-    // ... add more fields
   });
 
   const handleChange = (e) => {
@@ -69,13 +68,11 @@ const HeartDiseaseForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log(formData); // Replace this with your submission logic
+    console.log(formData); 
   };
 
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto mt-8">
-      {/* Render form fields for various attributes */}
       <div className="mb-4">
         <label htmlFor="age" className="block text-gray-700 font-semibold mb-2">
           Age
@@ -90,7 +87,6 @@ const HeartDiseaseForm = () => {
           className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         />
       </div>
-      {/* Add more fields using a similar structure */}
       {/* Weight */}
       <div className="mb-4">
         <label htmlFor="weight" className="block text-gray-700 font-semibold mb-2">
@@ -123,8 +119,6 @@ const HeartDiseaseForm = () => {
           <option value="female">Female</option>
         </select>
       </div>
-      {/* Add more fields using a similar structure */}
-      {/* ... (continue adding fields for all attributes) */}
       <div className="mt-6">
         <button
           type="submit"
