@@ -13,10 +13,13 @@ const HomePage = () => {
         />
       </div>
       <div className="relative z-10 text-center">
+        <h1 className="text-white text-6xl font-bold mb-8">Prototype</h1>
+        <h1 className="text-white text-6xl font-bold mb-8">Testing</h1>
+        <h1 className="text-white text-6xl font-bold mb-8">Framework</h1>
         <Link href="https://nasahunch.vercel.app/survey">
           <a
             className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-full shadow-md focus:outline-none text-4xl font-semibold"
-            target="_blank" rel="noopener noreferrer" 
+            target="_blank" rel="noopener noreferrer"
           >
             Survey
           </a>
