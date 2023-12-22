@@ -1,8 +1,11 @@
-
 import React from 'react';
 import Link from 'next/link';
 
 const HomePage = () => {
+  const surveyLink = 'https://nasahunch.vercel.app/survey';
+  const heartLink = 'https://nasahunch.vercel.app/cardio';
+  const respLink = 'https://nasahunch.vercel.app/resp';
+
   return (
     <div className="h-screen flex justify-center items-center relative">
       <div className="absolute inset-0 overflow-hidden z-0">
@@ -13,15 +16,28 @@ const HomePage = () => {
         />
       </div>
       <div className="relative z-10 text-center">
-        <h1 className="text-white text-6xl font-bold mb-8">Prototype</h1>
-        <h1 className="text-white text-6xl font-bold mb-8">Testing</h1>
-        <h1 className="text-white text-6xl font-bold mb-8">Framework</h1>
-        <Link href="https://nasahunch.vercel.app/survey">
+        <Link href={surveyLink}>
+          <a
+            className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-full shadow-md focus:outline-none text-4xl font-semibold mr-4"
+            target="_blank" rel="noopener noreferrer"
+          >
+            Basics
+          </a>
+        </Link>
+        <Link href={heartLink}>
+          <a
+            className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-full shadow-md focus:outline-none text-4xl font-semibold mr-4"
+            target="_blank" rel="noopener noreferrer"
+          >
+            Cardiovascular
+          </a>
+        </Link>
+        <Link href={respLink}>
           <a
             className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-full shadow-md focus:outline-none text-4xl font-semibold"
             target="_blank" rel="noopener noreferrer"
           >
-            Survey
+            Respiratory
           </a>
         </Link>
       </div>
