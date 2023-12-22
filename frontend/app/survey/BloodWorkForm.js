@@ -127,6 +127,31 @@ const HeartDiseaseForm = () => {
           Submit
         </button>
       </div>
+      {/*new attribute*/}
+      <div className="mb-4">
+        <label htmlFor="Current Smoker" className="block text-gray-700 font-semibold mb-2">
+          Sex
+        </label>
+        <select
+          id="currentsmoker"
+          name="currentsmoker"
+          value={formData.currentSmoker}
+          onChange={handleChange}
+          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+        >
+          <option value="">Current Smoker?</option>
+          <option value="male">Yes</option>
+          <option value="female">No</option>
+        </select>
+      </div>
+      <div className="mt-6">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+        >
+          Submit
+        </button>
+      </div>
     </form>
   );
 };
