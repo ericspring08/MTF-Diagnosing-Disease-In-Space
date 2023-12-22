@@ -5,7 +5,6 @@ from rich.progress import Progress, TimeElapsedColumn, SpinnerColumn
 from datetime import datetime
 import os
 
-
 def graph(args):
     output_location = args.output
     df = pd.read_csv(args.file)
