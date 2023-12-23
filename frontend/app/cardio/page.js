@@ -41,23 +41,29 @@ const BloodWorkPage = () => {
                 <button
                     onClick={() => setFormIndex(formIndex + 1)}
                     className="btn">
+                    style={{ marginLeft: '10px' }} 
                     Next
                 </button>
             )
         } else if (formIndex === 2) {
             return (
                 <div>
-                    <button
-                        onClick={() => setFormIndex(formIndex - 1)}
-                        className="btn">
-                        Previous
-                    </button>
-                    <button
-                        onClick={() => submitData()}
-                        className="btn">
-                        Submit
-                    </button>
-                </div>
+  <button
+    onClick={() => setFormIndex(formIndex - 1)}
+    className="btn"
+    style={{ marginRight: '10px' }} 
+  >
+    Previous
+  </button>
+  <button
+    onClick={() => submitData()}
+    className="btn"
+    style={{ marginLeft: '10px' }} 
+  >
+    Submit
+  </button>
+</div>
+
             )
         } else {
             return (
