@@ -40,8 +40,7 @@ const BloodWorkPage = () => {
           return (
             <button
               onClick={() => setFormIndex(formIndex + 1)}
-              className="btn"
-              style={{ marginLeft: '10px' }}
+              className="btn ml-10"
             >
               Next
             </button>
@@ -51,15 +50,13 @@ const BloodWorkPage = () => {
             <div>
               <button
                 onClick={() => setFormIndex(formIndex - 1)}
-                className="btn"
-                style={{ marginRight: '10px' }}
+                className="btn mr-10"
               >
                 Previous
               </button>
               <button
                 onClick={() => submitData()}
-                className="btn"
-                style={{ marginLeft: '10px' }}
+                className="btn ml-10"
               >
                 Submit
               </button>
@@ -70,15 +67,13 @@ const BloodWorkPage = () => {
             <div className="flex">
               <button
                 onClick={() => setFormIndex(formIndex - 1)}
-                className="btn"
-                style={{ marginRight: '5px' }}
+                className="btn mr-5"
               >
                 Previous
               </button>
               <button
                 onClick={() => setFormIndex(formIndex + 1)}
-                className="btn"
-                style={{ marginLeft: '5px' }}
+                className="btn ml-5"
               >
                 Next
               </button>
