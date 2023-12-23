@@ -21,7 +21,6 @@ const HeartDiseaseForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
-    // Add your submission logic here
   };
 
   return (
@@ -66,8 +65,10 @@ const HeartDiseaseForm = () => {
           name="chestPain"
           value={formData.chestPain}
           onChange={handleChange}
-          placeholder="Enter chest pain level (numerical)"
+          placeholder="Enter chest pain level (0, 1, 2, or 3)"
           className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+          min="0"
+          max="3"
         />
       </div>
       <div className="mb-4">
