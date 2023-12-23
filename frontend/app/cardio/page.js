@@ -37,34 +37,34 @@ const BloodWorkPage = () => {
     }
     const Buttons = () => {
         if (formIndex === 0) {
-            return (
-                <button
-                    onClick={() => setFormIndex(formIndex + 1)}
-                    className="btn">
-                    style={{ marginLeft: '10px' }} 
-                    Next
-                </button>
-            )
+          return (
+            <button
+              onClick={() => setFormIndex(formIndex + 1)}
+              className="btn"
+              style={{ marginLeft: '10px' }}
+            >
+              Next
+            </button>
+          );
         } else if (formIndex === forms.length - 1) {
-            return (
-                <div>
-  <button
-    onClick={() => setFormIndex(formIndex - 1)}
-    className="btn"
-    style={{ marginRight: '10px' }} 
-  >
-    Previous
-  </button>
-  <button
-    onClick={() => submitData()}
-    className="btn"
-    style={{ marginLeft: '10px' }} 
-  >
-    Submit
-  </button>
-</div>
-
-            )
+          return (
+            <div>
+              <button
+                onClick={() => setFormIndex(formIndex - 1)}
+                className="btn"
+                style={{ marginRight: '10px' }}
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => submitData()}
+                className="btn"
+                style={{ marginLeft: '10px' }}
+              >
+                Submit
+              </button>
+            </div>
+          );
         } else {
           return (
             <div className="flex">
