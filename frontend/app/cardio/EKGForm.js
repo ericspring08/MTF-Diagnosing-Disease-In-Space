@@ -11,6 +11,7 @@ const HeartDiseaseForm = ({formData, setFormData}) => {
 
   return (
       <div className="max-w-lg mx-auto mt-8">
+          <h1 className="text-6xl">EKG</h1>
       <div className="mb-4">
         <label htmlFor="thalach" className="block text-gray-700 font-semibold mb-2">
           Maximum Heart Rate
