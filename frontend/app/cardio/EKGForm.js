@@ -21,7 +21,7 @@ const HeartDiseaseForm = ({formData, setFormData}) => {
           name="thalach"
           value={formData.thalach}
           onChange={handleChange}
-          placeholder="Enter maximum heart rate"
+          placeholder="Enter maximum heart rate (bpm)"
           className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         />
       </div>
@@ -52,7 +52,7 @@ const HeartDiseaseForm = ({formData, setFormData}) => {
           name="oldpeak"
           value={formData.oldpeak}
           onChange={handleChange}
-          placeholder="Enter oldpeak"
+          placeholder="Enter oldpeak (slope)"
           className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         />
       </div>

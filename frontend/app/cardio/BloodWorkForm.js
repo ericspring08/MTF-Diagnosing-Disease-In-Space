@@ -23,7 +23,7 @@ const HeartDiseaseForm = ({formData, setFormData}) => {
           name="trestbps"
           value={formData.trestbps}
           onChange={handleChange}
-          placeholder="Enter resting blood pressure"
+          placeholder="Enter resting blood pressure (mm of Hg)"
           className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         />
       </div>
@@ -37,7 +37,7 @@ const HeartDiseaseForm = ({formData, setFormData}) => {
             name="chol"
             value={formData.chol}
             onChange={handleChange}
-            placeholder="Enter serum cholesterol"
+            placeholder="Enter serum cholesterol mg/dL"
             className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         />
       </div>
