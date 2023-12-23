@@ -62,19 +62,23 @@ const HeartDiseaseForm = () => {
   return (  
       <form onSubmit={handleSubmit} className="max-w-lg mx-auto mt-8">
       <div className="mb-4">
-        <label htmlFor="restingECG" className="block text-gray-700 font-semibold mb-2">
-          Resting ECG
-        </label>
-        <input
-          type="number"
-          id="restingECG"
-          name="restingECG"
-          value={formData.restingECG}
-          onChange={handleChange}
-          placeholder="Enter resting ECG (0, 1, or 2)"
-          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-        />
-      </div>
+  <label htmlFor="restingECG" className="block text-gray-700 font-semibold mb-2">
+    Resting ECG
+  </label>
+  <select
+    id="restingECG"
+    name="restingECG"
+    value={formData.restingECG}
+    onChange={handleChange}
+    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+  >
+    <option value="">Select resting ECG</option>
+    <option value="0">0 - Normal</option>
+    <option value="1">1 - Abnormality</option>
+    <option value="2">2 - Showing probable or definite left ventricular hypertrophy</option>
+  </select>
+</div>
+
       <div className="mb-4">
         <label htmlFor="maxHeartRate" className="block text-gray-700 font-semibold mb-2">
           Maximum Heart Rate
