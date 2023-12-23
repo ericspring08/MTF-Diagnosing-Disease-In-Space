@@ -42,6 +42,7 @@ const BloodWorkPage = () => {
                 <button
                     onClick={() => setFormIndex(formIndex + 1)}
                     className="btn">
+                    style={{ marginLeft: '10px' }} 
                     Next
                 </button>
             )
