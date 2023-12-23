@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 import os
 import pickle
@@ -74,7 +74,7 @@ def main_loop(config_path):
           OneHotEncoder(handle_unknown='infrequent_if_exist', sparse_output=False),
           categorical_features),
          ('scaler',
-          MinMaxScaler(),
+          StandardScaler(),
           numerical_features)],
         remainder='passthrough',
         verbose_feature_names_out=False).set_output(transform = 'pandas')
