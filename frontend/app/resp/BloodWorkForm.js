@@ -24,7 +24,10 @@ const HeartDiseaseForm = () => {
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto mt-8">
       <div className="mb-4">
-        <label htmlFor="asthma" className="block text-gray-700 font-semibold mb-2">
+        <label
+          htmlFor="asthma"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           Asthma
         </label>
         <select
@@ -40,7 +43,10 @@ const HeartDiseaseForm = () => {
         </select>
       </div>
       <div className="mb-4">
-        <label htmlFor="o2Saturation" className="block text-gray-700 font-semibold mb-2">
+        <label
+          htmlFor="o2Saturation"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           O2 Saturation Level
         </label>
         <input
@@ -54,7 +60,10 @@ const HeartDiseaseForm = () => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="pefr" className="block text-gray-700 font-semibold mb-2">
+        <label
+          htmlFor="pefr"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           PEFR
         </label>
         <input

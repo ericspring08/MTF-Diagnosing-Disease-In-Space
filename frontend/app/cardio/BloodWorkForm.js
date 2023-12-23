@@ -1,20 +1,23 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
-const HeartDiseaseForm = ({formData, setFormData}) => {
+const HeartDiseaseForm = ({ formData, setFormData }) => {
   const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(() => ({
-            ...formData,
-            [name]: value,
-        }));
+    const { name, value } = e.target;
+    setFormData(() => ({
+      ...formData,
+      [name]: value,
+    }));
   };
 
   return (
-      <div className="max-w-lg mx-auto mt-8">
-        <h1 className="text-6xl">Blood Work</h1>
+    <div className="max-w-lg mx-auto mt-8">
+      <h1 className="text-6xl">Blood Work</h1>
       <div className="mb-4">
-        <label htmlFor="trestbps" className="block text-gray-700 font-semibold mb-2">
+        <label
+          htmlFor="trestbps"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           Resting Blood Pressure
         </label>
         <input
@@ -28,17 +31,20 @@ const HeartDiseaseForm = ({formData, setFormData}) => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="chol" className="block text-gray-700 font-semibold mb-2">
+        <label
+          htmlFor="chol"
+          className="block text-gray-700 font-semibold mb-2"
+        >
           Serum Cholesterol
         </label>
         <input
-            type="number"
-            id="chol"
-            name="chol"
-            value={formData.chol}
-            onChange={handleChange}
-            placeholder="Enter serum cholesterol mg/dL"
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+          type="number"
+          id="chol"
+          name="chol"
+          value={formData.chol}
+          onChange={handleChange}
+          placeholder="Enter serum cholesterol mg/dL"
+          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         />
       </div>
       <div className="mb-4">
@@ -46,9 +52,9 @@ const HeartDiseaseForm = ({formData, setFormData}) => {
           Fasting Blood Sugar &gt;120mg/dl
         </label>
         <select
-            id="fbs"
-            name="fbs"
-            value={formData.fbs}
+          id="fbs"
+          name="fbs"
+          value={formData.fbs}
           onChange={handleChange}
           className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         >
@@ -57,7 +63,7 @@ const HeartDiseaseForm = ({formData, setFormData}) => {
           <option value="0">No</option>
         </select>
       </div>
-      </div>
+    </div>
   );
 };
 
