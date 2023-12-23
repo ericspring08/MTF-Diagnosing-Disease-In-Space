@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react';
 import BasicsForm from './BasicsForm';
 import EKGForm from './EKGForm';
 import BloodWork from './BloodWorkForm';
+import axios from 'axios';
 
 const BloodWorkPage = () => {
     const forms = [<BasicsForm key="basics"/>, <BloodWork key="bloodwork"/>, <EKGForm key="ekg"/>]
@@ -78,7 +79,8 @@ const BloodWorkPage = () => {
     }
 
     const submitData = async () => {
-        console.log(formData)
+        const res = await axios.post('https://nasahunchapi.onrender.com/hdd', formData)
+        alert(res.data)
     };
 
     return (
