@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import Link from 'next/link';
 
 const HeartDiseaseForm = () => {
@@ -8,6 +9,8 @@ const HeartDiseaseForm = () => {
     serumCholesterol: '',
     fastingBloodSugar: '',
   });
+
+  const [userInputs, setUserInputs] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,8 +22,25 @@ const HeartDiseaseForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
-    // Add your submission logic here
+
+    setUserInputs((prevInputs) => [...prevInputs, formData]);
+
+    setFormData({
+      restingBloodPressure: '',
+      serumCholesterol: '',
+      fastingBloodSugar: '',
+    });
+  };
+
+  const sendToServer = async () => {
+    try {
+      const response = await axios.post('https://your-backend-server.com/api/store-inputs', {
+        userInputs,
+      });
+      console.log('User inputs sent:', response.data);
+    } catch (error) {
+      console.error('Error sending user inputs:', error);
+    }
   };
 
   return (
@@ -73,6 +93,7 @@ const HeartDiseaseForm = () => {
         <div className="mt-6">
           <button
             type="submit"
+            onClick={sendToServer}
             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
           >
             Next
