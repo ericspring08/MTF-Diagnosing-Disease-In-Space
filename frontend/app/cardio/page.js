@@ -80,7 +80,7 @@ const BloodWorkPage = () => {
 
     const submitData = async () => {
         const res = await axios.post('https://nasahunchapi.onrender.com/hdd', formData)
-        alert(`Preidction: ${res.data.prediction} \n Probability: ${res.data.probability}`)
+        alert(`Prediction: ${res.data.prediction} \n Probability: ${res.data.probability}`)
     };
 
     return (
