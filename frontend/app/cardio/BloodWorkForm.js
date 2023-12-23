@@ -88,21 +88,24 @@ const HeartDiseaseForm = () => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="chestPain" className="block text-gray-700 font-semibold mb-2">
-          Chest Pain
-        </label>
-        <input
-          type="number"
-          id="chestPain"
-          name="chestPain"
-          value={formData.chestPain}
-          onChange={handleChange}
-          placeholder="Enter chest pain level (0, 1, 2, or 3)"
-          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-          min="0"
-          max="3"
-        />
-      </div>
+  <label htmlFor="chestPain" className="block text-gray-700 font-semibold mb-2">
+    Chest Pain
+  </label>
+  <select
+    id="chestPain"
+    name="chestPain"
+    value={formData.chestPain}
+    onChange={handleChange}
+    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+  >
+    <option value="">Select chest pain level</option>
+    <option value="0">0 - No chest pain</option>
+    <option value="1">1 - Mild chest pain</option>
+    <option value="2">2 - Moderate chest pain</option>
+    <option value="3">3 - Severe chest pain</option>
+  </select>
+</div>
+
       <div className="mb-4">
         <label htmlFor="exerciseInducedAngina" className="block text-gray-700 font-semibold mb-2">
           Exercise Induced Angina
