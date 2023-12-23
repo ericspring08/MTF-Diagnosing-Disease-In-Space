@@ -1,57 +1,13 @@
 import React, {useState} from 'react';
 import axios from 'axios';
 
-const BasicsForm = () => {
-    const respLink = 'https://nasahunch.vercel.app/morecardio';
-    const [formData, setFormData] = useState({
-        sex: '',
-        age: '',
-        chestPain: '',
-        exerciseInducedAngina: '',
-    });
-
-    const [userInputs, setUserInputs] = useState([]);
-
+const BasicsForm = ({formData, setFormData}) => {
     const handleChange = (e) => {
         const {name, value} = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
+        setFormData(() => ({
+            ...formData,
             [name]: value,
         }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        const requiredFields = ['sex', 'age', 'chestPain', 'exerciseInducedAngina'];
-
-        const isAnyFieldEmpty = requiredFields.some((field) => !formData[field]);
-
-        if (isAnyFieldEmpty) {
-            alert('Please fill out all required fields');
-            console.log('Please fill out all required fields');
-            return;
-        }
-
-        setUserInputs((prevInputs) => [...prevInputs, formData]);
-
-        setFormData({
-            sex: '',
-            age: '',
-            chestPain: '',
-            exerciseInducedAngina: '',
-        });
-    };
-
-    const sendToServer = async () => {
-        try {
-            const response = await axios.post('https://your-backend-server.com/api/store-inputs', {
-                userInputs,
-            });
-            console.log('User inputs sent:', response.data);
-        } catch (error) {
-            console.error('Error sending user inputs:', error);
-        }
     };
 
     return (
@@ -69,8 +25,8 @@ const BasicsForm = () => {
                     className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
                 >
                     <option value="">Select sex</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
+                    <option value="1">Male</option>
+                    <option value="0">Female</option>
                 </select>
             </div>
             <div className="mb-4">
@@ -88,13 +44,13 @@ const BasicsForm = () => {
                 />
             </div>
             <div className="mb-4">
-                <label htmlFor="chestPain" className="block text-gray-700 font-semibold mb-2">
+                <label htmlFor="cp" className="block text-gray-700 font-semibold mb-2">
                     Chest Pain
                 </label>
                 <select
-                    id="chestPain"
-                    name="chestPain"
-                    value={formData.chestPain}
+                    id="cp"
+                    name="cp"
+                    value={formData.cp}
                     onChange={handleChange}
                     className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
                 >
@@ -107,19 +63,19 @@ const BasicsForm = () => {
             </div>
 
             <div className="mb-4">
-                <label htmlFor="exerciseInducedAngina" className="block text-gray-700 font-semibold mb-2">
+                <label htmlFor="exang" className="block text-gray-700 font-semibold mb-2">
                     Exercise Induced Angina
                 </label>
                 <select
-                    id="exerciseInducedAngina"
-                    name="exerciseInducedAngina"
-                    value={formData.exerciseInducedAngina}
+                    id="exang"
+                    name="exang"
+                    value={formData.exang}
                     onChange={handleChange}
                     className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
                 >
                     <option value="">Do you have exercise-induced angina?</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
                 </select>
             </div>
         </div>

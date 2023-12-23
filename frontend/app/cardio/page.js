@@ -7,34 +7,87 @@ import BloodWork from './BloodWorkForm';
 const BloodWorkPage = () => {
     const forms = [<BasicsForm key="basics"/>, <BloodWork key="bloodwork"/>, <EKGForm key="ekg"/>]
     const [formIndex, setFormIndex] = useState(0)
+    const [formData, setFormData] = useState({
+        'age': '',
+        'sex': '',
+        'cp': '',
+        'trestbps': '',
+        'chol': '',
+        'fbs': '',
+        'restecg': '',
+        'thalach': '',
+        'exang': '',
+        'oldpeak': '',
+        'slope': '',
+        'ca': '',
+        'thal': ''
+    })
+
+    const ConditionalForm = () => {
+        switch (formIndex) {
+            case 0:
+                return <BasicsForm formData={formData} setFormData={setFormData}/>
+            case 1:
+                return <BloodWork formData={formData} setFormData={setFormData}/>
+            case 2:
+                return <EKGForm formData={formData} setFormData={setFormData}/>
+            default:
+                return <BasicsForm formData={formData} setFormData={setFormData}/>
+        }
+    }
+    const Buttons = () => {
+        if (formIndex === 0) {
+            return (
+                <button
+                    onClick={() => setFormIndex(formIndex + 1)}
+                    className="btn">
+                    Next
+                </button>
+            )
+        } else if (formIndex === forms.length - 1) {
+            return (
+                <div>
+                    <button
+                        onClick={() => setFormIndex(formIndex - 1)}
+                        className="btn">
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => submitData()}
+                        className="btn">
+                        Submit
+                    </button>
+                </div>
+            )
+        } else {
+            return (
+                <div className="flex">
+                    <button
+                        onClick={() => setFormIndex(formIndex - 1)}
+                        className="btn">
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => setFormIndex(formIndex + 1)}
+                        className="btn">
+                        Next
+                    </button>
+                </div>
+            )
+        }
+    }
+
+    const submitData = async () => {
+        console.log(formData)
+    };
 
     return (
         <div className="bg-gray-100 min-h-screen flex items-center justify-center dark:bg-gray-950">
             <div className="bg-white p-8 rounded-md shadow-md dark:bg-black">
                 <h1 className="text-2xl font-semibold mb-6">Cardiovascular Disease Risk Calculator</h1>
-                {forms[formIndex] || null}
+                {ConditionalForm()}
                 <div className="flex">
-                    {
-                        formIndex === 0 ? null : <button
-                            onClick={() => setFormIndex(formIndex - 1)}
-                            className="btn">
-                            Previous
-                        </button>
-                    }
-                    {
-                        formIndex === forms.length - 1 ? <button
-                            onClick={() => alert('You have completed the form!')}
-                            className="btn">
-                            Submit
-                        </button> : null
-                    }
-                    {
-                        formIndex === forms.length - 1 ? null : <button
-                            onClick={() => setFormIndex(formIndex + 1)}
-                            className="btn">
-                            Next
-                        </button>
-                    }
+                    <Buttons/>
                 </div>
             </div>
         </div>

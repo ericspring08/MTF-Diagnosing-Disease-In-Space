@@ -1,98 +1,46 @@
 import React, {useState} from 'react';
-import axios from 'axios';
-import Link from 'next/link';
 
-const HeartDiseaseForm = () => {
-  const respLink = 'https://nasahunch.vercel.app/resp';
-  const [formData, setFormData] = useState({
-    restingECG: '',
-    maxHeartRate: '',
-    oldpeak: '',
-    slope: '',
-    numMajorVessels: '',
-    thal: '',
-  });
-
-  const [userInputs, setUserInputs] = useState([]);
-
+const HeartDiseaseForm = ({formData, setFormData}) => {
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const requiredFields = ['restingECG', 'maxHeartRate', 'oldpeak', 'slope', 'numMajorVessels', 'thal'];
-
-    const isAnyFieldEmpty = requiredFields.some((field) => !formData[field]);
-
-    if (isAnyFieldEmpty) {
-    alert('Please fill out all required fields');
-    console.log('Please fill out all required fields');
-    return;
-  }
-
-    setUserInputs((prevInputs) => [...prevInputs, formData]);
-
-    setFormData({
-      restingECG: '',
-      maxHeartRate: '',
-      oldpeak: '',
-      slope: '',
-      numMajorVessels: '',
-      thal: '',
-    });
-  };
-
-  const sendToServer = async () => {
-    try {
-      const response = await axios.post('https://your-backend-server.com/api/store-inputs', {
-        userInputs,
-      });
-      console.log('User inputs sent:', response.data);
-    } catch (error) {
-      console.error('Error sending user inputs:', error);
-    }
+        const { name, value } = e.target;
+        setFormData(() => ({
+            ...formData,
+            [name]: value,
+        }));
   };
 
   return (
       <div className="max-w-lg mx-auto mt-8">
-
       <div className="mb-4">
-  <label htmlFor="restingECG" className="block text-gray-700 font-semibold mb-2">
-    Resting ECG
-  </label>
-  <select
-    id="restingECG"
-    name="restingECG"
-    value={formData.restingECG}
-    onChange={handleChange}
-    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-  >
-    <option value="">Select resting ECG</option>
-    <option value="0">0 - Normal</option>
-    <option value="1">1 - Abnormality</option>
-    <option value="2">2 - Showing probable or definite left ventricular hypertrophy</option>
-  </select>
-</div>
-
-      <div className="mb-4">
-        <label htmlFor="maxHeartRate" className="block text-gray-700 font-semibold mb-2">
+        <label htmlFor="thalach" className="block text-gray-700 font-semibold mb-2">
           Maximum Heart Rate
         </label>
         <input
           type="number"
-          id="maxHeartRate"
-          name="maxHeartRate"
-          value={formData.maxHeartRate}
+          id="thalach"
+          name="thalach"
+          value={formData.thalach}
           onChange={handleChange}
           placeholder="Enter maximum heart rate"
           className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         />
+      </div>
+      <div className="mb-4">
+          <label htmlFor="restecg">
+                Resting Electrocardiographic Results
+          </label>
+          <select
+            id="restecg"
+            name="restecg"
+            value={formData.restecg}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+          >
+            <option value="">Select resting electrocardiographic results</option>
+            <option value="0">0 - Normal</option>
+            <option value="1">1 - Abnormality</option>
+            <option value="2">2 - Showing probable or definite left ventricular hypertrophy</option>
+          </select>
       </div>
       <div className="mb-4">
         <label htmlFor="oldpeak" className="block text-gray-700 font-semibold mb-2">
@@ -123,22 +71,25 @@ const HeartDiseaseForm = () => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="numMajorVessels" className="block text-gray-700 font-semibold mb-2">
+        <label htmlFor="ca" className="block text-gray-700 font-semibold mb-2">
           Number of Major Vessels Colored by Fluorosopy
         </label>
-        <input
-          type="number"
-          id="numMajorVessels"
-          name="numMajorVessels"
-          value={formData.numMajorVessels}
-          onChange={handleChange}
-          placeholder="Enter number of major vessels"
-          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-        />
+        <select
+            id="ca"
+            name="ca"
+            value={formData.ca}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+            >
+            <option value="">Select number of major vessels</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select>
       </div>
       <div className="mb-4">
         <label htmlFor="thal" className="block text-gray-700 font-semibold mb-2">
-          Thal
+          Thalassemia
         </label>
         <select
           id="thal"
@@ -148,9 +99,9 @@ const HeartDiseaseForm = () => {
           className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         >
           <option value="">Select Thal</option>
-          <option value="normal">Normal</option>
-          <option value="fixed defect">Fixed Defect</option>
-          <option value="reversible defect">Reversible Defect</option>
+          <option value="1">Normal</option>
+          <option value="2">Fixed Defect</option>
+          <option value="3">Reversible Defect</option>
         </select>
       </div>
       </div>

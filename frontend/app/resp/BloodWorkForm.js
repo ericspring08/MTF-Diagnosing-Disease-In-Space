@@ -35,8 +35,8 @@ const HeartDiseaseForm = () => {
           className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
         >
           <option value="">Do you have asthma?</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
+          <option value="1">Yes</option>
+          <option value="0">No</option>
         </select>
       </div>
       <div className="mb-4">
