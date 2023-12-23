@@ -11,6 +11,9 @@ class Prediction(object):
 
     def preprocess(self):
         # Preprocess the data
+        # encode in types
+        for key in self.data.keys():
+            self.data[key] = format_dict[self.disease]['type'][key](self.data[key])
         headers = format_dict[self.disease]['features']
         categorical = format_dict[self.disease]['categorical']
         numerical = format_dict[self.disease]['numerical']
