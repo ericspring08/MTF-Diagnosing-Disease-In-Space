@@ -46,7 +46,7 @@ const BloodWorkPage = () => {
               Next
             </button>
           );
-        } else if (formIndex === forms.length - 1) {
+        } else if (formIndex === 2) {
           return (
             <div>
               <button
