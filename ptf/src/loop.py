@@ -3,9 +3,10 @@ from datetime import datetime
 import json
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.compose import ColumnTransformer
 import os
+import pickle
 
 from models import *
 from src.utils import *
@@ -73,11 +74,16 @@ def main_loop(config_path):
           OneHotEncoder(handle_unknown='infrequent_if_exist', sparse_output=False),
           categorical_features),
          ('scaler',
-          StandardScaler(),
+          MinMaxScaler(),
           numerical_features)],
         remainder='passthrough',
         verbose_feature_names_out=False).set_output(transform = 'pandas')
+
+    preprocessor.fit(dataset)
     x_dataset = preprocessor.fit_transform(dataset)
+    # Save Preprocessor
+    with open(os.path.join(results_path, 'hdd_standard_scaler.pkl'), 'wb') as f:
+        pickle.dump(preprocessor, f)
 
     # Map the outputs to dictionary
     for key, value in config['outputs'].items():
