@@ -24,6 +24,15 @@ const HeartDiseaseForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const requiredFields = ['sex', 'age', 'chestPain', 'exerciseInducedAngina'];
+
+    const isAnyFieldEmpty = requiredFields.some((field) => !formData[field]);
+
+    if (isAnyFieldEmpty) {
+    console.log('Please fill out all required fields');
+    return;
+  }
+
     setUserInputs((prevInputs) => [...prevInputs, formData]);
 
     setFormData({
