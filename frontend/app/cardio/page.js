@@ -45,7 +45,7 @@ const BloodWorkPage = () => {
                     Next
                 </button>
             )
-        } else if (formIndex === 2) {
+        } else if (formIndex === forms.length - 1) {
             return (
                 <div>
   <button
@@ -66,22 +66,27 @@ const BloodWorkPage = () => {
 
             )
         } else {
-            return (
-                <div className="flex">
-                    <button
-                        onClick={() => setFormIndex(formIndex - 1)}
-                        className="btn">
-                        Previous
-                    </button>
-                    <button
-                        onClick={() => setFormIndex(formIndex + 1)}
-                        className="btn">
-                        Next
-                    </button>
-                </div>
-            )
+          return (
+            <div className="flex">
+              <button
+                onClick={() => setFormIndex(formIndex - 1)}
+                className="btn"
+                style={{ marginRight: '5px' }}
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setFormIndex(formIndex + 1)}
+                className="btn"
+                style={{ marginLeft: '5px' }}
+              >
+                Next
+              </button>
+            </div>
+          );
         }
-    }
+      };
+      
 
     const submitData = async () => {
         const res = await axios.post('https://nasahunchapi.onrender.com/hdd', formData)
