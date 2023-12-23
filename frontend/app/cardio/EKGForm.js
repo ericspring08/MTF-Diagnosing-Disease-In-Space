@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 
@@ -59,8 +59,9 @@ const HeartDiseaseForm = () => {
     }
   };
 
-  return (  
-      <form onSubmit={handleSubmit} className="max-w-lg mx-auto mt-8">
+  return (
+      <div className="max-w-lg mx-auto mt-8">
+
       <div className="mb-4">
   <label htmlFor="restingECG" className="block text-gray-700 font-semibold mb-2">
     Resting ECG
@@ -152,18 +153,7 @@ const HeartDiseaseForm = () => {
           <option value="reversible defect">Reversible Defect</option>
         </select>
       </div>
-      <Link href={respLink}>
-        <div className="mt-6">
-          <button
-            onClick={sendToServer}
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-          >
-            Next
-          </button>
-        </div>
-      </Link>
-    </form>
+      </div>
   );
 };
 
