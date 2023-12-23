@@ -28,6 +28,7 @@ const HeartDiseaseForm = () => {
     const isAnyFieldEmpty = requiredFields.some((field) => !formData[field]);
 
     if (isAnyFieldEmpty) {
+    window.alert('Please fill out all required fields');
     console.log('Please fill out all required fields');
     return;
   }
