@@ -6,7 +6,6 @@ import BloodWork from './BloodWorkForm';
 import axios from 'axios';
 
 const BloodWorkPage = () => {
-    const forms = [<BasicsForm key="basics"/>, <BloodWork key="bloodwork"/>, <EKGForm key="ekg"/>]
     const [formIndex, setFormIndex] = useState(0)
     const [formData, setFormData] = useState({
         'age': '',
@@ -45,7 +44,7 @@ const BloodWorkPage = () => {
                     Next
                 </button>
             )
-        } else if (formIndex === forms.length - 1) {
+        } else if (formIndex === 2) {
             return (
                 <div>
                     <button
@@ -80,6 +79,7 @@ const BloodWorkPage = () => {
 
     const submitData = async () => {
         const res = await axios.post('https://nasahunchapi.onrender.com/hdd', formData)
+        console.log(res.data)
         alert(`Preidction: ${res.data.prediction} \n Probability: ${res.data.probability}`)
     };
 
