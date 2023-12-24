@@ -26,14 +26,19 @@ const BloodWorkPage = () => {
 
      const [disableNext, setDisableNext] = useState(true);
 
+     // the features that are required to be filled out for each page
      const features_per_page = {
           0: ['sex', 'age', 'cp', 'exang'],
           1: ['trestbps', 'chol', 'fbs'],
           2: ['thalach', 'restecg', 'oldpeak', 'slope', 'ca', 'thal'],
      };
 
+     // checks every time form data changes or form index changes
      useEffect(() => {
+          // get the features that are required to be filled out for the current page
           const features = features_per_page[formIndex];
+
+          // check if any of the features are empty
           let disable = false;
           for (let i = 0; i < features.length; i++) {
                if (formData[features[i]] === '') {
@@ -41,6 +46,7 @@ const BloodWorkPage = () => {
                     break;
                }
           }
+          // Set the disableNext state to true or false accordingly
           setDisableNext(disable);
      }, [formData, formIndex]);
 
