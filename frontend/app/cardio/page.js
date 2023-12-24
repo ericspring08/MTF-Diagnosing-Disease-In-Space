@@ -1,4 +1,3 @@
-'use client';
 import React, { useState, useEffect } from 'react';
 import BasicsForm from './BasicsForm';
 import EKGForm from './EKGForm';
@@ -23,70 +22,29 @@ const BloodWorkPage = () => {
     thal: '',
   });
 
+  const [formsCompleted, setFormsCompleted] = useState(false);
+
   const ConditionalForm = () => {
     switch (formIndex) {
       case 0:
-        return <BasicsForm formData={formData} setFormData={setFormData} />;
+        return <BasicsForm formData={formData} setFormData={setFormData} updateFormCompletion={setFormsCompleted} />;
       case 1:
-        return <BloodWork formData={formData} setFormData={setFormData} />;
+        return <BloodWork formData={formData} setFormData={setFormData} updateFormCompletion={setFormsCompleted} />;
       case 2:
-        return <EKGForm formData={formData} setFormData={setFormData} />;
+        return <EKGForm formData={formData} setFormData={setFormData} updateFormCompletion={setFormsCompleted} />;
       default:
-        return <BasicsForm formData={formData} setFormData={setFormData} />;
-    }
-  };
-  const Buttons = () => {
-    if (formIndex === 0) {
-      return (
-        <button
-          onClick={() => setFormIndex(formIndex + 1)}
-          className="btn ml-10"
-        >
-          Next
-        </button>
-      );
-    } else if (formIndex === 2) {
-      return (
-        <div>
-          <button
-            onClick={() => setFormIndex(formIndex - 1)}
-            className="btn mr-10"
-          >
-            Previous
-          </button>
-          <button onClick={() => submitData()} className="btn ml-10">
-            Submit
-          </button>
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex">
-          <button
-            onClick={() => setFormIndex(formIndex - 1)}
-            className="btn mr-5"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => setFormIndex(formIndex + 1)}
-            className="btn ml-5"
-          >
-            Next
-          </button>
-        </div>
-      );
+        return <BasicsForm formData={formData} setFormData={setFormData} updateFormCompletion={setFormsCompleted} />;
     }
   };
 
-  const submitData = async () => {
+  const handleSubmit = async () => {
     const res = await axios.post(
       'https://nasahunchapi.onrender.com/hdd',
-      formData,
+      formData
     );
     console.log(res.data);
     alert(
-      `Preidction: ${res.data.prediction} \n Probability: ${res.data.probability}`,
+      `Prediction: ${res.data.prediction} \n Probability: ${res.data.probability}`
     );
   };
 
@@ -98,7 +56,36 @@ const BloodWorkPage = () => {
         </h1>
         {ConditionalForm()}
         <div className="flex">
-          <Buttons />
+          {formIndex !== 0 && (
+            <button
+              onClick={() => setFormIndex(formIndex - 1)}
+              className="btn mr-5"
+            >
+              Previous
+            </button>
+          )}
+          {formIndex !== 2 && (
+            <button
+              onClick={() => setFormIndex(formIndex + 1)}
+              className={`btn ml-5 ${
+                !formsCompleted ? 'disabled' : ''
+              }`}
+              disabled={!formsCompleted}
+            >
+              Next
+            </button>
+          )}
+          {formIndex === 2 && (
+            <button
+              onClick={handleSubmit}
+              className={`btn ml-5 ${
+                !formsCompleted ? 'disabled' : ''
+              }`}
+              disabled={!formsCompleted}
+            >
+              Submit
+            </button>
+          )}
         </div>
       </div>
     </div>
