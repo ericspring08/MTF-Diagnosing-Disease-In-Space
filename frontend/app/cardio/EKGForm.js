@@ -64,22 +64,23 @@ const HeartDiseaseForm = ({ formData, setFormData }) => {
         />
       </div>
       <div className="mb-4">
-        <label
-          htmlFor="slope"
-          className="block text-gray-700 font-semibold mb-2"
-        >
-          Slope of Peak Exercise ST Segment
-        </label>
-        <input
-          type="number"
-          id="slope"
-          name="slope"
-          value={formData.slope}
-          onChange={handleChange}
-          placeholder="Enter slope"
-          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
-        />
-      </div>
+  <label htmlFor="slope" className="block text-gray-700 font-semibold mb-2">
+    Slope of Peak Exercise ST Segment
+  </label>
+  <select
+    id="slope"
+    name="slope"
+    value={formData.slope}
+    onChange={handleChange}
+    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+  >
+    <option value="">Select slope</option>
+    <option value="0">0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+  </select>
+</div>
+
       <div className="mb-4">
         <label htmlFor="ca" className="block text-gray-700 font-semibold mb-2">
           Number of Major Vessels Colored by Fluorosopy
