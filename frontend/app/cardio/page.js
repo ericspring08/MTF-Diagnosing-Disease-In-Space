@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import BasicsForm from './BasicsForm';
 import EKGForm from './EKGForm';
 import BloodWork from './BloodWorkForm';
+import Results from './results';
 import axios from 'axios';
 
 const BloodWorkPage = () => {
@@ -73,6 +74,13 @@ const BloodWorkPage = () => {
                               setFormData={setFormData}
                          />
                     );
+               case 3:
+                    return (
+                        <Results
+                              formData={formData}
+                              setFormData={setFormData}
+                        />
+                      );
                default:
                     return (
                          <BasicsForm
@@ -121,7 +129,8 @@ const BloodWorkPage = () => {
                          )}
                          {formIndex === 2 && (
                               <button
-                                   onClick={handleSubmit}
+                                   //onClick={handleSubmit}
+                                   onClick={() => setFormIndex(formIndex + 1)}
                                    className="btn btn-success ml-5"
                                    disabled={disableNext}
                               >
