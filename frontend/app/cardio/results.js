@@ -1,5 +1,6 @@
 import Head from 'next/head';
 
+const Results = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Head>
@@ -15,3 +16,5 @@ import Head from 'next/head';
       </main>
     </div>
   );
+}
+export default Results;
