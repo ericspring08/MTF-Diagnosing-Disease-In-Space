@@ -105,7 +105,7 @@ const BloodWorkPage = () => {
                          {formIndex !== 0 && (
                               <button
                                    onClick={() => setFormIndex(formIndex - 1)}
-                                   className="btn btn-accent mr-5"
+                                   className="btn btn-warning mr-5"
                               >
                                    Previous
                               </button>
@@ -113,7 +113,7 @@ const BloodWorkPage = () => {
                          {formIndex !== 2 && (
                               <button
                                    onClick={() => setFormIndex(formIndex + 1)}
-                                   className="btn btn-primary ml-5"
+                                   className="btn btn-info ml-5"
                                    disabled={disableNext}
                               >
                                    Next
@@ -122,7 +122,7 @@ const BloodWorkPage = () => {
                          {formIndex === 2 && (
                               <button
                                    onClick={handleSubmit}
-                                   className="btn-primary ml-5"
+                                   className="btn btn-success ml-5"
                                    disabled={disableNext}
                               >
                                    Submit
