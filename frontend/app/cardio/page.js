@@ -96,12 +96,12 @@ const BloodWorkPage = () => {
 
      return (
           <div className="bg-gray-100 min-h-screen flex items-center justify-center dark:bg-gray-950">
-               <div className="bg-white p-8 rounded-md shadow-md dark:bg-gray-900">
+               <div className="bg-white p-8 rounded-md shadow-md dark:bg-gray-900 m-10">
                     <h1 className="text-2xl font-semibold mb-6">
                          Cardiovascular Disease Risk Calculator
                     </h1>
                     {ConditionalForm()}
-                    <div className="flex">
+                    <div className="flex flex-row justify-between">
                          {formIndex !== 0 && (
                               <button
                                    onClick={() => setFormIndex(formIndex - 1)}
@@ -113,7 +113,7 @@ const BloodWorkPage = () => {
                          {formIndex !== 2 && (
                               <button
                                    onClick={() => setFormIndex(formIndex + 1)}
-                                   className="btn btn-info ml-5"
+                                   className="btn btn-info"
                                    disabled={disableNext}
                               >
                                    Next
