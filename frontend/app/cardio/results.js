@@ -4,7 +4,6 @@ import Head from 'next/head';
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Head>
         <title>Diagnosis Results</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className="flex flex-col items-center justify-center flex-1 w-full">
@@ -16,4 +15,3 @@ import Head from 'next/head';
       </main>
     </div>
   );
-}
