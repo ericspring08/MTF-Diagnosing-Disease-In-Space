@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import BasicsForm from './BasicsForm';
 import EKGForm from './EKGForm';
 import BloodWork from './BloodWorkForm';
-import Results from './results';
 import axios from 'axios';
 
 const BloodWorkPage = () => {
@@ -74,13 +73,6 @@ const BloodWorkPage = () => {
                               setFormData={setFormData}
                          />
                     );
-               case 3:
-                    return (
-                        <Results
-                              formData={formData}
-                              setFormData={setFormData}
-                        />
-                      );
                default:
                     return (
                          <BasicsForm
@@ -91,16 +83,46 @@ const BloodWorkPage = () => {
           }
      };
 
-     const handleSubmit = async () => {
-          const res = await axios.post(
-               'https://nasahunchapi.onrender.com/hdd',
-               formData,
-          );
-          console.log(res.data);
-          alert(
-               `Prediction: ${res.data.prediction} \n Probability: ${res.data.probability}`,
-          );
-     };
+     import React, { useState } from 'react';
+import axios from 'axios';
+
+const YourComponent = () => {
+  const [formIndex, setFormIndex] = useState(0);
+  //const [formData, setFormData] = useState();
+  const [predictionResults, setPredictionResults] = useState(null);
+
+  const handleSubmit = async () => {
+    try {
+      const res = await axios.post('https://nasahunchapi.onrender.com/hdd', formData);
+      const { prediction, probability } = res.data;
+      setPredictionResults({ prediction, probability });
+      setFormIndex(formIndex + 1); 
+    } catch (error) {
+      console.error('Error fetching prediction:', error);
+    }
+  };
+
+  const renderForm = () => {
+    switch (formIndex) {
+     case 0: 
+        return (
+          <div>
+            <h2>Prediction Result</h2>
+            {predictionResults && (
+              <div>
+                <p>Prediction: {predictionResults.prediction}</p>
+                <p>Probability: {predictionResults.probability}</p>
+                <button onClick={handleReset}>Close</button>
+              </div>
+            )}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+          
 
      return (
           <div className="bg-gray-100 min-h-screen flex items-center justify-center dark:bg-gray-950">
@@ -129,8 +151,8 @@ const BloodWorkPage = () => {
                          )}
                          {formIndex === 2 && (
                               <button
-                                   //onClick={handleSubmit}
-                                   onClick={() => setFormIndex(formIndex + 1)}
+                                   onClick={handleSubmit}
+                                   onClick={renderForm}
                                    className="btn btn-success ml-5"
                                    disabled={disableNext}
                               >
