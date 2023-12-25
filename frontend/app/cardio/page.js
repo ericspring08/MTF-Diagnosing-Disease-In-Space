@@ -5,6 +5,7 @@ import BasicsForm from './BasicsForm';
 import EKGForm from './EKGForm';
 import BloodWork from './BloodWorkForm';
 import Loader from '../../utils/Loading';
+import { createPDF } from '../../utils/Functions';
 import axios from 'axios';
 
 const BloodWorkPage = () => {
@@ -49,13 +50,13 @@ const BloodWorkPage = () => {
 
      const handleSubmit = async () => {
           try {
+               setFormIndex(formIndex + 1);
                const res = await axios.post(
                     'https://nasahunchapi.onrender.com/hdd',
                     formData,
                );
                const { prediction, probability } = res.data;
                setPredictionResults({ prediction, probability });
-               setFormIndex(formIndex + 1);
           } catch (error) {
                console.error('Error fetching prediction:', error);
           }
@@ -92,9 +93,15 @@ const BloodWorkPage = () => {
                                         className="btn btn-success ml-5"
                                         onClick={() => {
                                              // TODO: Save the report as a PDF
+                                             createPDF(
+                                                  'Cardiovascular Disease',
+                                                  formData,
+                                                  predictionResults.prediction,
+                                                  predictionResults.probability,
+                                             );
                                         }}
                                    >
-                                        Save as Report
+                                        Save as PDF
                                    </button>
                                    <a href="/" className="btn btn-info">
                                         Go To Home
