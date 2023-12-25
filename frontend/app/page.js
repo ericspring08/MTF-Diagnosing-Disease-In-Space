@@ -3,7 +3,10 @@ import Link from 'next/link';
 
 const HomePage = () => {
      return (
-          <div className="h-screen flex flex-col justify-center items-center">
+          <div
+               className="h-screen flex flex-col justify-center items-center"
+               data-theme="corporate"
+          >
                <div className="lg:text-8xl md:text-5xl sm:text-5xl text-5xl p-10 text-center">
                     Smart Disease Diagnosis
                </div>
