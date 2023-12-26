@@ -1,9 +1,17 @@
+import os
+import pickle
+from models import model_options
 import pandas as pd
+from datetime import datetime
 
 class ModelResults:
     results = {}
 
-    def __init__(self, models, outputs, metrics):
+    def __init__(self, models, outputs, metrics, x_dataset, y_dataset, progress, main_task):
+        self.x_dataset = x_dataset
+        self.y_dataset = y_dataset
+        self.progress = progress
+        self.main_task = main_task
         for model in models:
             self.results[model] = {}
             for output in outputs:
@@ -37,3 +45,29 @@ class ModelResults:
                     raw_results.append([model, output, metric, self.results[model][output][metric]])
         df = pd.DataFrame.from_dict(raw_results, orient='columns')
         df.to_csv(path, header=['model', 'output', 'metric', 'value'], index=False)
+
+    def save_models(self, path):
+        # Create folders
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        # Loop through models
+        for model in self.results:
+            # Loop through outputs
+            for output in self.results[model]:
+                # Train the model for the model and output with all of the data
+                self.progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Saving {model} on {output}")
+                try:
+                    training_model = model_options[model]
+                    training_model.fit(self.x_dataset, self.y_dataset[output])
+                    # Create folder is doesn't exist
+                    if not os.path.exists(os.path.join(path, model)):
+                        os.makedirs(os.path.join(path, model))
+                    if not os.path.exists(os.path.join(path, model, output)):
+                        os.makedirs(os.path.join(path, model, output))
+                    # Save the model
+                    with open(os.path.join(path, model, output, f"{model}-{output}.pkl"), 'wb') as f:
+                        pickle.dump(training_model, f)
+                except Exception as e:
+                    self.progress.print(f"[{datetime.now().strftime('%H:%M:%S')}] Error with {model} on {output}, {e}")
+                self.progress.update(self.main_task, advance=1)

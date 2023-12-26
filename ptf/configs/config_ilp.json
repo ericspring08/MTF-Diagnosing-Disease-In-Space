@@ -1,7 +1,7 @@
 {
   "location": {
-    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/data/ILP.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/results/ilp_results/"
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/ptf/data/ILP.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/ptf/results/ilp_results/"
   },
   "experiment": {
     "metrics": ["accuracy", "precision", "recall", "f1", "train_time", "predict_time"],

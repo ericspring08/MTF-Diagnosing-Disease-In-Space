@@ -4,14 +4,15 @@
 # Utility
 import warnings
 from art import text2art
+import time
 
 # Arg Parse
 from argparse import ArgumentParser
 
 # Import SubModules
-from ptf.src.loop import *
-from ptf.src.quickanalysis import *
-from ptf.src.graph import *
+from src.quickanalysis import *
+from src.graph import *
+from src.loop import *
 
 title = text2art("PTF", font="3d_diagonal")
 print(title)
