@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 import os
+import pickle
 
 from models import *
 from src.utils import *
@@ -30,6 +31,7 @@ def main_loop(config_path):
         numerical_features = config["experiment"]["numerical"]
         trials = config["experiment"]["trials"]
         models_selection = config["experiment"]["models"]
+
         # Create Results Folder if it doesn't exist
         if not os.path.exists(results_path):
             os.makedirs(results_path)
@@ -44,8 +46,7 @@ def main_loop(config_path):
                 exit()
             models_to_use[value] = model_options[value]
 
-        total_progress_amount = (trials + 1) * len(outputs_selection) * len(models_to_use) + 3
-        main_task = progress.add_task(f"[red]{config_path}", total=total_progress_amount)
+        total_progress_amount = trials * len(outputs) * len(models_to_use)
 
         progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Starting Experiment")
         progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Loading Data")
