@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import axios from 'axios';
+import { headers } from '@/next.config';
 
 const Page = ({ params }) => {
      const [formIndex, setFormIndex] = React.useState(0);
@@ -49,7 +50,8 @@ const Form = ({ formStructure, formHeaders, formIndex, formData, setFormData }) 
      }
      else {
           return (
-               <div className="max-w-lg mx-auto">
+               <div className="max-w-lg mx-auto" key={formIndex}>
+                    <h1 className="text-2xl font-semibold mb-4">{formHeaders[formIndex]}</h1>
                     {
                          Object.entries(formStructure[formHeaders[formIndex]]).map(([key, value]) => {
                               return (
@@ -94,7 +96,7 @@ const Form = ({ formStructure, formHeaders, formIndex, formData, setFormData }) 
                                                             <option value=''>Please select {value.title}</option>
                                                             {
                                                                  Object.entries(value.options).map(([optionname, optionvalue]) => {
-                                                                      return <option value={optionvalue}>{optionname}</option>
+                                                                      return <option value={optionvalue} key={optionname}>{optionname}</option>
                                                                  })
                                                             }
                                                        </select>
