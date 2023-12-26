@@ -94,7 +94,7 @@ const BloodWorkPage = () => {
                                         onClick={() => {
                                              // TODO: Save the report as a PDF
                                              createPDF(
-                                                  'Cardiovascular Disease',
+                                                  'Cardiovascular Page',
                                                   formData,
                                                   predictionResults.prediction,
                                                   predictionResults.probability,

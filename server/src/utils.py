@@ -29,3 +29,5 @@ format_dict = {
         'type': hdd_types
     }
 }
+
+diseases = ['hdd']

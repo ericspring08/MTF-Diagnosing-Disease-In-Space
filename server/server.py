@@ -7,6 +7,12 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/diseases')
+def diseases():
+    return jsonify({
+        'diseases': diseases
+    })
+
 @app.route('/hdd', methods=['POST'])
 def hdd():
     data = request.get_json(force=True)
