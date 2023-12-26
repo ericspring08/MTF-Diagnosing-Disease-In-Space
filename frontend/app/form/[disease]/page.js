@@ -26,13 +26,16 @@ const Page = ({ params }) => {
      
      return (
           <div className="h-screen w-screen" data-theme="corporate">
-               <Form formStructure={formStructure} formHeaders={formHeaders} formIndex={formIndex} formData={formData}/>               
-               <button onClick={() => setFormIndex(formIndex + 1)}>Next</button>
+               <Form formStructure={formStructure} formHeaders={formHeaders} formIndex={formIndex} formData={formData} setFormData={setFormData}/>               
+               <button onClick={() => {
+                    setFormIndex(formIndex + 1)
+                    console.log(formData)
+               }}>Next</button>
           </div>
      );
 };
 
-const Form = ({ formStructure, formHeaders, formIndex, formData }) => {
+const Form = ({ formStructure, formHeaders, formIndex, formData, setFormData }) => {
      const handleChange = (e) => {
           const { name, value } = e.target;
           setFormData(() => ({
@@ -50,7 +53,7 @@ const Form = ({ formStructure, formHeaders, formIndex, formData }) => {
                     {
                          Object.entries(formStructure[formHeaders[formIndex]]).map(([key, value]) => {
                               return (
-                                   <div>
+                                   <div key={key}>
                                         {
                                              value.type === 'numerical' ? 
                                                   <div>
@@ -64,9 +67,9 @@ const Form = ({ formStructure, formHeaders, formIndex, formData }) => {
                                                             type="number"
                                                             id={key}
                                                             name={key}
-                                                            value={formData.age}
+                                                            value={formData[key]}
                                                             onChange={handleChange}
-                                                            placeholder="Enter age"
+                                                            placeholder={`Enter ${value.title}`}
                                                             className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
                                                        />
                                                   </div>
@@ -84,7 +87,7 @@ const Form = ({ formStructure, formHeaders, formIndex, formData }) => {
                                                        <select
                                                             id={key}
                                                             name={key}
-                                                            value={formData.sex}
+                                                            value={formData[key]}
                                                             onChange={handleChange}
                                                             className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
                                                        >
