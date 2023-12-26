@@ -56,7 +56,7 @@ class ModelResults:
             # Loop through outputs
             for output in self.results[model]:
                 # Train the model for the model and output with all of the data
-                self.progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Saving {model} on {output}")
+                print(f"Saving {model} on {output}")
                 try:
                     training_model = model_options[model]
                     training_model.fit(self.x_dataset, self.y_dataset[output])

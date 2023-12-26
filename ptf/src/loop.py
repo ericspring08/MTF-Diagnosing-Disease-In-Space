@@ -5,11 +5,14 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
+import numpy as np
 import os
 
 from models import *
 from src.utils import *
 from src.save import *
+from models import *
+from skopt import BayesSearchCV
 
 from rich.progress import Progress, TimeElapsedColumn, SpinnerColumn
 
@@ -47,13 +50,13 @@ def main_loop(config_path):
         total_progress_amount = (trials + 1) * len(outputs_selection) * len(models_to_use) + 3
         main_task = progress.add_task(f"[red]{config_path}", total=total_progress_amount)
 
-        progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Starting Experiment")
-        progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Loading Data")
+        print("Starting Experiment")
+        print("Loading Data")
         # Load Data
         dataset = pd.read_csv(dataset_path)
 
         progress.update(main_task, advance=1)
-        progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Extract Outputs")
+        print("Extract Outputs")
 
         # Get Outputs extracted and remove after
         outputs = {}
@@ -71,7 +74,7 @@ def main_loop(config_path):
             dataset[feature] = dataset[feature].fillna(dataset[feature].mean())
 
         progress.update(main_task, advance=1)
-        progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Preprocessing Data")
+        print("Preprocessing Data")
 
         # Normalize Inputs
         preprocessor = ColumnTransformer(
@@ -93,7 +96,7 @@ def main_loop(config_path):
         outputs = pd.DataFrame(outputs)
 
         progress.update(main_task, advance=1)
-        progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Starting Trials")
+        print("Starting Trials")
         models_results = ModelResults(models_to_use, outputs, metrics_selection, x_dataset, outputs, progress, main_task)
         for trial in range(trials):
             # Random Train Test Split
@@ -104,41 +107,48 @@ def main_loop(config_path):
                 # Iterate through outputs
                 for output in outputs:
                     curr_time = datetime.now().strftime("%H:%M:%S")
-                    progress.console.print(f"[{curr_time}] Trial {trial + 1}, Training {model_name}, Output {output}")
-                    try:
-                        # Special cases for some models that require multiclass specification
-                        if model_name == "LGBM" and outputs[output].nunique() > 2:
-                            model.set_params(objective="multiclass")
-                        elif model_name == "XGB" and outputs[output].nunique() > 2:
-                            model.set_params(objective="multi:softmax", num_class=outputs[output].nunique())
+                    print(f"Trial {trial + 1}, Training {model_name}, Output {output}")
+                    # Special cases for some models that require multiclass specification
+                    if model_name == "LGBM" and outputs[output].nunique() > 2:
+                        model.set_params(objective="multiclass")
+                    elif model_name == "XGB" and outputs[output].nunique() > 2:
+                        model.set_params(objective="multi:softmax", num_class=outputs[output].nunique())
 
-                        # Train Model
-                        time_before_fit = time.perf_counter_ns()
-                        model.fit(x_train, y_train[output])
-                        time_after_fit = time.perf_counter_ns()
+                    # Train Model
+                    # Tune Hyperparameters with Bayesian Optimization
+                    np.int = int
+                    opt = BayesSearchCV(
+                        model,
+                        model_params[model_name],
+                        n_iter=32,
+                        cv=3,
+                        verbose=2
+                    )
+                    time_before_fit = time.perf_counter_ns()
+                    opt.fit(x_train, y_train[output])
+                    time_after_fit = time.perf_counter_ns()
 
-                        # Calculate Training Time
-                        train_time = (time_after_fit - time_before_fit)
+                    # Calculate Training Time
+                    train_time = (time_after_fit - time_before_fit)
 
-                        # Predict
-                        before_predict = time.perf_counter_ns()
-                        y_pred = model.predict(x_test)
-                        after_predict = time.perf_counter_ns()
-                        predict_time = (after_predict - before_predict)
+                    # Predict
+                    before_predict = time.perf_counter_ns()
+                    y_pred = opt.predict(x_test)
+                    after_predict = time.perf_counter_ns()
+                    predict_time = (after_predict - before_predict)
 
-                        # Calculate Metrics
-                        performance = get_metric(y_pred, y_test[output], metrics_selection, train_time, predict_time)
+                    # Calculate Metrics
+                    performance = get_metric(y_pred, y_test[output], metrics_selection, train_time, predict_time)
 
-                        # Save Results
-                        for metric, value in performance.items():
-                            models_results.add_result(model_name, output, metric, value)
-                    except Exception as e:
-                        print(f"[{datetime.now().strftime('%H:%M:%S')}] Error with {model_name} on {output}, {e}")
+                    # Save Results
+                    for metric, value in performance.items():
+                        print(f"{model_name}: {metric}: {value}")
+                        models_results.add_result(model_name, output, metric, value)
                     progress.update(main_task, advance=1)
 
-        progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Saving Models")
+        print("Saving Models")
         models_results.save_models(results_path + "/models")
-        progress.console.print(f"[{datetime.now().strftime('%H:%M:%S')}] Saving Results")
+        print("Saving Results")
         models_results.save_results_raw_csv(results_path + "/results_raw.csv")
         models_results.save_results_averages_csv(results_path + "/results_average.csv")
         progress.update(main_task, advance=1)

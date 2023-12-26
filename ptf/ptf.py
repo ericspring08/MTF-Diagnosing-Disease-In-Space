@@ -13,6 +13,9 @@ from argparse import ArgumentParser
 from src.quickanalysis import *
 from src.graph import *
 from src.loop import *
+import builtins
+from datetime import datetime
+from rich import print
 
 title = text2art("PTF", font="3d_diagonal")
 print(title)
@@ -21,6 +24,14 @@ print("By Eric Zhang, 2023")
 print('-' * 100)
 warnings.filterwarnings('ignore')
 start_time = time.perf_counter()
+
+# All prints have a timestamp
+_print = print
+def time_print(*args, **kwargs):
+    curr_time = datetime.now().strftime("%H:%M:%S")
+    _print(f"[{curr_time}]", *args, **kwargs)
+
+builtins.print = time_print
 
 
 # Experiment

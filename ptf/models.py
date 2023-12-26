@@ -11,46 +11,143 @@ from sklearn.dummy import DummyClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 
+model_params = {
+    'SVC': {
+        'kernel': ['rbf', 'linear', 'poly', 'sigmoid'],
+        'C': [0.1, 1, 10, 100],
+        'gamma': ['scale', 'auto']
+    },
+    'GradientBoosting': {
+        'learning_rate': [0.1, 0.5, 1.0],
+        'max_depth': [3, 5, 7, 9],
+        'n_estimators': [50, 100, 200]
+    },
+    'GaussianNB': {
+        'var_smoothing': [1e-09],
+    },
+    'DecisionTree': {
+        'criterion': ['gini', 'entropy'],
+        'max_depth': [3, 5, 7, 9],
+        'min_samples_split': [2, 3, 4, 5],
+        'min_samples_leaf': [1, 2, 3, 4, 5]
+    },
+    'KNeighbors': {
+        'n_neighbors': [3, 5, 7, 9],
+        'weights': ['uniform', 'distance'],
+        'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute']
+    },
+    'AdaBoost': {
+        'n_estimators': [50, 100, 200],
+        'learning_rate': [0.1, 0.5, 1.0]
+    },
+    'RandomForest': {
+        'n_estimators': [50, 100, 200],
+        'max_depth': [3, 5, 7, 9],
+        'min_samples_split': [2, 3, 4, 5],
+        'min_samples_leaf': [1, 2, 3, 4, 5]
+    },
+    'MLP': {
+        'activation': ['tanh', 'relu'],
+        'solver': ['sgd', 'adam'],
+        'alpha': [0.0001, 0.05],
+        'learning_rate': ['constant', 'adaptive'],
+    },
+    'QDA': {
+        'reg_param': [0.0, 0.1, 0.5, 1.0],
+        'priors': [None, [0.1, 0.9], [0.2, 0.8], [0.3, 0.7], [0.4, 0.6], [0.5, 0.5], [0.6, 0.4], [0.7, 0.3], [0.8, 0.2], [0.9, 0.1]],
+        'tol': [0.0001, 0.001, 0.01, 0.1],
+    },
+    'CatBoost': {
+        'iterations': [50, 100, 200],
+        'learning_rate': [0.1, 0.5, 1.0],
+        'depth': [3, 5, 7, 9],
+        'l2_leaf_reg': [1, 3, 5, 7, 9],
+        'border_count': [32, 64, 128],
+        'thread_count': [-1]
+    },
+    'ExtraTrees': {
+        'n_estimators': [50, 100, 200],
+        'max_depth': [3, 5, 7, 9],
+        'min_samples_split': [2, 3, 4, 5],
+        'min_samples_leaf': [1, 2, 3, 4, 5]
+    },
+    'Ridge': {
+        'alpha': [0.1, 1, 10, 100]
+    },
+    'PA': {
+        'C': [0.1, 1, 10, 100]
+    },
+    'SGDOneClass': {
+        'alpha': [0.1, 1, 10, 100]
+    },
+    'SGD': {
+        'alpha': [0.1, 1, 10, 100]
+    },
+    'Dummy': {
+
+        },
+    'HGB': {
+        'learning_rate': [0.1, 0.5, 1.0],
+        'max_depth': [3, 5, 7, 9],
+        'min_samples_leaf': [1, 2, 3, 4, 5],
+        'max_bins': [32, 64, 128],
+        'l2_regularization': [0.0, 0.1, 0.5, 1.0],
+        'max_iter': [50, 100, 200],
+        'tol': [1e-07, 1e-06, 1e-05],
+        'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
+        'validation_fraction': [0.1, 0.2, 0.3],
+        'n_iter_no_change': [10, 20, 30],
+        'early_stopping': [True, False]
+    },
+    'LGBM': {
+        'learning_rate': [0.1, 0.5, 1.0],
+        'max_depth': [3, 5, 7, 9],
+        'min_samples_leaf': [1, 2, 3, 4, 5],
+        'max_bins': [32, 64, 128],
+        'tol': [1e-07, 1e-06, 1e-05],
+        'n_estimators': [50, 100, 200],
+        'num_leaves': [31, 127, 255],
+        'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
+    },
+    'XGB': {
+        'learning_rate': [0.1, 0.5, 1.0],
+        'max_depth': [3, 5, 7, 9],
+        'min_samples_leaf': [1, 2, 3, 4, 5],
+        'max_bins': [32, 64, 128],
+        'l2_regularization': [0.0, 0.1, 0.5, 1.0],
+        'max_iter': [50, 100, 200],
+        'tol': [1e-07, 1e-06, 1e-05],
+        'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
+        'validation_fraction': [0.1, 0.2, 0.3],
+        'n_iter_no_change': [10, 20, 30],
+        'early_stopping': [True, False],
+    },
+    'IsolationForest': {
+        'n_estimators': [50, 100, 200],
+        'max_samples': [0.1, 0.5, 1.0],
+        'contamination': [0.1, 0.5, 1.0]
+    },
+    'ExtraTree': {
+        'criterion': ['gini', 'entropy'],
+        'max_depth': [3, 5, 7, 9],
+        'min_samples_split': [2, 3, 4, 5],
+        'min_samples_leaf': [1, 2, 3, 4, 5]
+    }
+}
+
 model_options = {
     # SVC is SVCRBF
     'SVC': SVC(),
-    'SVCLinear': SVC(kernel='linear'),
-    'SVCPoly': SVC(kernel='poly'),
-    'SVCSigmoid': SVC(kernel='sigmoid'),
-    'NuSVC': NuSVC(nu=0.1),
     'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=5, random_state=0),
-    'GradientBoostingSE': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=5, random_state=0, criterion='squared_error'),
     'GaussianNB': GaussianNB(),
-    'GaussianNBVarSmoothing': GaussianNB(var_smoothing=1e-09),
     'DecisionTree': DecisionTreeClassifier(),
-    'DecisionTreeEntropy': DecisionTreeClassifier(criterion='entropy'),
-    'DecisionTreeGini': DecisionTreeClassifier(criterion='gini'),
     'KNeighbors': KNeighborsClassifier(n_neighbors=5, n_jobs=-1),
-    'KNeighborsDistance': KNeighborsClassifier(n_neighbors=5, weights='distance', n_jobs=-1),
     'AdaBoost': AdaBoostClassifier(),
-    'AdaBoostSAMME': AdaBoostClassifier(algorithm='SAMME'),
     'RandomForest': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42, n_jobs=-1),
-    'RandomForestEntropy': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42, n_jobs=-1, criterion='entropy'),
-    'RandomForestGini': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42, n_jobs=-1, criterion='gini'),
     'MLP': MLPClassifier(),
-    'MLPIdentity': MLPClassifier(activation='identity'),
-    'MLPLogistic': MLPClassifier(activation='logistic'),
-    'MLPTanh': MLPClassifier(activation='tanh'),
-    'MLPReLU': MLPClassifier(activation='relu'),
     'QDA': QuadraticDiscriminantAnalysis(),
-    'QDAPriors': QuadraticDiscriminantAnalysis(priors=[0.5, 0.5]),
     'CatBoost': CatBoostClassifier(verbose=False, thread_count=-1),
-    'CatBoostAccuracy': CatBoostClassifier(verbose=False, eval_metric='Accuracy', thread_count=-1),
-    'CatBoostAUC': CatBoostClassifier(verbose=False, eval_metric='AUC', thread_count=-1),
-    'CatBoostCrossEntropy': CatBoostClassifier(verbose=False, eval_metric='CrossEntropy', thread_count=-1),
-    'CatBoostF1': CatBoostClassifier(verbose=False, eval_metric='F1', thread_count=-1),
-    'CatBoostLogloss': CatBoostClassifier(verbose=False, eval_metric='Logloss', thread_count=-1),
-    'CatBoostMCC': CatBoostClassifier(verbose=False, eval_metric='MCC', thread_count=-1),
-    'CatBoostPrecision': CatBoostClassifier(verbose=False, eval_metric='Precision', thread_count=-1),
-    'CatBoostRecall': CatBoostClassifier(verbose=False, eval_metric='Recall', thread_count=-1),
     'ExtraTrees': ExtraTreesClassifier(n_jobs=-1),
-    'ExtraTreesEntropy': ExtraTreesClassifier(n_jobs=-1, criterion='entropy'),
-    'ExtraTreesGini': ExtraTreesClassifier(n_jobs=-1, criterion='gini'),
     'Ridge': RidgeClassifier(),
     'PA': PassiveAggressiveClassifier(n_jobs=-1),
     'SGDOneClass': SGDOneClassSVM(verbose=False),
@@ -58,17 +155,7 @@ model_options = {
     'Dummy': DummyClassifier(strategy="uniform"),
     'HGB': HistGradientBoostingClassifier(verbose=False),
     'LGBM': LGBMClassifier(verbose=-1, n_jobs=-1),
-    'LGBMGBDT': LGBMClassifier(verbose=-1, n_jobs=-1, boosting_type='gbdt'),
-    'LGBMDart': LGBMClassifier(verbose=-1, n_jobs=-1, boosting_type='dart'),
-    'LGBMGoss': LGBMClassifier(verbose=-1, n_jobs=-1, boosting_type='goss'),
     'XGB': XGBClassifier(verbose=1),
-    'XGBLogistic': XGBClassifier(verbose=1, objective='binary:logistic'),
-    'XGBMultiSoftmax': XGBClassifier(verbose=1, objective='multi:softmax'),
-    'XGBMultiSoftprob': XGBClassifier(verbose=1, objective='multi:softprob'),
-    'XGBRankPairwise': XGBClassifier(verbose=1, objective='rank:pairwise'),
-    'LDA': LinearDiscriminantAnalysis(),
     'IsolationForest': IsolationForest(n_jobs=-1),
     'ExtraTree': ExtraTreeClassifier(),
-    'ExtraTreeEntropy': ExtraTreeClassifier(criterion='entropy'),
-    'ExtraTreeGini': ExtraTreeClassifier(criterion='gini'),
 }

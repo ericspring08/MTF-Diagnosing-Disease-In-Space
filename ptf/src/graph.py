@@ -50,8 +50,7 @@ def graph(args):
 
                 # Go through every metric
                 for metric in df_output['metric'].unique():
-                    curr_time = datetime.now().strftime("%H:%M:%S")
-                    progress.console.print(f'[{curr_time}] Distribution Graph - {output} - {metric}')
+                    print(f'Distribution Graph - {output} - {metric}')
                     df_metric = df_output[df_output['metric'] == metric]
 
                     # Go through every model
@@ -84,8 +83,7 @@ def graph(args):
 
                 # Go through every metric
                 for metric in df_output['metric'].unique():
-                    curr_time = datetime.now().strftime("%H:%M:%S")
-                    progress.console.print(f'[{curr_time}] Rank Graph - {output} - {metric}')
+                    print(f'Rank Graph - {output} - {metric}')
                     df_metric = df_output[df_output['metric'] == metric]
 
                     models = []
