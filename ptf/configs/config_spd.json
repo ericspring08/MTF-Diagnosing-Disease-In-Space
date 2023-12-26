@@ -9,7 +9,7 @@
     "numerical": ["age", "avg_glucose_level", "bmi"],
     "categorical": ["gender","hypertension", "heart_disease", "ever_married", "work_type", "Residence_type", "smoking_status"],
     "models": "all",
-    "trials": 2
+    "trials": 1
   },
   "outputs": {
   }
