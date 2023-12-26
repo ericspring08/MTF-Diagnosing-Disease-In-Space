@@ -4,15 +4,16 @@ from src.Prediction import Prediction
 from src.utils import disease_options, format_dict
 import os
 
-
 app = Flask(__name__)
 CORS(app)
+
 
 @app.route('/diseases')
 def diseases():
     return jsonify({
         'diseases': disease_options
     })
+
 
 @app.route('/get_features', methods=['GET'])
 def get_features():
@@ -23,6 +24,7 @@ def get_features():
         'numerical': format_dict[disease]['numerical'],
         'form': format_dict[disease]['form']
     })
+
 
 @app.route('/hdd', methods=['POST'])
 def hdd():
