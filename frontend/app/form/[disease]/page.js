@@ -68,10 +68,15 @@ const Page = ({ params }) => {
                     <div className="flex flex-row justify-between p-4">
                          <button
                               onClick={() => {
-                                   setFormIndex(formIndex - 1);
+                                   if (formIndex > 0) {
+                                        setFormIndex(formIndex - 1);
+                                        console.log(formData);
+                                    }
                                    console.log(formData);
+                                   
                               }}
                               className="btn btn-warning px-6 py-2"
+                              disabled={formIndex === 0}
                          >
                               Previous
                          </button>
