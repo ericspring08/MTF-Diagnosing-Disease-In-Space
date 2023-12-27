@@ -9,40 +9,84 @@ const Page = ({ params }) => {
      const [formStructure, setFormStructure] = React.useState({});
      const [formHeaders, setFormHeaders] = React.useState([]);
      const [formData, setFormData] = React.useState({});
+     const [disableNext, setDisableNext] = React.useState(true);
 
      useEffect(() => {
-          // fill formdata with blank values
-          let promise = axios.get(
-               `https://nasahunchapi.onrender.com/get_features?disease=${params.disease}`,
-          );
-          promise.then((response) => {
-               for (const element of response.data.features)
-                    setFormData(() => ({
-                         ...formData,
-                         [element]: '',
-                    }));
-               setFormStructure(response.data.form);
-               setFormHeaders(Object.keys(response.data.form));
-          });
-     }, []);
+          if (formHeaders.length > 0 && formHeaders[formIndex]) {
+              const keysForPage = Object.keys(formStructure[formHeaders[formIndex]]);
+      
+              let requiredFieldsPresent = false;
+      
+              for (const key of keysForPage) {
+                  if (formData[key] === '') {
+                      requiredFieldsPresent = true;
+                      break;
+                  }
+              }
+      
+              setDisableNext(requiredFieldsPresent);
+          }
+      }, [formData, formIndex, formStructure, formHeaders]);
+      
+      useEffect(() => {
+          const fetchData = async () => {
+              try {
+                  const response = await axios.get(`https://nasahunchapi.onrender.com/get_features?disease=${params.disease}`);
+                  const { features, form } = response.data;
+      
+                  // Initialize form data, structure, and headers
+                  const newFormData = {};
+                  for (const element of features) {
+                      newFormData[element] = '';
+                  }
+      
+                  setFormData(newFormData);
+                  setFormStructure(form);
+                  setFormHeaders(Object.keys(form));
+              } catch (error) {
+                  console.error('Error fetching data:', error);
+              }
+          };
+      
+          fetchData();
+      }, []);
+      
 
      return (
-          <div className="h-screen w-screen" data-theme="corporate">
-               <Form
-                    formStructure={formStructure}
-                    formHeaders={formHeaders}
-                    formIndex={formIndex}
-                    formData={formData}
-                    setFormData={setFormData}
-               />
-               <button
-                    onClick={() => {
-                         setFormIndex(formIndex + 1);
-                         console.log(formData);
-                    }}
-               >
-                    Next
-               </button>
+          <div
+               className="h-screen w-screen flex flex-col justify-center items-center"
+               data-theme="corporate"
+          >
+               <div className="p-5 m-5 card card-bordered shadow-2xl">
+                    <Form
+                         formStructure={formStructure}
+                         formHeaders={formHeaders}
+                         formIndex={formIndex}
+                         formData={formData}
+                         setFormData={setFormData}
+                    />
+                    <div className="flex flex-row justify-between p-4">
+                         <button
+                              onClick={() => {
+                                   setFormIndex(formIndex - 1);
+                                   console.log(formData);
+                              }}
+                              className="btn btn-warning px-6 py-2"
+                         >
+                              Previous
+                         </button>
+                         <button
+                              onClick={() => {
+                                   setFormIndex(formIndex + 1);
+                                   console.log(formData);
+                              }}
+                              className="btn btn-info px-6 py-2"
+                              disabled={disableNext}
+                         >
+                              Next
+                         </button>
+                    </div>
+               </div>
           </div>
      );
 };
