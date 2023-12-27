@@ -23,24 +23,26 @@ const HomePage = () => {
                     <div className="flex flex-wrap justify-center items-stretch">
                          {diseases.map((disease) => (
                               <Link
-                                   className="flex flex-wrap justify-center items-stretch m-5"
+                                   className="flex flex-wrap justify-center items-stretch m-3"
                                    href={`/form/${disease.value}`}
                                    key={disease.value}
                               >
-                                   <div class="card card-bordered m-5 w-96 bg-base-100 shadow-xl hover:shadow-2xl hover:opacity-60">
+                                   <div class="card card-bordered w-80 bg-base-100 shadow-xl hover:shadow-2xl hover:opacity-60">
                                         <figure class="px-10 pt-10">
                                              <Image
                                                   src={`/img/${disease.value}.png`}
                                                   alt={disease}
-                                                  width={1000}
-                                                  height={1000}
+                                                  width={500}
+                                                  height={500}
                                              />
                                         </figure>
                                         <div class="card-body items-center text-center">
                                              <h2 class="card-title">
                                                   {disease.label}
                                              </h2>
-                                             <p>{disease.description}</p>
+                                             <p className="text-sm">
+                                                  {disease.description}
+                                             </p>
                                         </div>
                                    </div>
                               </Link>
