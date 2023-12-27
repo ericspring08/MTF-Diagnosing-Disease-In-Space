@@ -6,5 +6,4 @@ RUN pip install -r requirements.txt
 COPY server.py server.py
 COPY /src /src
 
-ENTRYPOINT [ "python" ]
-CMD ["server.py" ]
+CMD ["gunicorn", "server:app" ]
