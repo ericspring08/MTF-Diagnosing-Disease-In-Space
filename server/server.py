@@ -10,9 +10,7 @@ CORS(app)
 
 @app.route('/diseases')
 def diseases():
-    return jsonify({
-        'diseases': disease_options
-    })
+    return jsonify(disease_options)
 
 
 @app.route('/get_features', methods=['GET'])

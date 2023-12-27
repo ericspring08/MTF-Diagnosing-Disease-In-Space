@@ -131,4 +131,17 @@ format_dict = {
     }
 }
 
-disease_options = ['hdd']
+disease_options = {
+    'diseases': [
+        {
+            'value': 'hdd',
+            'label': 'Heart Disease',
+            'description': 'Heart disease describes a range of conditions that affect your heart. Diseases under the heart disease umbrella include blood vessel diseases, such as coronary artery disease; heart rhythm problems (arrhythmias); and heart defects you\'re born with (congenital heart defects), among others.',
+        },
+        {
+            'value': 'kdd',
+            'label': 'Kidney Disease',
+            'description': 'Kidney disease means your kidneys are damaged and can’t filter blood the way they should. You are at greater risk for kidney disease if you have diabetes or high blood pressure. If you experience kidney failure, treatments include kidney transplant or dialysis.',
+        }
+    ]
+}
