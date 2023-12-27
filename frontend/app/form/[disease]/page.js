@@ -266,7 +266,7 @@ const Form = ({
           <span className="loading loading-dots loading-xs"></span>;
      } else {
           return (
-               <div className="max-w-lg mx-auto" key={formIndex}>
+               <div className="max-w-lg mx-auto m-5" key={formIndex}>
                     <h1 className="text-2xl font-semibold mb-4">
                          {formHeaders[formIndex]}
                     </h1>

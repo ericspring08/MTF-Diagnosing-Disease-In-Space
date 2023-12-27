@@ -23,7 +23,7 @@ const HomePage = () => {
                     <div className="flex flex-wrap justify-center items-stretch">
                          {diseases.map((disease) => (
                               <Link
-                                   className="flex flex-wrap justify-center items-stretch"
+                                   className="flex flex-wrap justify-center items-stretch m-5"
                                    href={`/form/${disease.value}`}
                                    key={disease.value}
                               >
