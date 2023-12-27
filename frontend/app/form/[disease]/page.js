@@ -5,7 +5,7 @@ import axios from 'axios';
 import { headers } from '@/next.config';
 import { createPDF } from '../../../utils/Functions';
 
-const Page = ({ params }) => { 
+const Page = ({ params }) => {
      const [formIndex, setFormIndex] = React.useState(0);
      const [formStructure, setFormStructure] = React.useState({});
      const [formHeaders, setFormHeaders] = React.useState([]);
