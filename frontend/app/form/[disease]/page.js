@@ -217,12 +217,12 @@ const Form = ({
                     {Object.entries(formStructure[formHeaders[formIndex]]).map(
                          ([key, value]) => {
                               return (
-                                   <div key={key}>
+                                   <div key={key} className="my-3">
                                         {value.type === 'numerical' ? (
                                              <div>
                                                   <label
                                                        htmlFor={key}
-                                                       className="block text-gray-700 font-semibold mb-2"
+                                                       className="label-text"
                                                   >
                                                        {value.title}
                                                   </label>
@@ -233,7 +233,7 @@ const Form = ({
                                                        value={formData[key]}
                                                        onChange={handleChange}
                                                        placeholder={`Enter ${value.title}`}
-                                                       className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                                                       className="input input-bordered w-full"
                                                   />
                                              </div>
                                         ) : null}
@@ -241,7 +241,7 @@ const Form = ({
                                              <div>
                                                   <label
                                                        htmlFor={key}
-                                                       className="block text-gray-700 font-semibold mb-2"
+                                                       className="label-text"
                                                   >
                                                        {value.title}
                                                   </label>
@@ -250,9 +250,12 @@ const Form = ({
                                                        name={key}
                                                        value={formData[key]}
                                                        onChange={handleChange}
-                                                       className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500"
+                                                       className="select select-bordered w-full"
                                                   >
-                                                       <option value="">
+                                                       <option
+                                                            selected
+                                                            value=""
+                                                       >
                                                             Please select{' '}
                                                             {value.title}
                                                        </option>
