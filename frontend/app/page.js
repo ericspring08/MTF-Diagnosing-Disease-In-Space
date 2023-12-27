@@ -16,7 +16,8 @@ const HomePage = () => {
      }, []);
 
      const DiseaseCards = () => {
-          if (diseases === null) return null;
+          if (diseases === null)
+               return <span className="loading loading-dots loading-lg"></span>;
           else {
                return (
                     <div className="flex flex-wrap justify-center items-stretch">
@@ -50,7 +51,10 @@ const HomePage = () => {
      };
 
      return (
-          <div className="h-screen w-screen" data-theme="corporate">
+          <div
+               className="h-screen w-screen flex flex-col items-center"
+               data-theme="corporate"
+          >
                <h1
                     className="text-5xl text-center font-bold mt-10 mb-5"
                     data-theme="corporate"

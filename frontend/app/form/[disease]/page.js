@@ -35,18 +35,19 @@ const Page = ({ params }) => {
 
      const handleSubmit = async () => {
           try {
+               setSubmitted(true);
                const res = await axios.post(`/api/${params.disease}`, formData);
                const { prediction, probability } = res.data;
                setPredictionResults({ prediction, probability });
-               setSubmitted(true);
           } catch (error) {
                console.error('Error fetching prediction:', error);
           }
      };
 
      const handleReset = () => {
-          setPredictionResults(null);
           setFormIndex(0);
+          setSubmitted(false);
+          setPredictionResults(null);
           const resetData = Object.keys(formData).reduce((acc, key) => {
                acc[key] = '';
                return acc;
@@ -70,8 +71,8 @@ const Page = ({ params }) => {
                     }
 
                     setFormData(newFormData);
-                    setFormStructure(form);
                     setFormHeaders(Object.keys(form));
+                    setFormStructure(form);
                } catch (error) {
                     console.error('Error fetching data:', error);
                }
@@ -102,10 +103,11 @@ const Page = ({ params }) => {
                     </svg>
                </Link>
                {submitted ? (
-                    <div>
-                         <h1 className="text-6xl">Prediction Result</h1>
-                         {predictionResults === null}
-                         {predictionResults && (
+                    predictionResults === null ? (
+                         <span className="loading loading-dots loading-lg"></span>
+                    ) : (
+                         <div>
+                              <h1 className="text-6xl">Prediction Result</h1>
                               <div>
                                    <p className="text-2xl">
                                         Prediction:{' '}
@@ -147,8 +149,10 @@ const Page = ({ params }) => {
                                         </a>
                                    </div>
                               </div>
-                         )}
-                    </div>
+                         </div>
+                    )
+               ) : formHeaders.length === 0 ? (
+                    <span className="loading loading-dots loading-lg"></span>
                ) : (
                     <div className="p-5 m-5 card card-bordered shadow-2xl mt-10">
                          <div className="mb-4">
@@ -259,7 +263,7 @@ const Form = ({
      };
 
      if (formHeaders.length === 0) {
-          return <div>Loading...</div>;
+          <span className="loading loading-dots loading-xs"></span>;
      } else {
           return (
                <div className="max-w-lg mx-auto" key={formIndex}>
