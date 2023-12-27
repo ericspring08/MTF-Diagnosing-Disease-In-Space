@@ -159,7 +159,7 @@ const Page = ({ params }) => {
                                         }
                                         console.log(formData);
                                    }}
-                                   className="btn btn-warning px-6 py-2"
+                                   className="btn btn-warning"
                                    disabled={formIndex === 0}
                               >
                                    Previous
@@ -167,7 +167,7 @@ const Page = ({ params }) => {
                               {formIndex === formHeaders.length - 1 ? (
                                    <button
                                         onClick={handleSubmit}
-                                        className="btn btn-success px-6 py-2"
+                                        className="btn btn-success"
                                         disabled={disableNext}
                                    >
                                         Submit
@@ -178,7 +178,7 @@ const Page = ({ params }) => {
                                              setFormIndex(formIndex + 1);
                                              console.log(formData);
                                         }}
-                                        className="btn btn-info px-6 py-2"
+                                        className="btn btn-info"
                                         disabled={disableNext}
                                    >
                                         Next
