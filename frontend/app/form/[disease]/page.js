@@ -13,51 +13,54 @@ const Page = ({ params }) => {
 
      useEffect(() => {
           if (formHeaders.length > 0 && formHeaders[formIndex]) {
-              const keysForPage = Object.keys(formStructure[formHeaders[formIndex]]);
-      
-              let requiredFieldsPresent = false;
-      
-              for (const key of keysForPage) {
-                  if (formData[key] === '') {
-                      requiredFieldsPresent = true;
-                      break;
-                  }
-              }
-      
-              setDisableNext(requiredFieldsPresent);
+               const keysForPage = Object.keys(
+                    formStructure[formHeaders[formIndex]],
+               );
+
+               let requiredFieldsPresent = false;
+
+               for (const key of keysForPage) {
+                    if (formData[key] === '') {
+                         requiredFieldsPresent = true;
+                         break;
+                    }
+               }
+
+               setDisableNext(requiredFieldsPresent);
           }
-      }, [formData, formIndex, formStructure, formHeaders]);
-      
-      useEffect(() => {
+     }, [formData, formIndex, formStructure, formHeaders]);
+
+     useEffect(() => {
           const fetchData = async () => {
-              try {
-                  const response = await axios.get(`https://nasahunchapi.onrender.com/get_features?disease=${params.disease}`);
-                  const { features, form } = response.data;
-      
-                  // Initialize form data, structure, and headers
-                  const newFormData = {};
-                  for (const element of features) {
-                      newFormData[element] = '';
-                  }
-      
-                  setFormData(newFormData);
-                  setFormStructure(form);
-                  setFormHeaders(Object.keys(form));
-              } catch (error) {
-                  console.error('Error fetching data:', error);
-              }
+               try {
+                    const response = await axios.get(
+                         `https://nasahunchapi.onrender.com/get_features?disease=${params.disease}`,
+                    );
+                    const { features, form } = response.data;
+
+                    // Initialize form data, structure, and headers
+                    const newFormData = {};
+                    for (const element of features) {
+                         newFormData[element] = '';
+                    }
+
+                    setFormData(newFormData);
+                    setFormStructure(form);
+                    setFormHeaders(Object.keys(form));
+               } catch (error) {
+                    console.error('Error fetching data:', error);
+               }
           };
-      
+
           fetchData();
-      }, []);
-      
+     }, []);
 
      return (
           <div
                className="h-screen w-screen flex flex-col justify-center items-center"
                data-theme="corporate"
           >
-               <div className="p-5 m-5 card card-bordered shadow-2xl">
+               <div className="p-5 m-5 card card-bordered shadow-2xl mt-10">
                     <Form
                          formStructure={formStructure}
                          formHeaders={formHeaders}
@@ -71,9 +74,8 @@ const Page = ({ params }) => {
                                    if (formIndex > 0) {
                                         setFormIndex(formIndex - 1);
                                         console.log(formData);
-                                    }
+                                   }
                                    console.log(formData);
-                                   
                               }}
                               className="btn btn-warning px-6 py-2"
                               disabled={formIndex === 0}

@@ -22,13 +22,14 @@ const HomePage = () => {
         <div className="flex flex-wrap justify-center items-center">
           {diseases.map((disease) => (
             <Link legacyBehavior href={`/form/${disease}`} key={disease}>
-              <a className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg m-2 inline-block">
+              <button className="btn btn-warning px-6 py-2">
                 {disease}
-              </a>
+              </button>
             </Link>
           ))}
         </div>
       );
+      
     }
   };
 
