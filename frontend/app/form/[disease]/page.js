@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { headers } from '@/next.config';
+import { createPDF } from '../../../utils/Functions';
 
 const Page = ({ params }) => {
      const [formIndex, setFormIndex] = React.useState(0);
@@ -10,6 +11,8 @@ const Page = ({ params }) => {
      const [formHeaders, setFormHeaders] = React.useState([]);
      const [formData, setFormData] = React.useState({});
      const [disableNext, setDisableNext] = React.useState(true);
+     const [submitted, setSubmitted] = React.useState(false);
+     const [predictionResults, setPredictionResults] = React.useState(null);
 
      useEffect(() => {
           if (formHeaders.length > 0 && formHeaders[formIndex]) {
@@ -29,6 +32,31 @@ const Page = ({ params }) => {
                setDisableNext(requiredFieldsPresent);
           }
      }, [formData, formIndex, formStructure, formHeaders]);
+
+     const handleSubmit = async () => {
+          try {
+               const res = await axios.post(
+                    `https://nasahunchapi.onrender.com/${params.disease}`,
+                    formData,
+               );
+               const { prediction, probability } = res.data;
+               setPredictionResults({ prediction, probability });
+               setSubmitted(true);
+          } catch (error) {
+               console.error('Error fetching prediction:', error);
+          }
+     };
+
+     const handleReset = () => {
+          setPredictionResults(null);
+          setFormIndex(0);
+          const resetData = Object.keys(formData).reduce((acc, key) => {
+               acc[key] = '';
+               return acc;
+          }, {});
+
+          setFormData(resetData);
+     };
 
      useEffect(() => {
           const fetchData = async () => {
@@ -60,40 +88,100 @@ const Page = ({ params }) => {
                className="h-screen w-screen flex flex-col justify-center items-center"
                data-theme="corporate"
           >
-               <div className="p-5 m-5 card card-bordered shadow-2xl mt-10">
-                    <Form
-                         formStructure={formStructure}
-                         formHeaders={formHeaders}
-                         formIndex={formIndex}
-                         formData={formData}
-                         setFormData={setFormData}
-                    />
-                    <div className="flex flex-row justify-between p-4">
-                         <button
-                              onClick={() => {
-                                   if (formIndex > 0) {
-                                        setFormIndex(formIndex - 1);
-                                        console.log(formData);
-                                   }
-                                   console.log(formData);
-                              }}
-                              className="btn btn-warning px-6 py-2"
-                              disabled={formIndex === 0}
-                         >
-                              Previous
-                         </button>
-                         <button
-                              onClick={() => {
-                                   setFormIndex(formIndex + 1);
-                                   console.log(formData);
-                              }}
-                              className="btn btn-info px-6 py-2"
-                              disabled={disableNext}
-                         >
-                              Next
-                         </button>
+               {submitted ? (
+                    <div>
+                         <h1 className="text-6xl">Prediction Result</h1>
+                         {predictionResults === null}
+                         {predictionResults && (
+                              <div>
+                                   <p className="text-2xl">
+                                        Prediction:{' '}
+                                        {predictionResults.prediction === 1
+                                             ? 'Positive'
+                                             : 'Negative'}
+                                   </p>
+                                   <p className="text-2xl pb-5">
+                                        Confidence:{' '}
+                                        {Math.round(
+                                             predictionResults.probability *
+                                                  100,
+                                        )}
+                                        %
+                                   </p>
+                                   <div className="flex flex-row justify-between">
+                                        <button
+                                             className="btn btn-warning"
+                                             onClick={handleReset}
+                                        >
+                                             Reset Form
+                                        </button>
+                                        <button
+                                             className="btn btn-success ml-5"
+                                             onClick={() => {
+                                                  // TODO: Save the report as a PDF
+                                                  createPDF(
+                                                       'Cardiovascular Page',
+                                                       formData,
+                                                       predictionResults.prediction,
+                                                       predictionResults.probability,
+                                                  );
+                                             }}
+                                        >
+                                             Save as PDF
+                                        </button>
+                                        <a href="/" className="btn btn-info">
+                                             Go To Home
+                                        </a>
+                                   </div>
+                              </div>
+                         )}
                     </div>
-               </div>
+               ) : (
+                    <div className="p-5 m-5 card card-bordered shadow-2xl mt-10">
+                         <Form
+                              formStructure={formStructure}
+                              formHeaders={formHeaders}
+                              formIndex={formIndex}
+                              formData={formData}
+                              setFormData={setFormData}
+                         />
+                         <div className="flex flex-row justify-between p-4">
+                              <button
+                                   onClick={() => {
+                                        if (formIndex > 0) {
+                                             setFormIndex(formIndex - 1);
+                                             console.log(formData);
+                                        }
+                                        console.log(formData);
+                                   }}
+                                   className="btn btn-warning px-6 py-2"
+                                   disabled={formIndex === 0}
+                              >
+                                   Previous
+                              </button>
+                              {formIndex === formHeaders.length - 1 ? (
+                                   <button
+                                        onClick={handleSubmit}
+                                        className="btn btn-success px-6 py-2"
+                                        disabled={disableNext}
+                                   >
+                                        Submit
+                                   </button>
+                              ) : (
+                                   <button
+                                        onClick={() => {
+                                             setFormIndex(formIndex + 1);
+                                             console.log(formData);
+                                        }}
+                                        className="btn btn-info px-6 py-2"
+                                        disabled={disableNext}
+                                   >
+                                        Next
+                                   </button>
+                              )}
+                         </div>
+                    </div>
+               )}
           </div>
      );
 };
