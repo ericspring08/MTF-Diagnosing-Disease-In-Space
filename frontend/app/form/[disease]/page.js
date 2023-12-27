@@ -5,7 +5,7 @@ import axios from 'axios';
 import { headers } from '@/next.config';
 import { createPDF } from '../../../utils/Functions';
 
-const Page = ({ params }) => {
+const Page = ({ params }) => { 
      const [formIndex, setFormIndex] = React.useState(0);
      const [formStructure, setFormStructure] = React.useState({});
      const [formHeaders, setFormHeaders] = React.useState([]);
@@ -159,7 +159,7 @@ const Page = ({ params }) => {
                                         }
                                         console.log(formData);
                                    }}
-                                   className="btn btn-warning"
+                                   className="btn btn-warning mt-5 mb-5"
                                    disabled={formIndex === 0}
                               >
                                    Previous
@@ -167,7 +167,7 @@ const Page = ({ params }) => {
                               {formIndex === formHeaders.length - 1 ? (
                                    <button
                                         onClick={handleSubmit}
-                                        className="btn btn-success"
+                                        className="btn btn-success mt-5 mb-5"
                                         disabled={disableNext}
                                    >
                                         Submit
@@ -178,7 +178,7 @@ const Page = ({ params }) => {
                                              setFormIndex(formIndex + 1);
                                              console.log(formData);
                                         }}
-                                        className="btn btn-info"
+                                        className="btn btn-info mt-5 mb-5"
                                         disabled={disableNext}
                                    >
                                         Next
