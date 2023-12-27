@@ -150,7 +150,7 @@ const Page = ({ params }) => {
                               formData={formData}
                               setFormData={setFormData}
                          />
-                         <div className="flex flex-row justify-between p-4">
+                         <div className="flex flex-row justify-between">
                               <button
                                    onClick={() => {
                                         if (formIndex > 0) {
