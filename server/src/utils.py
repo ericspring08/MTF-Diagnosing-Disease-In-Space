@@ -303,7 +303,7 @@ format_dict = {
     'kdd' : {
         'features': kdd_features,
         'target': 'target',
-        'model': 'SVC_kdd_classifier.pkl',
+        'model': './src/models/SVC_kdd_classifier.pkl',
         'standard_scaler': './src/preprocessor/kdd_preprocessor.pkl',
         'categorical': kdd_categorical_features,
         'numerical': kdd_numerical_features,
