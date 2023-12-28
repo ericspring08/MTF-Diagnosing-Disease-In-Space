@@ -54,7 +54,6 @@ model_params = {
     },
     'QDA': {
         'reg_param': [0.0, 0.1, 0.5, 1.0],
-        'priors': [None, [0.1, 0.9], [0.2, 0.8], [0.3, 0.7], [0.4, 0.6], [0.5, 0.5], [0.6, 0.4], [0.7, 0.3], [0.8, 0.2], [0.9, 0.1]],
         'tol': [0.0001, 0.001, 0.01, 0.1],
     },
     'CatBoost': {
@@ -72,16 +71,16 @@ model_params = {
         'min_samples_leaf': [1, 2, 3, 4, 5]
     },
     'Ridge': {
-        'alpha': [0.1, 1, 10, 100]
+        'alpha': [0.1, 1, 10, 100],
+        'solver': ['auto', 'svd', 'cholesky', 'lsqr', 'sparse_cg', 'sag', 'saga']
     },
     'PA': {
-        'C': [0.1, 1, 10, 100]
-    },
-    'SGDOneClass': {
-        'alpha': [0.1, 1, 10, 100]
+        'C': [0.1, 1, 10, 100],
+        'loss': ['hinge', 'squared_hinge'],
     },
     'SGD': {
-        'alpha': [0.1, 1, 10, 100]
+        'alpha': [0.0001, 0.001, 0.01, 0.1],
+        'loss': ['hinge', 'log_loss', 'modified_huber', 'squared_hinge', 'perceptron'],
     },
     'Dummy': {
 
@@ -150,7 +149,6 @@ model_options = {
     'ExtraTrees': ExtraTreesClassifier(n_jobs=-1),
     'Ridge': RidgeClassifier(),
     'PA': PassiveAggressiveClassifier(n_jobs=-1),
-    'SGDOneClass': SGDOneClassSVM(verbose=False),
     'SGD': SGDClassifier(n_jobs=-1),
     'Dummy': DummyClassifier(strategy="uniform"),
     'HGB': HistGradientBoostingClassifier(verbose=False),

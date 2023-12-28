@@ -116,12 +116,15 @@ def main_loop(config_path):
 
                     # Train Model
                     # Tune Hyperparameters with Bayesian Optimization
+                    # if model has parameter probability, set to True
+                    if dir(model).__contains__("probability"):
+                        model.probability = True
                     np.int = int
                     opt = BayesSearchCV(
                         model,
                         model_params[model_name],
                         n_iter=32,
-                        cv=None,
+                        cv=3,
                         verbose=1,
                     )
                     time_before_fit = time.perf_counter_ns()
@@ -136,9 +139,10 @@ def main_loop(config_path):
                     y_pred = opt.predict(x_test)
                     after_predict = time.perf_counter_ns()
                     predict_time = (after_predict - before_predict)
+                    y_prob = opt.predict_proba(x_test)
 
                     # Calculate Metrics
-                    performance = get_metric(y_pred, y_test[output], metrics_selection, train_time, predict_time)
+                    performance = get_metric(y_pred, y_prob, y_test[output], metrics_selection, train_time, predict_time)
 
                     # Save Results
                     for metric, value in performance.items():
