@@ -4,13 +4,9 @@ import math
 import statistics as st
 
 # Metrics
-from sklearn.metrics import accuracy_score, precision_score, balanced_accuracy_score, f1_score, recall_score
+from sklearn.metrics import accuracy_score, precision_score, balanced_accuracy_score, f1_score, recall_score, log_loss
 
 # Functions
-def add_text_label(ax, labels):
-    for i, txt in enumerate(labels):
-        ax.annotate(txt, (i, 0.5))
-
 def ammp(accuracy, precision, time_to_fit):
     accuracy_reciprocal_sum = sum(accuracy.rdiv(1))
     precision_reciprocal_sum = sum(precision.rdiv(1))
@@ -21,7 +17,7 @@ def ammp(accuracy, precision, time_to_fit):
 
     return 0.14 * (trials_num / precision_reciprocal_sum) + 0.85 * (accuracy_sum / trials_num) - (0.01 * math.log(time_to_fit_ms, 12))
 
-def get_metric(y_pred, y_test, metrics, train_time, predict_time):
+def get_metric(y_pred, y_prob, y_test, metrics, train_time, predict_time,):
     global metric_params
     global metric_options
 
@@ -38,6 +34,9 @@ def get_metric(y_pred, y_test, metrics, train_time, predict_time):
         elif metric == "ammp":
             # AMMP Metric
             all_metrics[metric] = ammp(accuracy_score(y_pred, y_test), precision_score(y_pred, y_test), train_time)
+        elif metric == "logloss":
+            # Probability Metric
+            all_metrics[metric] = log_loss(y_test, y_prob)
         # Standard Metrics
         elif metric in metric_options:
             # Traditional metrics
