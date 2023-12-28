@@ -224,15 +224,15 @@ form_hdd = {
     },
     'Blood Work': {
         'trestbps': {
-            'title': 'Resting Blood Pressure',
+            'title': 'Resting Blood Pressure mm/Hg',
             'type': 'numerical'
         },
         'chol': {
-            'title': 'Serum Cholestrol',
+            'title': 'Serum Cholestrol mg/dL',
             'type': 'numerical'
         },
         'fbs': {
-            'title': 'Fasting Blood Sugar',
+            'title': 'Fasting Blood Sugar >120mg/dL',
             'type': 'categorical',
             'options': {
                 'Yes': '1',
