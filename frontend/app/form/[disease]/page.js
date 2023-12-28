@@ -34,6 +34,7 @@ const Page = ({ params }) => {
      }, [formData, formIndex, formStructure, formHeaders]);
 
      const handleSubmit = async () => {
+          console.log(formData);
           try {
                setSubmitted(true);
                const res = await axios.post(
