@@ -16,6 +16,8 @@ from skopt import BayesSearchCV
 
 from rich.progress import Progress, TimeElapsedColumn, SpinnerColumn
 
+import pickle
+
 def main_loop(config_path):
     with Progress(SpinnerColumn(), *Progress.get_default_columns(), TimeElapsedColumn()) as progress:
         start_time = time.perf_counter()
@@ -87,7 +89,13 @@ def main_loop(config_path):
               numerical_features)],
             remainder='passthrough',
             verbose_feature_names_out=False).set_output(transform = 'pandas')
-        x_dataset = preprocessor.fit_transform(dataset)
+        preprocessor = preprocessor.fit(dataset)
+
+        # Save Preprocessor
+        with open(results_path + "/kdd_preprocessor.pkl", "wb") as f:
+            pickle.dump(preprocessor, f)
+
+        x_dataset = preprocessor.transform(dataset)
 
         # Map the outputs to dictionary
         for key, value in config['outputs'].items():
