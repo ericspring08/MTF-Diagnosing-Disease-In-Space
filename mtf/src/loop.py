@@ -16,6 +16,8 @@ from skopt import BayesSearchCV
 
 import threading
 
+import pickle
+
 class MTF(object):
     def __init__(self, config_path):
         self.models_results = None
@@ -115,7 +117,11 @@ class MTF(object):
               self.numerical_features)],
             remainder='passthrough',
             verbose_feature_names_out=False).set_output(transform = 'pandas')
-        self.x_dataset = preprocessor.fit_transform(dataset)
+        preprocessor = preprocessor.fit(dataset)
+        self.x_dataset = preprocessor.transform(dataset)
+
+        # Save Preprocessor
+        pickle.dump(preprocessor, open(self.results_path + "/preprocessor.pkl", "wb"))
 
         # Map the outputs to dictionary
         for key, value in self.config['outputs'].items():
@@ -130,7 +136,7 @@ class MTF(object):
 
             # Random Train Test Split
             # Sample 20% of the dataset for testing
-            sampled_dataset = pd.concat([self.x_dataset, self.outputs], axis=1).sample(frac=0.2)
+            sampled_dataset = pd.concat([self.x_dataset, self.outputs], axis=1).sample(frac=0.5)
             x_sampled_dataset = sampled_dataset.drop(self.outputs_selection, axis=1)
             y_sampled_dataset = sampled_dataset[self.outputs_selection]
             x_train, x_test, y_train, y_test = train_test_split(x_sampled_dataset, y_sampled_dataset, test_size=0.2)
