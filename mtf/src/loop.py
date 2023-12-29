@@ -165,14 +165,14 @@ class MTF(object):
             # Iterate through outputs
             for output in self.outputs:
                 # Special cases for some models that require multiclass specification
-                if model_name == "LGBM" and self.outputs[output].nunique() > 2:
+                if "LGBM" in model_name and self.outputs[output].nunique() > 2:
                     model.set_params(objective="multiclass")
-                elif model_name == "LGBM" and self.outputs[output].nunique() == 2:
+                elif "LGBM" in model_name and self.outputs[output].nunique() == 2:
                     model.set_params(objective="binary")
 
-                if model_name == "XGB" and self.outputs[output].nunique() > 2:
+                if "XGB" in model_name and self.outputs[output].nunique() > 2:
                     model.set_params(objective="multi:softmax", num_class=self.outputs[output].nunique())
-                elif model_name == "XGB" and self.outputs[output].nunique() == 2:
+                elif "XGB" in model_name and self.outputs[output].nunique() == 2:
                     model.set_params(objective="binary:logistic", num_class=1)
 
                 # Set model probability to true if it exists
