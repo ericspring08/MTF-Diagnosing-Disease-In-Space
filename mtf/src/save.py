@@ -71,3 +71,6 @@ class ModelResults:
                 except Exception as e:
                     self.progress.print(f"[{datetime.now().strftime('%H:%M:%S')}] Error with {model} on {output}, {e}")
                 self.progress.update(self.main_task, advance=1)
+
+    def save_model(self, model, path):
+        pickle.dump(model, open(path, "wb"))

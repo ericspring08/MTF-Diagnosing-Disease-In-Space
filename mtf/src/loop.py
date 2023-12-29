@@ -72,7 +72,7 @@ class MTF(object):
             self.models_to_use = {}
             if self.models_selection == "all" or self.models_selection == "All":
                 models_selection = list(model_options.keys())
-            for value in models_selection:
+            for value in self.models_selection:
                 if value not in model_options:
                     print(f"Model {value} not found. Please check your spelling and try again.")
                     exit()
@@ -116,13 +116,14 @@ class MTF(object):
         preprocessor = ColumnTransformer(
             transformers =
             [('ohe',
-              OneHotEncoder(handle_unknown='infrequent_if_exist', sparse_output=False),
+              OneHotEncoder(handle_unknown='ignore', sparse_output=False),
               self.categorical_features),
              ('scaler',
               StandardScaler(),
               self.numerical_features)],
             remainder='passthrough',
             verbose_feature_names_out=False).set_output(transform = 'pandas')
+
         preprocessor = preprocessor.fit(dataset)
         self.x_dataset = preprocessor.transform(dataset)
 
@@ -142,10 +143,11 @@ class MTF(object):
 
             # Random Train Test Split
             # Sample 500 rows of the dataset for testing
+            combined_dataset = pd.concat([self.x_dataset, self.outputs], axis=1)
             if len(self.dataset) < 500:
-                sampled_dataset = self.dataset
+                sampled_dataset = combined_dataset
             else:
-                sampled_dataset = self.dataset.sample(n=500)
+                sampled_dataset = combined_dataset.sample(n=500)
             x_sampled_dataset = sampled_dataset.drop(self.outputs_selection, axis=1)
             y_sampled_dataset = sampled_dataset[self.outputs_selection]
             x_train, x_test, y_train, y_test = train_test_split(x_sampled_dataset, y_sampled_dataset, test_size=0.2)
@@ -162,13 +164,16 @@ class MTF(object):
         for model_name, model in self.models_to_use.items():
             # Iterate through outputs
             for output in self.outputs:
-                self.print_tags((f"Trial {trial+1}",), f"Training {model_name}, Output {output}")
-                self.print_tags((f"Trial {trial+1}",), f"Training dataset dimensions: {x_train.shape}")
                 # Special cases for some models that require multiclass specification
                 if model_name == "LGBM" and self.outputs[output].nunique() > 2:
                     model.set_params(objective="multiclass")
-                elif model_name == "XGB" and self.outputs[output].nunique() > 2:
+                elif model_name == "LGBM" and self.outputs[output].nunique() == 2:
+                    model.set_params(objective="binary")
+
+                if model_name == "XGB" and self.outputs[output].nunique() > 2:
                     model.set_params(objective="multi:softmax", num_class=self.outputs[output].nunique())
+                elif model_name == "XGB" and self.outputs[output].nunique() == 2:
+                    model.set_params(objective="binary:logistic", num_class=1)
 
                 # Set model probability to true if it exists
                 if dir(model).__contains__('probability'):
@@ -187,7 +192,7 @@ class MTF(object):
 
                 # Fit
                 time_before_fit = time.perf_counter_ns()
-                opt.fit(x_train, y_train[output], callback=lambda res: self.logging_callback_fit(res, trial+1, model_name))
+                opt.fit(x_train, y_train[output], callback=lambda res: self.logging_callback_fit(res, trial+1, model_name, output,))
                 time_after_fit = time.perf_counter_ns()
 
                 # Calculate Training Time
@@ -209,7 +214,7 @@ class MTF(object):
 
                 # Save Results
                 for metric, value in performance.items():
-                    self.print_tags((f"Trial {trial+1}",), f"{model_name}: {metric}: {value}")
+                    self.print_tags((f"Trial {trial+1}", f"{model_name}", f"{output}"), f"{metric}: {value}")
                     self.models_results.add_result(model_name, output, metric, value)
                     self.progress.advance(self.main_task, 1)
     def save_results(self):
@@ -225,10 +230,10 @@ class MTF(object):
             tag += f"[{value}] "
         print(f"{tag} {message}")
 
-    def logging_callback_fit(self, res, trial, model_name):
+    def logging_callback_fit(self, res, trial, model_name, output):
         self.progress.advance(self.main_task, 1)
         self.progress.advance(self.trial_tasks[trial-1], 1)
-        self.print_tags((f"Trial {trial}", f"Iteration {len(res.func_vals)+1}", f"{model_name}"), f"{res.x_iters[-1]} -> {res.func_vals[-1]}")
+        self.print_tags((f"Trial {trial}", f"Iteration {len(res.func_vals)+1}", f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals[-1]}")
 
     def run(self):
         self.read_config()
