@@ -12,10 +12,9 @@ from src.utils import get_metric, hasmethod
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from skopt import BayesSearchCV
 
 import threading
-
+from skopt import BayesSearchCV
 import pickle
 
 class MTF(object):
@@ -38,13 +37,13 @@ class MTF(object):
         self.config_path = None
         self.config = None
         self.tuning_iterations = None
+        self.current_model = None
+        self.current_trial = None
         self.config_path = config_path
+        self.trial_tasks = []
 
     def set_progress(self, progress):
         self.progress = progress
-
-    def set_main_task(self, main_task):
-        self.main_task = main_task
 
     def read_config(self):
         try:
@@ -78,6 +77,13 @@ class MTF(object):
                     print(f"Model {value} not found. Please check your spelling and try again.")
                     exit()
                 self.models_to_use[value] = model_options[value]
+
+            # Create Progress Bar for Main Task
+            self.main_task = self.progress.add_task("Main Task", total=self.trials*len(self.models_to_use)*len(self.outputs_selection)*(len(self.metrics_selection)+self.tuning_iterations))
+            # Create Progress Bar for Trials
+            for trial in range(self.trials):
+                self.trial_tasks.append(self.progress.add_task(f"Trial {trial+1}", total=len(self.models_to_use)*len(self.outputs_selection)*self.tuning_iterations))
+
         except:
             raise FileExistsError("Error loading config file. Please check your spelling and try again.")
 
@@ -135,8 +141,11 @@ class MTF(object):
         for trial in range(self.trials):
 
             # Random Train Test Split
-            # Sample 20% of the dataset for testing
-            sampled_dataset = pd.concat([self.x_dataset, self.outputs], axis=1).sample(frac=0.5)
+            # Sample 500 rows of the dataset for testing
+            if len(self.dataset) < 500:
+                sampled_dataset = self.dataset
+            else:
+                sampled_dataset = self.dataset.sample(n=500)
             x_sampled_dataset = sampled_dataset.drop(self.outputs_selection, axis=1)
             y_sampled_dataset = sampled_dataset[self.outputs_selection]
             x_train, x_test, y_train, y_test = train_test_split(x_sampled_dataset, y_sampled_dataset, test_size=0.2)
@@ -153,8 +162,8 @@ class MTF(object):
         for model_name, model in self.models_to_use.items():
             # Iterate through outputs
             for output in self.outputs:
-                print(f"Trial {trial + 1}, Training {model_name}, Output {output}")
-                print(f"Size of Training Set: {len(x_train)}")
+                self.print_tags((f"Trial {trial+1}",), f"Training {model_name}, Output {output}")
+                self.print_tags((f"Trial {trial+1}",), f"Training dataset dimensions: {x_train.shape}")
                 # Special cases for some models that require multiclass specification
                 if model_name == "LGBM" and self.outputs[output].nunique() > 2:
                     model.set_params(objective="multiclass")
@@ -178,7 +187,7 @@ class MTF(object):
 
                 # Fit
                 time_before_fit = time.perf_counter_ns()
-                opt.fit(x_train, y_train[output])
+                opt.fit(x_train, y_train[output], callback=lambda res: self.logging_callback_fit(res, trial+1, model_name))
                 time_after_fit = time.perf_counter_ns()
 
                 # Calculate Training Time
@@ -200,15 +209,26 @@ class MTF(object):
 
                 # Save Results
                 for metric, value in performance.items():
-                    print(f"{model_name}: {metric}: {value}")
+                    self.print_tags((f"Trial {trial+1}",), f"{model_name}: {metric}: {value}")
                     self.models_results.add_result(model_name, output, metric, value)
-                self.progress.update(self.main_task, advance=1)
+                    self.progress.advance(self.main_task, 1)
     def save_results(self):
         print("Saving Results")
         self.models_results.save_models(self.results_path + "/models")
         self.models_results.save_results_raw_csv(self.results_path + "/results_raw.csv")
         self.models_results.save_results_averages_csv(self.results_path + "/results_average.csv")
         self.progress.update(self.main_task, advance=1)
+
+    def print_tags(self, tags, message):
+        tag = ""
+        for value in tags:
+            tag += f"[{value}] "
+        print(f"{tag} {message}")
+
+    def logging_callback_fit(self, res, trial, model_name):
+        self.progress.advance(self.main_task, 1)
+        self.progress.advance(self.trial_tasks[trial-1], 1)
+        self.print_tags((f"Trial {trial}", f"Iteration {len(res.func_vals)+1}", f"{model_name}"), f"{res.x_iters[-1]} -> {res.func_vals[-1]}")
 
     def run(self):
         self.read_config()

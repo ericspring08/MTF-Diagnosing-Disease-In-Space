@@ -15,6 +15,8 @@ from src.graph import *
 from src.loop import MTF
 import builtins
 from datetime import datetime
+
+from rich.progress import Progress, TimeElapsedColumn, SpinnerColumn, BarColumn, TextColumn, TaskProgressColumn
 from rich import print
 
 title = text2art("MTF", font="3d_diagonal")
@@ -38,11 +40,9 @@ builtins.print = time_print
 def experiment(args):
     for config in args.config:
         print(f"Running experiment {config}")
-        with Progress(SpinnerColumn(), *Progress.get_default_columns(), TimeElapsedColumn()) as progress:
-            main_task = progress.add_task(f"[red]{config}", total=100)
+        with Progress(SpinnerColumn(), TextColumn(text_format="[progress.description]{task.description}"), BarColumn(), TaskProgressColumn(), TimeElapsedColumn()) as progress:
             mtf = MTF(config)
             mtf.set_progress(progress)
-            mtf.set_main_task(main_task)
             mtf.run()
         print('-' * 100)
 
