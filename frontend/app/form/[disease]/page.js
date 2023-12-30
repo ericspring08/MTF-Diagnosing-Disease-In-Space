@@ -34,9 +34,13 @@ const Page = ({ params }) => {
      }, [formData, formIndex, formStructure, formHeaders]);
 
      const handleSubmit = async () => {
+          console.log(formData);
           try {
                setSubmitted(true);
-               const res = await axios.post(`/api/${params.disease}`, formData);
+               const res = await axios.post(
+                    `/api/predict/${params.disease}`,
+                    formData,
+               );
                const { prediction, probability } = res.data;
                setPredictionResults({ prediction, probability });
           } catch (error) {

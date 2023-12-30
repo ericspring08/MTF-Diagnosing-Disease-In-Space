@@ -16,6 +16,8 @@ from skopt import BayesSearchCV
 
 from rich.progress import Progress, TimeElapsedColumn, SpinnerColumn
 
+import pickle
+
 def main_loop(config_path):
     with Progress(SpinnerColumn(), *Progress.get_default_columns(), TimeElapsedColumn()) as progress:
         start_time = time.perf_counter()
@@ -87,7 +89,13 @@ def main_loop(config_path):
               numerical_features)],
             remainder='passthrough',
             verbose_feature_names_out=False).set_output(transform = 'pandas')
-        x_dataset = preprocessor.fit_transform(dataset)
+        preprocessor = preprocessor.fit(dataset)
+
+        # Save Preprocessor
+        with open(results_path + "/kdd_preprocessor.pkl", "wb") as f:
+            pickle.dump(preprocessor, f)
+
+        x_dataset = preprocessor.transform(dataset)
 
         # Map the outputs to dictionary
         for key, value in config['outputs'].items():
@@ -116,12 +124,15 @@ def main_loop(config_path):
 
                     # Train Model
                     # Tune Hyperparameters with Bayesian Optimization
+                    # if model has parameter probability, set to True
+                    if dir(model).__contains__("probability"):
+                        model.probability = True
                     np.int = int
                     opt = BayesSearchCV(
                         model,
                         model_params[model_name],
                         n_iter=32,
-                        cv=None,
+                        cv=3,
                         verbose=1,
                     )
                     time_before_fit = time.perf_counter_ns()
@@ -136,9 +147,10 @@ def main_loop(config_path):
                     y_pred = opt.predict(x_test)
                     after_predict = time.perf_counter_ns()
                     predict_time = (after_predict - before_predict)
+                    y_prob = opt.predict_proba(x_test)
 
                     # Calculate Metrics
-                    performance = get_metric(y_pred, y_test[output], metrics_selection, train_time, predict_time)
+                    performance = get_metric(y_pred, y_prob, y_test[output], metrics_selection, train_time, predict_time)
 
                     # Save Results
                     for metric, value in performance.items():
