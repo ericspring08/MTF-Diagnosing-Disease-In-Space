@@ -46,7 +46,6 @@ def experiment(args):
             mtf.run()
         print('-' * 100)
 
-
 # Parser
 parser = ArgumentParser(description="Prototype Training Platform")
 subparsers = parser.add_subparsers(dest="command")

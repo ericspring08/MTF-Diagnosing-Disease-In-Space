@@ -87,6 +87,7 @@ def graph(args):
                     df_metric = df_output[df_output['metric'] == metric]
 
                     models = []
+                    raw = []
                     means = []
                     stdevs = []
                     # Go through every model
@@ -94,10 +95,11 @@ def graph(args):
                         df_model = df_metric[df_metric['model'] == model]
 
                         # Get the average of all the individual results of every trial of that model, output, metric combination
-                        value = [n.strip() for n in df_model['value'].means[0][1:-1].split(',')]
+                        value = [n.strip() for n in df_model['value'].values[0][1:-1].split(',')]
                         # Convert string means to float
                         if value[0] != '':
                             value = [float(n) for n in value]
+                            raw.append(value)
                             means.append(mean(value))
                             stdevs.append(stdev(value))
                             models.append(model)
@@ -121,7 +123,7 @@ def graph(args):
                     plt.grid(axis='x')
                     plt.xlabel(metric)
                     plt.ylabel('Model')
-                    plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}.png'))
+                    plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}_mean.png'))
                     plt.clf()
 
                     # Generate a graph for the deviation of the means
@@ -139,10 +141,7 @@ def graph(args):
                     plt.title(f'{output} - {metric} - Deviation')
                     plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}_deviation.png'))
                     plt.clf()
-                    # Boxplot of one for each model
-                    plt.title(f'{output} - {metric} - Boxplot')
-                    plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}_boxplot.png'))
-                    plt.clf()
+
                     progress.update(main_task, advance=1)
 
         main_task = progress.add_task("[red]Graphing Results", total=total_tasks)

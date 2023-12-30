@@ -1,15 +1,16 @@
 {
   "location": {
-    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/ptf/data/LDD.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/ptf/results/ldd_results/"
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/data/LDD.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/ldd_results/"
   },
   "experiment": {
-    "metrics": ["accuracy", "precision", "recall", "f1", "train_time"],
+    "metrics": ["accuracy", "precision", "recall", "f1", "train_time", "predict_time", "logloss"],
     "outputs": ["Risk"],
     "numerical": ["FVC", "FEC1", "AGE"],
     "categorical": ["smoke", "PEFR", "O2", "ABG-P-O2", "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseaes"],
-    "models": ["XGB"],
-    "trials": 1
+    "models": "all",
+    "trials": 5,
+    "tuning_iterations": 32
   },
   "outputs": {
     "Risk": {
