@@ -3,7 +3,9 @@ hdd_features = ["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thala
 kdd_features =["age", "bp", "sg", "al", "su", "rbc", "pc", "pcc", "ba", "bgr", "bu", "sc", "sod", "pot", "hemo", "pcv", "wc", "rc", "htn", "dm", "cad", "appet", "pe", "ane"]
 kdd_categorical_features = ["su", "rbc", "pc", "pcc", "ba", "htn", "dm", "cad", "appet", "pe", "ane"]
 kdd_numerical_features = ["age", "bp", "sg", "al", "bgr", "bu", "sc", "sod", "pot", "hemo", "pcv", "wc", "rc"]
-
+ldd_features = ["smoke", "FVC", "FEC1", "PEFR", "O2", "ABG-P-O2", "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseases", "AGE"]
+ldd_categorical = ["smoke", "PEFR", "O2", "ABG-P-O2", "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseases"]
+ldd_numerical = ["FVC", "FEC1", "AGE"]
 hdd_categorical_features = ["sex", "cp", "fbs", "restecg", "exang", "slope", "ca", "thal"]
 hdd_numerical_features = ["age", "trestbps", "chol", "thalach", "oldpeak"]
 hdd_types = {
@@ -46,6 +48,110 @@ kdd_types = {
     "appet": str,
     "pe": str,
     "ane": str
+}
+ldd_types = {
+    "smoke": str,
+    "FVC": float,
+    "FEC1": float,
+    "PEFR": str,
+    "O2": str,
+    "ABG-P-O2": str,
+    "ABG-P-CO2": str,
+    "ABG-pH Level": str,
+    "Scan": str,
+    "Asthama": str,
+    "Other diseases": str,
+    "AGE": int
+}
+form_ldd: {
+    'Basics': {
+        'AGE': {
+            'title': 'Age',
+            'type': 'numerical'
+        },
+    'smoke' : { 
+            'title': 'Have Smoked?',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'T',
+                'No': 'F'
+            }
+        },
+    'Asthama' : { 
+            'title': 'Have Asthama?',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'T',
+                'No': 'F'
+            }
+        },
+    'Other diseases' : { 
+            'title': 'Currently Have Other Diseases?',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'T',
+                'No': 'F'
+            }
+        },
+    },
+    'Testing Specifics': {
+        'FVC': {
+            'title': 'Forced Vital Capacity (L)',
+            'type': 'numerical'
+        },
+        'FEC1': {
+            'title': 'Forced Expiratory Volume (L)',
+            'type': 'numerical'
+        },
+        'PEFR' : { 
+            'title': 'Normal Levels of Peak Expiratory Flow Rate? (320-550L/min)',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'F',
+                'No': 'T'
+            }
+        },
+        'O2' : { 
+            'title': 'Normal Oxygen Saturation? (95-100%)',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'F',
+                'No': 'T'
+            }
+        },
+        'ABG-P-O2' : { 
+            'title': 'Normal Arterial Blood Gas Partial Pressure of Oxygen? (75-100mmHg)',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'F',
+                'No': 'T'
+            }
+        },
+        'ABG-P-CO2' : { 
+            'title': 'Normal Arterial Blood Gas Partial Pressure of Carbon Dioxide? (35-40mmHg)',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'F',
+                'No': 'T'
+            }
+        },
+        'ABG-pH Level' : { 
+            'title': 'Normal Arterial Blood Acidity? (7.35-7.45pH)',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'F',
+                'No': 'T'
+            }
+        },
+        'Scan' : { 
+            'title': 'Type of Imaging Scan performed',
+            'type': 'categorical',
+            'options': {
+                'X-ray' : 'X-ray',
+                'MRI': 'MRI'
+            }
+        }
+    }
 }
 form_kdd = {
     'Basic Patient and Urine Information': {
@@ -304,11 +410,21 @@ format_dict = {
         'features' : kdd_features,
         'target': 'target',
         'model': '',
-        'standard_scaler': './src/preprocessor/hdd_standard_scaler.pkl',
+        'standard_scaler': './src/preprocessor/kdd_standard_scaler.pkl',
         'categorical': kdd_categorical_features,
         'numerical': kdd_numerical_features,
         'type': kdd_types,
         'form': form_kdd,
+    },
+    'ldd' : {
+        'features' : ldd_features,
+        'target': 'target',
+        'model': '',
+        'standard_scaler': './src/preprocessor/ldd_standard_scaler.pkl',
+        'categorical': kdd_categorical_features,
+        'numerical': ldd_numerical_features,
+        'type': ldd_types,
+        'form': form_ldd,
     }
 }
 
@@ -323,6 +439,11 @@ disease_options = {
             'value': 'kdd',
             'label': 'Kidney Disease',
             'description': 'Kidney disease means your kidneys are damaged and can’t filter blood the way they should. You are at greater risk for kidney disease if you have diabetes or high blood pressure. If you experience kidney failure, treatments include kidney transplant or dialysis.',
+        },
+        {
+            'value': 'ldd',
+            'label': 'Lung Disease',
+            'description': 'Lung disease refers to various conditions affecting the lungs, impairing their function and often causing symptoms like coughing, shortness of breath, and decreased oxygen intake. These conditions range from infections like pneumonia to chronic diseases such as COPD and asthma, impacting breathing and overall respiratory health.'
         }
     ]
 }
