@@ -407,10 +407,10 @@ format_dict = {
         'form': form_hdd,
     },
     'kdd' : {
-        'features' : kdd_features,
+        'features': kdd_features,
         'target': 'target',
         'model': '',
-        'standard_scaler': './src/preprocessor/kdd_standard_scaler.pkl',
+        'standard_scaler': './src/preprocessor/hdd_standard_scaler.pkl',
         'categorical': kdd_categorical_features,
         'numerical': kdd_numerical_features,
         'type': kdd_types,
