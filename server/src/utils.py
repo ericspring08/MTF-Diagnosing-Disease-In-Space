@@ -63,7 +63,7 @@ ldd_types = {
     "Other diseases": str,
     "AGE": int
 }
-form_ldd: {
+form_ldd = {
     'Basics': {
         'AGE': {
             'title': 'Age',
