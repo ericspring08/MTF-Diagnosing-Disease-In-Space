@@ -7,6 +7,8 @@ import statistics as st
 from sklearn.metrics import accuracy_score, precision_score, balanced_accuracy_score, f1_score, recall_score, log_loss
 
 # Functions
+
+
 def ammp(accuracy, precision, time_to_fit):
     precision_reciprocal_sum = sum(precision.rdiv(1))
     trials_num = len(accuracy)
@@ -15,6 +17,7 @@ def ammp(accuracy, precision, time_to_fit):
     time_to_fit_ms = st.mean(time_to_fit/1000000)
 
     return 0.14 * (trials_num / precision_reciprocal_sum) + 0.85 * (accuracy_sum / trials_num) - (0.01 * math.log(time_to_fit_ms, 12))
+
 
 def get_metric(y_pred, y_prob, y_test, metrics, train_time, predict_time):
     global metric_params
@@ -35,10 +38,12 @@ def get_metric(y_pred, y_prob, y_test, metrics, train_time, predict_time):
             if y_prob is None:
                 all_metrics[metric] = 0
             else:
-                all_metrics[metric] = log_loss(y_test, y_prob, labels=y_test.unique())
+                all_metrics[metric] = log_loss(
+                    y_test, y_prob, labels=y_test.unique())
         elif metric == "ammp":
             # AMMP Metric
-            all_metrics[metric] = ammp(accuracy_score(y_pred, y_test), precision_score(y_pred, y_test), train_time)
+            all_metrics[metric] = ammp(accuracy_score(
+                y_pred, y_test), precision_score(y_pred, y_test), train_time)
         # Standard Metrics
         elif metric in metric_options:
             # Traditional metrics
@@ -47,13 +52,23 @@ def get_metric(y_pred, y_prob, y_test, metrics, train_time, predict_time):
             metric_value = metric_func(y_pred, y_test, **parameters)
             all_metrics[metric] = metric_value
         else:
-            print(f"Metric {metric} not found. Please check your spelling and try again.")
+            print(
+                f"Metric {metric} not found. Please check your spelling and try again.")
             exit()
 
     return all_metrics
 
+
+def print_tags(tags, message):
+    tag = ""
+    for value in tags:
+        tag += f"[{value}] "
+    print(f"{tag} {message}")
+
+
 def hasmethod(obj, method_name):
     return hasattr(obj, method_name) and callable(getattr(obj, method_name))
+
 
 # Variables
 metric_options = {

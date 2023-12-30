@@ -200,7 +200,7 @@ model_params = {
 model_options = {
     # SVC is SVCRBF
     'SVC': SVC(),
-    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=5, random_state=0),
+    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=5, random_state=0),
     'GaussianNB': GaussianNB(),
     'DecisionTree': DecisionTreeClassifier(),
     'KNeighbors': KNeighborsClassifier(n_neighbors=5, n_jobs=-1),

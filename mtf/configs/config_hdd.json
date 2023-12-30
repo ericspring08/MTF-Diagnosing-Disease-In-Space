@@ -1,18 +1,40 @@
 {
   "location": {
     "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/data/hdd.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/hdd_results/"
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/nosave_hdd_results/"
   },
   "experiment": {
-    "metrics": ["accuracy", "precision", "recall", "f1", "train_time", "predict_time", "logloss"],
-    "outputs": ["target"],
-    "numerical": ["age", "trestbps", "thalach", "oldpeak"],
-    "categorical": ["sex", "cp", "fbs", "restecg", "exang", "slope", "ca", "thal"],
+    "metrics": [
+      "accuracy",
+      "precision",
+      "recall",
+      "f1",
+      "train_time",
+      "predict_time",
+      "logloss"
+    ],
+    "outputs": [
+      "target"
+    ],
+    "numerical": [
+      "age",
+      "trestbps",
+      "thalach",
+      "oldpeak"
+    ],
+    "categorical": [
+      "sex",
+      "cp",
+      "fbs",
+      "restecg",
+      "exang",
+      "slope",
+      "ca",
+      "thal"
+    ],
     "models": "all",
     "trials": 5,
-    "tuning_iterations": 32
+    "tuning_iterations": 1
   },
-  "outputs": {
-    
-  }
+  "outputs": {}
 }

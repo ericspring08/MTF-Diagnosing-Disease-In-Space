@@ -4,6 +4,7 @@ from models import model_options
 import pandas as pd
 from datetime import datetime
 
+
 class ModelResults:
     results = {}
 
@@ -32,7 +33,8 @@ class ModelResults:
                     if len(self.results[model][output][metric]) == 0:
                         self.results[model][output][metric] = 0
                     else:
-                        self.results[model][output][metric] = sum(self.results[model][output][metric]) / len(self.results[model][output][metric])
+                        self.results[model][output][metric] = sum(
+                            self.results[model][output][metric]) / len(self.results[model][output][metric])
         df = pd.DataFrame.from_dict(self.results)
         df.to_csv(path, index=False)
 
@@ -42,9 +44,11 @@ class ModelResults:
         for model in self.results:
             for output in self.results[model]:
                 for metric in self.results[model][output]:
-                    raw_results.append([model, output, metric, self.results[model][output][metric]])
+                    raw_results.append(
+                        [model, output, metric, self.results[model][output][metric]])
         df = pd.DataFrame.from_dict(raw_results, orient='columns')
-        df.to_csv(path, header=['model', 'output', 'metric', 'value'], index=False)
+        df.to_csv(path, header=['model', 'output',
+                  'metric', 'value'], index=False)
 
     def save_models(self, path):
         # Create folders
@@ -69,8 +73,12 @@ class ModelResults:
                     with open(os.path.join(path, model, output, f"{model}-{output}.pkl"), 'wb') as f:
                         pickle.dump(training_model, f)
                 except Exception as e:
-                    self.progress.print(f"[{datetime.now().strftime('%H:%M:%S')}] Error with {model} on {output}, {e}")
+                    self.progress.print(
+                        f"[{datetime.now().strftime('%H:%M:%S')}] Error with {model} on {output}, {e}")
                 self.progress.update(self.main_task, advance=1)
 
     def save_model(self, model, path):
+        # Create if don't exist
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
         pickle.dump(model, open(path, "wb"))

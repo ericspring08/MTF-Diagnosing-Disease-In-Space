@@ -7,7 +7,7 @@ import pandas as pd
 
 from models import model_options, model_params
 from src.save import ModelResults
-from src.utils import get_metric, hasmethod
+from src.utils import get_metric, hasmethod, print_tags
 
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
@@ -16,6 +16,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import threading
 from skopt import BayesSearchCV
 import pickle
+
 
 class MTF(object):
     def __init__(self, config_path):
@@ -74,22 +75,25 @@ class MTF(object):
                 self.models_selection = list(model_options.keys())
             for value in self.models_selection:
                 if value not in model_options:
-                    print(f"Model {value} not found. Please check your spelling and try again.")
+                    print(
+                        f"Model {value} not found. Please check your spelling and try again.")
                     exit()
                 self.models_to_use[value] = model_options[value]
 
             # Create Progress Bar for Main Task
-            self.main_task = self.progress.add_task("Main Task", total=self.trials*len(self.models_to_use)*len(self.outputs_selection)*(len(self.metrics_selection)+self.tuning_iterations))
+            self.main_task = self.progress.add_task("Main Task", total=self.trials*len(self.models_to_use)*len(
+                self.outputs_selection)*(len(self.metrics_selection)+self.tuning_iterations))
             # Create Progress Bar for Trials
             for trial in range(self.trials):
-                self.trial_tasks.append(self.progress.add_task(f"Trial {trial+1}", total=len(self.models_to_use)*len(self.outputs_selection)*self.tuning_iterations))
+                self.trial_tasks.append(self.progress.add_task(f"Trial {trial+1}", total=len(
+                    self.models_to_use)*len(self.outputs_selection)*self.tuning_iterations))
 
-        except:
-            raise FileExistsError("Error loading config file. Please check your spelling and try again.")
+        except FileExistsError:
+            raise FileExistsError(
+                "Error loading config file. Please check your spelling and try again.")
 
     def load_data(self):
         self.dataset = pd.read_csv(self.dataset_path)
-
 
     def preprocess(self):
         print("Extract Outputs")
@@ -103,7 +107,8 @@ class MTF(object):
 
         # Loop through categorical features and fill null values with most frequent
         for feature in self.categorical_features:
-            dataset[feature] = dataset[feature].fillna(dataset[feature].value_counts().index[0])
+            dataset[feature] = dataset[feature].fillna(
+                dataset[feature].value_counts().index[0])
 
         # Loop through numerical features and fill null values with mean
         for feature in self.numerical_features:
@@ -114,21 +119,22 @@ class MTF(object):
 
         # Normalize Inputs
         preprocessor = ColumnTransformer(
-            transformers =
-            [('ohe',
-              OneHotEncoder(handle_unknown='ignore', sparse_output=False),
-              self.categorical_features),
-             ('scaler',
-              StandardScaler(),
-              self.numerical_features)],
+            transformers=[('ohe',
+                           OneHotEncoder(handle_unknown='ignore',
+                                         sparse_output=False),
+                           self.categorical_features),
+                          ('scaler',
+                           StandardScaler(),
+                           self.numerical_features)],
             remainder='passthrough',
-            verbose_feature_names_out=False).set_output(transform = 'pandas')
+            verbose_feature_names_out=False).set_output(transform='pandas')
 
         preprocessor = preprocessor.fit(dataset)
         self.x_dataset = preprocessor.transform(dataset)
 
         # Save Preprocessor
-        pickle.dump(preprocessor, open(self.results_path + "/preprocessor.pkl", "wb"))
+        pickle.dump(preprocessor, open(
+            self.results_path + "/preprocessor.pkl", "wb"))
 
         # Map the outputs to dictionary
         for key, value in self.config['outputs'].items():
@@ -137,22 +143,27 @@ class MTF(object):
         self.outputs = pd.DataFrame(outputs)
 
     def main_loop(self):
-        self.models_results = ModelResults(self.models_to_use, self.outputs, self.metrics_selection, self.x_dataset, self.outputs, self.progress, self.main_task)
+        self.models_results = ModelResults(
+            self.models_to_use, self.outputs, self.metrics_selection, self.x_dataset, self.outputs, self.progress, self.main_task)
         threads = []
         for trial in range(self.trials):
 
             # Random Train Test Split
             # Sample 500 rows of the dataset for testing
-            combined_dataset = pd.concat([self.x_dataset, self.outputs], axis=1)
+            combined_dataset = pd.concat(
+                [self.x_dataset, self.outputs], axis=1)
             if len(self.dataset) < 500:
                 sampled_dataset = combined_dataset
             else:
                 sampled_dataset = combined_dataset.sample(n=500)
-            x_sampled_dataset = sampled_dataset.drop(self.outputs_selection, axis=1)
+            x_sampled_dataset = sampled_dataset.drop(
+                self.outputs_selection, axis=1)
             y_sampled_dataset = sampled_dataset[self.outputs_selection]
-            x_train, x_test, y_train, y_test = train_test_split(x_sampled_dataset, y_sampled_dataset, test_size=0.2)
+            x_train, x_test, y_train, y_test = train_test_split(
+                x_sampled_dataset, y_sampled_dataset, test_size=0.2)
             # Multi-threading
-            t = threading.Thread(target=self.run_trials, args=(trial, x_train, y_train, x_test, y_test,))
+            t = threading.Thread(target=self.run_trials, args=(
+                trial, x_train, y_train, x_test, y_test,))
             threads.append(t)
             t.start()
 
@@ -171,7 +182,8 @@ class MTF(object):
                     model.set_params(objective="binary")
 
                 if "XGB" in model_name and self.outputs[output].nunique() > 2:
-                    model.set_params(objective="multi:softmax", num_class=self.outputs[output].nunique())
+                    model.set_params(objective="multi:softmax",
+                                     num_class=self.outputs[output].nunique())
                 elif "XGB" in model_name and self.outputs[output].nunique() == 2:
                     model.set_params(objective="binary:logistic", num_class=1)
 
@@ -192,7 +204,8 @@ class MTF(object):
 
                 # Fit
                 time_before_fit = time.perf_counter_ns()
-                opt.fit(x_train, y_train[output], callback=lambda res: self.logging_callback_fit(res, trial+1, model_name, output,))
+                opt.fit(x_train, y_train[output], callback=lambda res: self.logging_callback_fit(
+                    res, trial+1, model_name, output,))
                 time_after_fit = time.perf_counter_ns()
 
                 # Calculate Training Time
@@ -210,29 +223,34 @@ class MTF(object):
                     y_prob = opt.predict_proba(x_test)
 
                 # Calculate Metrics
-                performance = get_metric(y_pred, y_prob, y_test[output], self.metrics_selection, train_time, predict_time)
+                performance = get_metric(
+                    y_pred, y_prob, y_test[output], self.metrics_selection, train_time, predict_time)
+
+                # Save Model pickle
+                self.models_results.save_model(
+                    opt.best_estimator_, os.path.join(self.results_path, "models/", f"trial_{trial+1}/", f"{output}/", f"{trial+1}_{model_name}_{output}.pkl"))
 
                 # Save Results
                 for metric, value in performance.items():
-                    self.print_tags((f"Trial {trial+1}", f"{model_name}", f"{output}"), f"{metric}: {value}")
-                    self.models_results.add_result(model_name, output, metric, value)
+                    print_tags(
+                        (f"Trial {trial+1}", f"{model_name}", f"{output}"), f"{metric}: {value}")
+                    self.models_results.add_result(
+                        model_name, output, metric, value)
                     self.progress.advance(self.main_task, 1)
+
     def save_results(self):
         print("Saving Results")
-        self.models_results.save_results_raw_csv(self.results_path + "/results_raw.csv")
-        self.models_results.save_results_averages_csv(self.results_path + "/results_average.csv")
+        self.models_results.save_results_raw_csv(
+            self.results_path + "/results_raw.csv")
+        self.models_results.save_results_averages_csv(
+            self.results_path + "/results_average.csv")
         self.progress.update(self.main_task, advance=1)
-
-    def print_tags(self, tags, message):
-        tag = ""
-        for value in tags:
-            tag += f"[{value}] "
-        print(f"{tag} {message}")
 
     def logging_callback_fit(self, res, trial, model_name, output):
         self.progress.advance(self.main_task, 1)
         self.progress.advance(self.trial_tasks[trial-1], 1)
-        self.print_tags((f"Trial {trial}", f"Iteration {len(res.func_vals)+1}", f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals[-1]}")
+        print_tags((f"Trial {trial}", f"Iteration {len(res.func_vals)+1}",
+                    f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals[-1]}")
 
     def run(self):
         self.read_config()

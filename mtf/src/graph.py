@@ -86,7 +86,8 @@ def graph(args):
                     print(f'Rank Graph - {output} - {metric}')
                     df_metric = df_output[df_output['metric'] == metric]
 
-                    models = []
+                    models_means = []
+                    models_stdevs = []
                     raw = []
                     means = []
                     stdevs = []
@@ -102,18 +103,20 @@ def graph(args):
                             raw.append(value)
                             means.append(mean(value))
                             stdevs.append(stdev(value))
-                            models.append(model)
+                            models_means.append(model)
+                            models_stdevs.append(model)
                         else:
                             means.append(0)
                             stdevs.append(0)
-                            models.append(model)
+                            models_stdevs.append(model)
+                            models_means.append(model)
 
                     # Sort the means and models
-                    means, models = zip(*sorted(zip(means, models)))
+                    means, models_means = zip(*sorted(zip(means, models_means)))
 
                     # Plot the bar
                     plt.title(f'{output} - {metric}')
-                    plt.barh(models, means, label=metric)
+                    plt.barh(models_means, means, label=metric)
                     for i, v in enumerate(means):
                         if v == 0:
                             plt.text(0, i, str("Model could not be executed"), color='red', fontweight='bold')
@@ -127,8 +130,8 @@ def graph(args):
                     plt.clf()
 
                     # Generate a graph for the deviation of the means
-                    stdevs, models = zip(*sorted(zip(stdevs, models)))
-                    plt.barh(models, stdevs, label=metric)
+                    stdevs, models_stdevs = zip(*sorted(zip(stdevs, models_stdevs)))
+                    plt.barh(models_stdevs, stdevs, label=metric)
                     for i, v in enumerate(means):
                         if v == 0:
                             plt.text(0, i, str("Model could not be executed"), color='red', fontweight='bold')
