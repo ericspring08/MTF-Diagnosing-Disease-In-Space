@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from statistics import mean
+from statistics import mean, stdev
 from rich.progress import Progress, TimeElapsedColumn, SpinnerColumn
 from datetime import datetime
 import os
@@ -58,8 +58,8 @@ def graph(args):
                         df_model = df_metric[df_metric['model'] == model]
                         try:
                             # Get the average of all the individual results of every trial of that model, output, metric combination
-                            value = [n.strip() for n in df_model['value'].values[0][1:-1].split(',')]
-                            # Convert string values to float
+                            value = [n.strip() for n in df_model['value'].means[0][1:-1].split(',')]
+                            # Convert string means to float
                             value = [float(n) for n in value]
                             # Plot the histogram
                             plt.title(f'{output} - {metric} - {model}')
@@ -87,30 +87,32 @@ def graph(args):
                     df_metric = df_output[df_output['metric'] == metric]
 
                     models = []
-                    values = []
+                    means = []
+                    stdevs = []
                     # Go through every model
                     for model in df_metric['model'].unique():
                         df_model = df_metric[df_metric['model'] == model]
 
-
                         # Get the average of all the individual results of every trial of that model, output, metric combination
-                        value = [n.strip() for n in df_model['value'].values[0][1:-1].split(',')]
-                        # Convert string values to float
+                        value = [n.strip() for n in df_model['value'].means[0][1:-1].split(',')]
+                        # Convert string means to float
                         if value[0] != '':
                             value = [float(n) for n in value]
-                            values.append(mean(value))
+                            means.append(mean(value))
+                            stdevs.append(stdev(value))
                             models.append(model)
                         else:
-                            values.append(0)
+                            means.append(0)
+                            stdevs.append(0)
                             models.append(model)
 
-                    # Sort the values and models
-                    values, models = zip(*sorted(zip(values, models)))
+                    # Sort the means and models
+                    means, models = zip(*sorted(zip(means, models)))
 
                     # Plot the bar
                     plt.title(f'{output} - {metric}')
-                    plt.barh(models, values, label=metric)
-                    for i, v in enumerate(values):
+                    plt.barh(models, means, label=metric)
+                    for i, v in enumerate(means):
                         if v == 0:
                             plt.text(0, i, str("Model could not be executed"), color='red', fontweight='bold')
                         else:
@@ -120,6 +122,26 @@ def graph(args):
                     plt.xlabel(metric)
                     plt.ylabel('Model')
                     plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}.png'))
+                    plt.clf()
+
+                    # Generate a graph for the deviation of the means
+                    stdevs, models = zip(*sorted(zip(stdevs, models)))
+                    plt.barh(models, stdevs, label=metric)
+                    for i, v in enumerate(means):
+                        if v == 0:
+                            plt.text(0, i, str("Model could not be executed"), color='red', fontweight='bold')
+                        else:
+                            plt.text(v, i, str(round(v, 5)), color='black', fontweight='bold')
+                    # Ticks in smaller intervals
+                    plt.grid(axis='x')
+                    plt.xlabel(metric)
+                    plt.ylabel('Model')
+                    plt.title(f'{output} - {metric} - Deviation')
+                    plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}_deviation.png'))
+                    plt.clf()
+                    # Boxplot of one for each model
+                    plt.title(f'{output} - {metric} - Boxplot')
+                    plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}_boxplot.png'))
                     plt.clf()
                     progress.update(main_task, advance=1)
 

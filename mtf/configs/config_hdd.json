@@ -9,8 +9,8 @@
     "numerical": ["age", "trestbps", "thalach", "oldpeak"],
     "categorical": ["sex", "cp", "fbs", "restecg", "exang", "slope", "ca", "thal"],
     "models": "all",
-    "trials": 1,
-    "tuning_iterations": 2
+    "trials": 5,
+    "tuning_iterations": 32
   },
   "outputs": {
     

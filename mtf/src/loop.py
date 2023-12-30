@@ -71,7 +71,7 @@ class MTF(object):
             # Model Selection
             self.models_to_use = {}
             if self.models_selection == "all" or self.models_selection == "All":
-                models_selection = list(model_options.keys())
+                self.models_selection = list(model_options.keys())
             for value in self.models_selection:
                 if value not in model_options:
                     print(f"Model {value} not found. Please check your spelling and try again.")
@@ -219,7 +219,6 @@ class MTF(object):
                     self.progress.advance(self.main_task, 1)
     def save_results(self):
         print("Saving Results")
-        self.models_results.save_models(self.results_path + "/models")
         self.models_results.save_results_raw_csv(self.results_path + "/results_raw.csv")
         self.models_results.save_results_averages_csv(self.results_path + "/results_average.csv")
         self.progress.update(self.main_task, advance=1)

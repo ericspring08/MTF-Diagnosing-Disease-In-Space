@@ -10,6 +10,7 @@ from sklearn.linear_model import RidgeClassifier, PassiveAggressiveClassifier, S
 from sklearn.dummy import DummyClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
+from sklvq import GLVQ, GMLVQ, LGMLVQ
 
 model_params = {
     'SVC': {
@@ -110,6 +111,8 @@ model_params = {
         'n_estimators': [50, 100, 200],
         'num_leaves': [31, 127, 255],
         'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
+        'bagging_fraction': [0.1, 0.5, 1.0],
+        'bagging_freq': [0, 1, 2, 3, 4, 5],
     },
     'LGBMDart': {
         'learning_rate': [0.1, 0.5, 1.0],
@@ -120,6 +123,8 @@ model_params = {
         'n_estimators': [50, 100, 200],
         'num_leaves': [31, 127, 255],
         'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
+        'bagging_fraction': [0.1, 0.5, 1.0],
+        'bagging_freq': [0, 1, 2, 3, 4, 5],
     },
     'LGBMrf': {
         'learning_rate': [0.1, 0.5, 1.0],
@@ -130,6 +135,8 @@ model_params = {
         'n_estimators': [50, 100, 200],
         'num_leaves': [31, 127, 255],
         'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
+        'bagging_fraction': [0.1, 0.5],
+        'bagging_freq': [1],
     },
     'XGBDart': {
         'learning_rate': [0.1, 0.5, 1.0],
@@ -175,6 +182,18 @@ model_params = {
         'max_depth': [3, 5, 7, 9],
         'min_samples_split': [2, 3, 4, 5],
         'min_samples_leaf': [1, 2, 3, 4, 5]
+    },
+    'GLVQ': {
+        'activation_type': ['sigmoid', 'identity', 'soft+', 'swish'],
+        'solver_type': ['sgd', 'adam', 'bgd', 'bfgs', 'lbfgs'],
+    },
+    'GMLVQ': {
+        'activation_type': ['sigmoid', 'identity', 'soft+', 'swish'],
+        'solver_type': ['sgd', 'adam', 'bgd', 'bfgs', 'lbfgs'],
+    },
+    'LGMLVQ': {
+        'activation_type': ['sigmoid', 'identity', 'soft+', 'swish'],
+        'solver_type': ['sgd', 'adam', 'bgd', 'bfgs', 'lbfgs'],
     }
 }
 
@@ -189,7 +208,7 @@ model_options = {
     'RandomForest': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42, n_jobs=-1),
     'MLP': MLPClassifier(),
     'QDA': QuadraticDiscriminantAnalysis(),
-    'CatBoost': CatBoostClassifier(verbose=False, thread_count=-1),
+    'CatBoost': CatBoostClassifier(logging_level="Silent", thread_count=-1),
     'ExtraTrees': ExtraTreesClassifier(n_jobs=-1),
     'Ridge': RidgeClassifier(),
     'PA': PassiveAggressiveClassifier(n_jobs=-1),
@@ -203,4 +222,7 @@ model_options = {
     'XGBDart': XGBClassifier(verbosity=0, booster='dart'),
     'XGBLinear': XGBClassifier(verbosity=0, booster='gblinear'),
     'ExtraTree': ExtraTreeClassifier(),
+    'GLVQ': GLVQ(),
+    'GMLVQ': GMLVQ(),
+    'LGMLVQ': LGMLVQ(),
 }
