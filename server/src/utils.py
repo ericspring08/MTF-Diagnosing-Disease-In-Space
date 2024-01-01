@@ -8,6 +8,9 @@ ldd_categorical_features = ["smoke", "PEFR", "O2", "ABG-P-O2", "ABG-P-CO2", "ABG
 ldd_numerical_features = ["FVC", "FEC1", "AGE"]
 hdd_categorical_features = ["sex", "cp", "fbs", "restecg", "exang", "slope", "ca", "thal"]
 hdd_numerical_features = ["age", "trestbps", "chol", "thalach", "oldpeak"]
+tdd_features = ["age", "sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery", "I131_treatment", "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary", "TSH", "T3", "TT4", "T4U", "FTI", "TBG"]
+tdd_numerical_features = ["age", "TSH", "T3", "TT4", "T4U", "FTI", "TBG"]
+tdd_categorical_features = ["sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery", "I131_treatment", "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary"]
 hdd_types = {
     "age": int,
     "sex": int,
@@ -62,6 +65,149 @@ ldd_types = {
     "Asthama": str,
     "Other diseases": str,
     "AGE": int
+}
+tdd_types = {
+    "age": int,
+    "sex": str,
+    "on_thyroxine": bool,
+    "on antithyroid meds": bool,
+    "sick": bool,
+    "thyroid_surgery": bool,
+    "I131_treatment": bool,
+    "query_hypothyroid": bool,
+    "query_hyperthyroid": bool,
+    "goitre": bool,
+    "tumor": bool,
+    "hypopituitary": bool,
+    "TSH": float,
+    "T3": float,
+    "TT4": float,
+    "T4U": float,
+    "FTI": float,
+    "TBG": float
+}
+form_tdd = {
+    'Basics': {
+        'age': {
+            'title': 'Age',
+            'type': 'numerical'
+        },
+        'sex': {
+            'title': 'Sex',
+            'type': 'categorical',
+            'options': {
+                'Male': 'M',
+                'Female': 'F'
+            }
+        },
+        'on_thyroxine': {
+            'title': 'On thyroxine?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'on antithyroid meds': {
+            'title': 'On Antithyroid meds?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'sick': {
+            'title': 'Sick?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'thyroid_surgery': {
+            'title': 'Have had Thyroid Surgery?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'I131_treatment': {
+            'title': 'Have had I131 treatment?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'query_hypothyroid': {
+            'title': 'Do you think you have Hypothyroidism?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'query_hyperthyroid': {
+            'title': 'Do you think you have Hyperthyroidism?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'goitre': {
+            'title': 'Do you have goiter?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'tumor': {
+            'title': 'Do you have a thyroid tumor?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'hypopituitary': {
+            'title': 'Do you have hypopituitarism?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+    },
+    'Bloodwork': {
+        'TSH': {    
+            'title': 'TSH in Blood (µU/mL)',
+            'type': 'numerical'
+        },
+        'T3': {    
+            'title': 'T3 in Blood (nmol/L)',
+            'type': 'numerical'
+        },
+        'TT4': {    
+            'title': 'TT4 in Blood (nmol/L)',
+            'type': 'numerical'
+        },
+        'T4U': {    
+            'title': 'T4U in Blood (mcg/dL)',
+            'type': 'numerical'
+        },
+        'FTI': {    
+            'title': 'FTI in Blood (μg/dL)',
+            'type': 'numerical'
+        },
+        'TBG': {    
+            'title': 'TBG in Blood (mcg/dL)',
+            'type': 'numerical'
+        },
+    }
+    
 }
 form_ldd = {
     'Basics': {
@@ -421,13 +567,22 @@ format_dict = {
         'target': 'target',
         'model': '',
         'standard_scaler': './src/preprocessor/ldd_standard_scaler.pkl',
-        'categorical': kdd_categorical_features,
+        'categorical': ldd_categorical_features,
         'numerical': ldd_numerical_features,
         'type': ldd_types,
         'form': form_ldd,
-    }
+    },
+    'tdd' : {
+        'features' : tdd_features,
+        'target': 'target',
+        'model': '',
+        'standard_scaler': './src/preprocessor/tdd_standard_scaler.pkl',
+        'categorical': tdd_categorical_features,
+        'numerical': tdd_numerical_features,
+        'type': tdd_types,
+        'form': form_tdd,
 }
-
+}
 disease_options = {
     'diseases': [
         {
@@ -444,6 +599,11 @@ disease_options = {
             'value': 'ldd',
             'label': 'Lung Disease',
             'description': 'Lung disease refers to various conditions affecting the lungs, impairing their function and often causing symptoms like coughing, shortness of breath, and decreased oxygen intake. These conditions range from infections like pneumonia to chronic diseases such as COPD and asthma, impacting breathing and overall respiratory health.'
+        },
+        {
+            'value': 'tdd',
+            'label': 'Thyroid Disease',
+            'description': 'Thyroid disease refers to conditions affecting the thyroid glands function, leading to hormonal imbalances that can impact metabolism, energy levels, and various bodily functions',
         }
     ]
 }
