@@ -1,19 +1,28 @@
 {
-  "location": {
-    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/ptf/data/TDF.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/ptf/results/tdf_results/"
+  "location": { 
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/data/TDF_clean.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/tdf_results/"
   },
   "experiment": {
-    "metrics": ["accuracy", "precision", "recall", "f1", "train_time"],
+    "metrics": ["accuracy", "precision", "recall", "f1", "train_time", "predict_time", "logloss"],
     "outputs": ["target"],
-    "numerical": ["Age", "Weight", "Length", "BMI", "BP", "PR", "FBS", "CR", "TG", "LDL", "HDL",	"BUN", "ESR", "HB",	"K", "Na", "WBC", "Lymph", "Neut", "PLT", "EF-TTE"],
-    "categorical": ["Sex", "DM", "HTN", "Current Smoker", "EX-Smoker", "FH", "Obesity", "CRF", "CVA", "Airway disease", "Thyroid Disease", "CHF", "DLP", "Edema", "Weak Peripheral Pulse", "Lung rales", "Systolic Murmur", "Diastolic Murmur", "Typical Chest Pain", "Dyspnea", "Function Class", "Atypical", "Nonanginal", "Exertional CP", "LowTH Ang", "Q Wave", "St Elevation", "St Depression", "Tinversion", "LVH", "Poor R Progression", "BBB"],
+    "numerical": ["age", "TSH", "T3", "TT4", "T4U", "FTI", "TBG"],
+    "categorical": ["sex", "on_thyroxine", "query_on_thyroxine", "on_antithyroid_meds", "sick", "thyroid_surgery", "I131_treatment", "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary"],
     "models": "all", 
-    "trials": 2
+    "trials": 5,
+    "tuning_iterations": 32
   },
   "outputs": {
     "target": {
-
+      "-": 0,
+      "A": 1,
+      "B": 2,
+      "C": 3,
+      "D": 4, 
+      "E": 5,
+      "F": 6,
+      "G": 7,
+      "H": 8
     }
   }
 }

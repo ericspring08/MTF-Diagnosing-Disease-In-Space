@@ -152,10 +152,10 @@ class MTF(object):
             # Sample 500 rows of the dataset for testing
             combined_dataset = pd.concat(
                 [self.x_dataset, self.outputs], axis=1)
-            if len(self.dataset) < 500:
+            if len(self.dataset) < 2000:
                 sampled_dataset = combined_dataset
             else:
-                sampled_dataset = combined_dataset.sample(n=500)
+                sampled_dataset = combined_dataset.sample(n=2000)
             x_sampled_dataset = sampled_dataset.drop(
                 self.outputs_selection, axis=1)
             y_sampled_dataset = sampled_dataset[self.outputs_selection]
@@ -175,68 +175,73 @@ class MTF(object):
         for model_name, model in self.models_to_use.items():
             # Iterate through outputs
             for output in self.outputs:
-                # Special cases for some models that require multiclass specification
-                if "LGBM" in model_name and self.outputs[output].nunique() > 2:
-                    model.set_params(objective="multiclass")
-                elif "LGBM" in model_name and self.outputs[output].nunique() == 2:
-                    model.set_params(objective="binary")
+                try:
+                    # Special cases for some models that require multiclass specification
+                    if "LGBM" in model_name and self.outputs[output].nunique() > 2:
+                        model.set_params(objective="multiclass")
+                    elif "LGBM" in model_name and self.outputs[output].nunique() == 2:
+                        model.set_params(objective="binary")
 
-                if "XGB" in model_name and self.outputs[output].nunique() > 2:
-                    model.set_params(objective="multi:softmax",
-                                     num_class=self.outputs[output].nunique())
-                elif "XGB" in model_name and self.outputs[output].nunique() == 2:
-                    model.set_params(objective="binary:logistic", num_class=1)
+                    if "XGB" in model_name and self.outputs[output].nunique() > 2:
+                        model.set_params(objective="multi:softmax",
+                                        num_class=self.outputs[output].nunique())
+                    elif "XGB" in model_name and self.outputs[output].nunique() == 2:
+                        model.set_params(objective="binary:logistic", num_class=1)
 
-                # Set model probability to true if it exists
-                if dir(model).__contains__('probability'):
-                    model.set_params(probability=True)
+                    # Set model probability to true if it exists
+                    if dir(model).__contains__('probability'):
+                        model.set_params(probability=True)
 
-                # Train Model
-                # Tune Hyperparameters with Bayesian Optimization
-                np.int = int
-                opt = BayesSearchCV(
-                    model,
-                    model_params[model_name],
-                    n_iter=self.tuning_iterations,
-                    cv=3,
-                    verbose=0,
-                )
+                    # Train Model
+                    # Tune Hyperparameters with Bayesian Optimization
+                    np.int = int
+                    opt = BayesSearchCV(
+                        model,
+                        model_params[model_name],
+                        n_iter=self.tuning_iterations,
+                        cv=3,
+                        verbose=0,
+                    )
 
-                # Fit
-                time_before_fit = time.perf_counter_ns()
-                opt.fit(x_train, y_train[output], callback=lambda res: self.logging_callback_fit(
-                    res, trial+1, model_name, output,))
-                time_after_fit = time.perf_counter_ns()
+                    # Fit
+                    time_before_fit = time.perf_counter_ns()
+                    opt.fit(x_train, y_train[output], callback=lambda res: self.logging_callback_fit(
+                        res, trial+1, model_name, output,))
+                    time_after_fit = time.perf_counter_ns()
 
-                # Calculate Training Time
-                train_time = (time_after_fit - time_before_fit)
+                    # Calculate Training Time
+                    train_time = (time_after_fit - time_before_fit)
 
-                # Predict
-                before_predict = time.perf_counter_ns()
-                y_pred = opt.predict(x_test)
-                after_predict = time.perf_counter_ns()
-                predict_time = (after_predict - before_predict)
+                    # Predict
+                    before_predict = time.perf_counter_ns()
+                    y_pred = opt.predict(x_test)
+                    after_predict = time.perf_counter_ns()
+                    predict_time = (after_predict - before_predict)
 
-                y_prob = None
-                # Get Model Probability
-                if hasmethod(opt, 'predict_proba'):
-                    y_prob = opt.predict_proba(x_test)
+                    y_prob = None
+                    # Get Model Probability
+                    if hasmethod(opt, 'predict_proba'):
+                        y_prob = opt.predict_proba(x_test)
 
-                # Calculate Metrics
-                performance = get_metric(
-                    y_pred, y_prob, y_test[output], self.metrics_selection, train_time, predict_time)
+                    # Calculate Metrics
+                    performance = get_metric(
+                        y_pred, y_prob, y_test[output], self.metrics_selection, train_time, predict_time)
 
-                # Save Model pickle
-                self.models_results.save_model(
-                    opt.best_estimator_, os.path.join(self.results_path, "models/", f"trial_{trial+1}/", f"{output}/", f"{trial+1}_{model_name}_{output}.pkl"))
+                    # Save Model pickle
+                    self.models_results.save_model(
+                        opt.best_estimator_, os.path.join(self.results_path, "models/", f"trial_{trial+1}/", f"{output}/", f"{trial+1}_{model_name}_{output}.pkl"))
 
-                # Save Results
-                for metric, value in performance.items():
-                    print_tags(
-                        (f"Trial {trial+1}", f"{model_name}", f"{output}"), f"{metric}: {value}")
-                    self.models_results.add_result(
-                        model_name, output, metric, value)
-                    self.progress.advance(self.main_task, 1)
+                    for metric, value in performance.items():
+                        print_tags(
+                            (f"Trial {trial+1}", f"{model_name}", f"{output}"), f"{metric}: {value}")
+                        self.models_results.add_result(
+                            model_name, output, metric, value)
+                        self.progress.advance(self.main_task, 1)
+                except Exception as e:
+                    print(e)
+                    print(f"Error with {model_name} {output}")
+                    for metric, value in performance.items():
+                        self.progress.advance(self.main_task, 1)
 
     def save_results(self):
         print("Saving Results")

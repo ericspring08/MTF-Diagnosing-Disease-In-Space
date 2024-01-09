@@ -10,8 +10,8 @@ import time
 from argparse import ArgumentParser
 
 # Import SubModules
-from src.quickanalysis import *
-from src.graph import *
+from src.quickanalysis import quickanalysis
+from src.graph import graph
 from src.loop import MTF
 import builtins
 from datetime import datetime
@@ -29,9 +29,12 @@ start_time = time.perf_counter()
 
 # All prints have a timestamp
 _print = print
+
+
 def time_print(*args, **kwargs):
     curr_time = datetime.now().strftime("%H:%M:%S")
     _print(f"[{curr_time}]", *args, **kwargs)
+
 
 builtins.print = time_print
 
@@ -46,25 +49,34 @@ def experiment(args):
             mtf.run()
         print('-' * 100)
 
+
 # Parser
 parser = ArgumentParser(description="Prototype Training Platform")
 subparsers = parser.add_subparsers(dest="command")
 
 # Subcommand for analysis
-parser_experiment = subparsers.add_parser("experiment", help="Run an experiment")
-parser_experiment.add_argument("config", help="Specify an experiment config file (.json) to run", nargs="+")
+parser_experiment = subparsers.add_parser(
+    "experiment", help="Run an experiment")
+parser_experiment.add_argument(
+    "config", help="Specify an experiment config file (.json) to run", nargs="+")
 parser_experiment.set_defaults(func=experiment)
 
 parser_graph = subparsers.add_parser("graph", help="Analyze a results file")
 parser_graph.add_argument("file", help="Specify a results file to analyze")
-parser_graph.add_argument("-o", "--output", help="Specify an output folder to save to")
-parser_graph.add_argument("-r", "--ranking", help="Generate ranking graphs", action="store_true")
-parser_graph.add_argument("-d", "--distribution", help="Generate distribution graphs", action="store_true")
+parser_graph.add_argument(
+    "-o", "--output", help="Specify an output folder to save to")
+parser_graph.add_argument(
+    "-r", "--ranking", help="Generate ranking graphs", action="store_true")
+parser_graph.add_argument(
+    "-d", "--distribution", help="Generate distribution graphs", action="store_true")
 parser_graph.set_defaults(func=graph)
 
-parser_quickanalysis = subparsers.add_parser("quickanalysis", help="Quick statistics of a results file")
-parser_quickanalysis.add_argument("file", help="Specify a results file to analyze")
-parser_quickanalysis.add_argument("-o", "--output", help="Specify an output file to save to")
+parser_quickanalysis = subparsers.add_parser(
+    "quickanalysis", help="Quick statistics of a results file")
+parser_quickanalysis.add_argument(
+    "file", help="Specify a results file to analyze")
+parser_quickanalysis.add_argument(
+    "-o", "--output", help="Specify an output file to save to")
 
 parser_quickanalysis.set_defaults(func=quickanalysis)
 

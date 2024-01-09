@@ -102,7 +102,8 @@ def graph(args):
                             value = [float(n) for n in value]
                             raw.append(value)
                             means.append(mean(value))
-                            stdevs.append(stdev(value))
+                            if len(value) > 2:
+                                stdevs.append(stdev(value))
                             models_means.append(model)
                             models_stdevs.append(model)
                         else:
@@ -130,20 +131,21 @@ def graph(args):
                     plt.clf()
 
                     # Generate a graph for the deviation of the means
-                    stdevs, models_stdevs = zip(*sorted(zip(stdevs, models_stdevs)))
-                    plt.barh(models_stdevs, stdevs, label=metric)
-                    for i, v in enumerate(means):
-                        if v == 0:
-                            plt.text(0, i, str("Model could not be executed"), color='red', fontweight='bold')
-                        else:
-                            plt.text(v, i, str(round(v, 5)), color='black', fontweight='bold')
-                    # Ticks in smaller intervals
-                    plt.grid(axis='x')
-                    plt.xlabel(metric)
-                    plt.ylabel('Model')
-                    plt.title(f'{output} - {metric} - Deviation')
-                    plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}_deviation.png'))
-                    plt.clf()
+                    if len(stdevs) > 0:
+                        stdevs, models_stdevs = zip(*sorted(zip(stdevs, models_stdevs)))
+                        plt.barh(models_stdevs, stdevs, label=metric)
+                        for i, v in enumerate(means):
+                            if v == 0:
+                                plt.text(0, i, str("Model could not be executed"), color='red', fontweight='bold')
+                            else:
+                                plt.text(v, i, str(round(v, 5)), color='black', fontweight='bold')
+                        # Ticks in smaller intervals
+                        plt.grid(axis='x')
+                        plt.xlabel(metric)
+                        plt.ylabel('Model')
+                        plt.title(f'{output} - {metric} - Deviation')
+                        plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}_deviation.png'))
+                        plt.clf()
 
                     progress.update(main_task, advance=1)
 

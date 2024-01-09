@@ -8,6 +8,7 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis, LinearD
 from catboost import CatBoostClassifier
 from sklearn.linear_model import RidgeClassifier, PassiveAggressiveClassifier, SGDOneClassSVM, SGDClassifier
 from sklearn.dummy import DummyClassifier
+from sklearn.utils import all_estimators
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from sklvq import GLVQ, GMLVQ, LGMLVQ
