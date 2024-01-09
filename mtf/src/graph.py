@@ -5,6 +5,7 @@ from rich.progress import Progress, TimeElapsedColumn, SpinnerColumn
 from datetime import datetime
 import os
 
+
 def graph(args):
     output_location = args.output
     df = pd.read_csv(args.file)
@@ -14,17 +15,20 @@ def graph(args):
     if not os.path.exists(output_location):
         os.makedirs(output_location)
     if args.distribution:
-        total_tasks += len(df['output'].unique()) * len(df['metric'].unique()) * len(df['model'].unique())
+        total_tasks += len(df['output'].unique()) * \
+            len(df['metric'].unique()) * len(df['model'].unique())
         if not os.path.exists(os.path.join(output_location, 'distributions')):
             os.makedirs(os.path.join(output_location, 'distributions'))
             # Create folder for every output
             for output in df['output'].unique():
                 if not os.path.exists(os.path.join(output_location, 'distributions', output)):
-                    os.makedirs(os.path.join(output_location, 'distributions', output))
+                    os.makedirs(os.path.join(
+                        output_location, 'distributions', output))
                 # Create folder for every metric
                 for metric in df['metric'].unique():
                     if not os.path.exists(os.path.join(output_location, 'distributions', output, metric)):
-                        os.makedirs(os.path.join(output_location, 'distributions', output, metric))
+                        os.makedirs(os.path.join(output_location,
+                                    'distributions', output, metric))
 
     if args.ranking:
         total_tasks += len(df['output'].unique()) * len(df['metric'].unique())
@@ -33,7 +37,8 @@ def graph(args):
             # Create folder for every output
             for output in df['output'].unique():
                 if not os.path.exists(os.path.join(output_location, 'rankings', output)):
-                    os.makedirs(os.path.join(output_location, 'rankings', output))
+                    os.makedirs(os.path.join(
+                        output_location, 'rankings', output))
 
     with Progress(
         SpinnerColumn(),
@@ -58,7 +63,8 @@ def graph(args):
                         df_model = df_metric[df_metric['model'] == model]
                         try:
                             # Get the average of all the individual results of every trial of that model, output, metric combination
-                            value = [n.strip() for n in df_model['value'].means[0][1:-1].split(',')]
+                            value = [
+                                n.strip() for n in df_model['value'].means[0][1:-1].split(',')]
                             # Convert string means to float
                             value = [float(n) for n in value]
                             # Plot the histogram
@@ -67,7 +73,8 @@ def graph(args):
                             plt.xlabel(metric)
                             plt.ylabel('Frequency')
                             plt.grid()
-                            plt.savefig(os.path.join(output_location, 'distributions', output, metric, f'{output}_{metric}_{model}.png'))
+                            plt.savefig(os.path.join(
+                                output_location, 'distributions', output, metric, f'{output}_{metric}_{model}.png'))
                             plt.clf()
                         except Exception as e:
                             print(f"{datetime.now().strftime('%H:%M:%S')} {e}")
@@ -96,14 +103,14 @@ def graph(args):
                         df_model = df_metric[df_metric['model'] == model]
 
                         # Get the average of all the individual results of every trial of that model, output, metric combination
-                        value = [n.strip() for n in df_model['value'].values[0][1:-1].split(',')]
+                        value = [n.strip()
+                                 for n in df_model['value'].values[0][1:-1].split(',')]
                         # Convert string means to float
                         if value[0] != '':
                             value = [float(n) for n in value]
                             raw.append(value)
                             means.append(mean(value))
-                            if len(value) > 2:
-                                stdevs.append(stdev(value))
+                            stdevs.append(stdev(value))
                             models_means.append(model)
                             models_stdevs.append(model)
                         else:
@@ -113,43 +120,51 @@ def graph(args):
                             models_means.append(model)
 
                     # Sort the means and models
-                    means, models_means = zip(*sorted(zip(means, models_means)))
+                    means, models_means = zip(
+                        *sorted(zip(means, models_means)))
 
                     # Plot the bar
                     plt.title(f'{output} - {metric}')
                     plt.barh(models_means, means, label=metric)
                     for i, v in enumerate(means):
                         if v == 0:
-                            plt.text(0, i, str("Model could not be executed"), color='red', fontweight='bold')
+                            plt.text(0, i, str("Model could not be executed"),
+                                     color='red', fontweight='bold')
                         else:
-                            plt.text(v, i, str(round(v, 5)), color='black', fontweight='bold')
+                            plt.text(v, i, str(round(v, 5)),
+                                     color='black', fontweight='bold')
                     # Ticks in smaller intervals
                     plt.grid(axis='x')
                     plt.xlabel(metric)
                     plt.ylabel('Model')
-                    plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}_mean.png'))
+                    plt.savefig(os.path.join(output_location, 'rankings',
+                                output, f'{output}_{metric}_mean.png'))
                     plt.clf()
 
                     # Generate a graph for the deviation of the means
-                    if len(stdevs) > 0:
-                        stdevs, models_stdevs = zip(*sorted(zip(stdevs, models_stdevs)))
-                        plt.barh(models_stdevs, stdevs, label=metric)
-                        for i, v in enumerate(means):
-                            if v == 0:
-                                plt.text(0, i, str("Model could not be executed"), color='red', fontweight='bold')
-                            else:
-                                plt.text(v, i, str(round(v, 5)), color='black', fontweight='bold')
-                        # Ticks in smaller intervals
-                        plt.grid(axis='x')
-                        plt.xlabel(metric)
-                        plt.ylabel('Model')
-                        plt.title(f'{output} - {metric} - Deviation')
-                        plt.savefig(os.path.join(output_location, 'rankings', output, f'{output}_{metric}_deviation.png'))
-                        plt.clf()
+                    stdevs, models_stdevs = zip(
+                        *sorted(zip(stdevs, models_stdevs)))
+                    plt.barh(models_stdevs, stdevs, label=metric)
+                    for i, v in enumerate(means):
+                        if v == 0:
+                            plt.text(
+                                0, i, str("Model could not be executed"), color='red', fontweight='bold')
+                        else:
+                            plt.text(v, i, str(round(v, 5)),
+                                     color='black', fontweight='bold')
+                    # Ticks in smaller intervals
+                    plt.grid(axis='x')
+                    plt.xlabel(metric)
+                    plt.ylabel('Model')
+                    plt.title(f'{output} - {metric} - Deviation')
+                    plt.savefig(os.path.join(
+                        output_location, 'rankings', output, f'{output}_{metric}_deviation.png'))
+                    plt.clf()
 
                     progress.update(main_task, advance=1)
 
-        main_task = progress.add_task("[red]Graphing Results", total=total_tasks)
+        main_task = progress.add_task(
+            "[red]Graphing Results", total=total_tasks)
 
         # Generate graphs
         if args.ranking:
