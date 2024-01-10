@@ -41,6 +41,7 @@ class MTF(object):
         self.current_model = None
         self.current_trial = None
         self.config_path = config_path
+        self.null_character = None
         self.trial_tasks = []
 
     def set_progress(self, progress):
@@ -62,6 +63,8 @@ class MTF(object):
             # Options
             self.trials = config["experiment"]["trials"]
             self.tuning_iterations = config["experiment"]["tuning_iterations"]
+
+            self.null_character = config["experiment"]["null_character"]
 
             self.config = config
 
@@ -106,6 +109,11 @@ class MTF(object):
         dataset = self.dataset.drop(self.outputs_selection, axis=1)
 
         # Loop through categorical features and fill null values with most frequent
+        # If null character is specified, replace with null character
+        if self.null_character != None:
+            for feature in self.categorical_features:
+                dataset[feature] = dataset[feature].fillna(self.null_character)
+
         for feature in self.categorical_features:
             dataset[feature] = dataset[feature].fillna(
                 dataset[feature].value_counts().index[0])
@@ -184,9 +192,10 @@ class MTF(object):
 
                     if "XGB" in model_name and self.outputs[output].nunique() > 2:
                         model.set_params(objective="multi:softmax",
-                                        num_class=self.outputs[output].nunique())
+                                         num_class=self.outputs[output].nunique())
                     elif "XGB" in model_name and self.outputs[output].nunique() == 2:
-                        model.set_params(objective="binary:logistic", num_class=1)
+                        model.set_params(
+                            objective="binary:logistic", num_class=1)
 
                     # Set model probability to true if it exists
                     if dir(model).__contains__('probability'):

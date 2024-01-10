@@ -1,0 +1,53 @@
+{
+  "location": {
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/data/thyroid.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/thyroid_results/"
+  },
+  "experiment": {
+    "metrics": [
+      "accuracy",
+      "precision",
+      "recall",
+      "f1",
+      "train_time",
+      "predict_time",
+      "logloss"
+    ],
+    "outputs": [
+      "binaryClass"
+    ],
+    "numerical": [
+      "age",
+      "TSH",
+      "T3",
+      "TT4",
+      "T4U",
+      "FTI",
+      "TBG"
+    ],
+    "categorical": [
+      "sex",
+      "on thyroxine",
+      "query on thyroxine",
+      "on antithyroid medication",
+      "sick",
+      "thyroid surgery",
+      "I131 treatment",
+      "query hypothyroid",
+      "query hyperthyroid",
+      "goitre",
+      "tumor",
+      "hypopituitary"
+    ],
+    "models": "all",
+    "trials": 5,
+    "tuning_iterations": 32,
+    "null_character": "?"
+  },
+  "outputs": {
+    "binaryClass": {
+      "P": 1,
+      "N": 0
+    }
+  }
+}
