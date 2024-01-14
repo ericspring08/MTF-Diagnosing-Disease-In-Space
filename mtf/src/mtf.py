@@ -10,9 +10,8 @@ import time
 from argparse import ArgumentParser
 
 # Import SubModules
-from src.quickanalysis import quickanalysis
-from src.graph import graph
-from src.loop import MTF
+from graph import graph
+from loop import MTF
 import builtins
 from datetime import datetime
 
@@ -41,13 +40,12 @@ builtins.print = time_print
 
 # Experiment
 def experiment(args):
-    for config in args.config:
-        print(f"Running experiment {config}")
-        with Progress(SpinnerColumn(), TextColumn(text_format="[progress.description]{task.description}"), BarColumn(), TaskProgressColumn(), TimeElapsedColumn()) as progress:
-            mtf = MTF(config)
-            mtf.set_progress(progress)
-            mtf.run()
-        print('-' * 100)
+    print(f"Running experiment {args.config}")
+    with Progress(SpinnerColumn(), TextColumn(text_format="[progress.description]{task.description}"), BarColumn(), TaskProgressColumn(), TimeElapsedColumn()) as progress:
+        mtf = MTF(args.config, args.dataset)
+        mtf.set_progress(progress)
+        mtf.run()
+    print('-' * 100)
 
 
 # Parser
@@ -58,7 +56,11 @@ subparsers = parser.add_subparsers(dest="command")
 parser_experiment = subparsers.add_parser(
     "experiment", help="Run an experiment")
 parser_experiment.add_argument(
-    "config", help="Specify an experiment config file (.json) to run", nargs="+")
+    "-c", "--config", help="Specify an experiment config file (.json) to run",
+)
+parser_experiment.add_argument(
+    "-d", "--dataset", help="Specify a dataset to use")
+
 parser_experiment.set_defaults(func=experiment)
 
 parser_graph = subparsers.add_parser("graph", help="Analyze a results file")
@@ -70,15 +72,6 @@ parser_graph.add_argument(
 parser_graph.add_argument(
     "-d", "--distribution", help="Generate distribution graphs", action="store_true")
 parser_graph.set_defaults(func=graph)
-
-parser_quickanalysis = subparsers.add_parser(
-    "quickanalysis", help="Quick statistics of a results file")
-parser_quickanalysis.add_argument(
-    "file", help="Specify a results file to analyze")
-parser_quickanalysis.add_argument(
-    "-o", "--output", help="Specify an output file to save to")
-
-parser_quickanalysis.set_defaults(func=quickanalysis)
 
 args = parser.parse_args()
 

@@ -6,20 +6,19 @@ import numpy as np
 import pandas as pd
 
 from models import model_options, model_params
-from src.save import ModelResults
-from src.utils import get_metric, hasmethod, print_tags
+from save import ModelResults
+from utils import get_metric, hasmethod, print_tags
 
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-import threading
 from skopt import BayesSearchCV
 import pickle
 
 
 class MTF(object):
-    def __init__(self, config_path):
+    def __init__(self, config_path, dataset):
         self.models_results = None
         self.outputs = None
         self.models_to_use = None
@@ -27,22 +26,19 @@ class MTF(object):
         self.main_task = None
         self.progress = None
         self.dataset = None
-        self.dataset_path = None
         self.results_path = None
         self.outputs_selection = None
         self.metrics_selection = None
         self.models_selection = None
         self.categorical_features = None
         self.numerical_features = None
-        self.trials = None
         self.config_path = None
         self.config = None
         self.tuning_iterations = None
         self.current_model = None
-        self.current_trial = None
         self.config_path = config_path
         self.null_character = None
-        self.trial_tasks = []
+        self.dataset_path = dataset
 
     def set_progress(self, progress):
         self.progress = progress
@@ -51,7 +47,6 @@ class MTF(object):
         try:
             config = json.load(open(self.config_path))
             # Locations
-            self.dataset_path = config["location"]["dataset"]
             self.results_path = config["location"]["results"]
             # Selections
             self.outputs_selection = config["experiment"]["outputs"]
@@ -61,7 +56,6 @@ class MTF(object):
             self.categorical_features = config["experiment"]["categorical"]
             self.numerical_features = config["experiment"]["numerical"]
             # Options
-            self.trials = config["experiment"]["trials"]
             self.tuning_iterations = config["experiment"]["tuning_iterations"]
 
             self.null_character = config["experiment"]["null_character"]
@@ -84,12 +78,9 @@ class MTF(object):
                 self.models_to_use[value] = model_options[value]
 
             # Create Progress Bar for Main Task
-            self.main_task = self.progress.add_task("Main Task", total=self.trials*len(self.models_to_use)*len(
+            self.main_task = self.progress.add_task("Main Task", total=len(self.models_to_use)*len(
                 self.outputs_selection)*(len(self.metrics_selection)+self.tuning_iterations))
             # Create Progress Bar for Trials
-            for trial in range(self.trials):
-                self.trial_tasks.append(self.progress.add_task(f"Trial {trial+1}", total=len(
-                    self.models_to_use)*len(self.outputs_selection)*self.tuning_iterations))
 
         except FileExistsError:
             raise FileExistsError(
@@ -153,32 +144,28 @@ class MTF(object):
     def main_loop(self):
         self.models_results = ModelResults(
             self.models_to_use, self.outputs, self.metrics_selection, self.x_dataset, self.outputs, self.progress, self.main_task)
-        threads = []
-        for trial in range(self.trials):
 
-            # Random Train Test Split
-            # Sample 500 rows of the dataset for testing
-            combined_dataset = pd.concat(
-                [self.x_dataset, self.outputs], axis=1)
-            if len(self.dataset) < 2000:
-                sampled_dataset = combined_dataset
-            else:
-                sampled_dataset = combined_dataset.sample(n=2000)
-            x_sampled_dataset = sampled_dataset.drop(
-                self.outputs_selection, axis=1)
-            y_sampled_dataset = sampled_dataset[self.outputs_selection]
-            x_train, x_test, y_train, y_test = train_test_split(
-                x_sampled_dataset, y_sampled_dataset, test_size=0.2)
-            # Multi-threading
-            t = threading.Thread(target=self.run_trials, args=(
-                trial, x_train, y_train, x_test, y_test,))
-            threads.append(t)
-            t.start()
+        # Random Train Test Split
+        # Sample 500 rows of the dataset for testing
+        combined_dataset = pd.concat(
+            [self.x_dataset, self.outputs], axis=1)
+        if len(self.dataset) < 2000:
+            sampled_dataset = combined_dataset
+        else:
+            sampled_dataset = combined_dataset.sample(n=2000)
+        x_sampled_dataset = sampled_dataset.drop(
+            self.outputs_selection, axis=1)
+        y_sampled_dataset = sampled_dataset[self.outputs_selection]
+        x_train, x_test, y_train, y_test = train_test_split(
+            x_sampled_dataset, y_sampled_dataset, test_size=0.2)
 
-        for thread in threads:
-            thread.join()
+        # Run Trial
+        self.x_train = x_train
+        self.y_train = y_train
+        self.x_test = x_test
+        self.y_test = y_test
 
-    def run_trials(self, trial, x_train, y_train, x_test, y_test):
+    def run_trial(self):
         # Iterate through models
         for model_name, model in self.models_to_use.items():
             # Iterate through outputs
@@ -214,8 +201,8 @@ class MTF(object):
 
                     # Fit
                     time_before_fit = time.perf_counter_ns()
-                    opt.fit(x_train, y_train[output], callback=lambda res: self.logging_callback_fit(
-                        res, trial+1, model_name, output,))
+                    opt.fit(self.x_train, self.y_train[output], callback=lambda res: self.logging_callback_fit(
+                        res, model_name, output,))
                     time_after_fit = time.perf_counter_ns()
 
                     # Calculate Training Time
@@ -223,26 +210,26 @@ class MTF(object):
 
                     # Predict
                     before_predict = time.perf_counter_ns()
-                    y_pred = opt.predict(x_test)
+                    y_pred = opt.predict(self.x_test)
                     after_predict = time.perf_counter_ns()
                     predict_time = (after_predict - before_predict)
 
                     y_prob = None
                     # Get Model Probability
                     if hasmethod(opt, 'predict_proba'):
-                        y_prob = opt.predict_proba(x_test)
+                        y_prob = opt.predict_proba(self.x_test)
 
                     # Calculate Metrics
                     performance = get_metric(
-                        y_pred, y_prob, y_test[output], self.metrics_selection, train_time, predict_time)
+                        y_pred, y_prob, self.y_test[output], self.metrics_selection, train_time, predict_time)
 
                     # Save Model pickle
                     self.models_results.save_model(
-                        opt.best_estimator_, os.path.join(self.results_path, "models/", f"trial_{trial+1}/", f"{output}/", f"{trial+1}_{model_name}_{output}.pkl"))
+                        opt.best_estimator_, os.path.join(self.results_path, "models/", f"{output}/", f"{model_name}_{output}.pkl"))
 
                     for metric, value in performance.items():
                         print_tags(
-                            (f"Trial {trial+1}", f"{model_name}", f"{output}"), f"{metric}: {value}")
+                            (f"{self.model_name}", f"{output}"), f"{metric}: {value}")
                         self.models_results.add_result(
                             model_name, output, metric, value)
                         self.progress.advance(self.main_task, 1)
@@ -260,10 +247,9 @@ class MTF(object):
             self.results_path + "/results_average.csv")
         self.progress.update(self.main_task, advance=1)
 
-    def logging_callback_fit(self, res, trial, model_name, output):
+    def logging_callback_fit(self, res, model_name, output):
         self.progress.advance(self.main_task, 1)
-        self.progress.advance(self.trial_tasks[trial-1], 1)
-        print_tags((f"Trial {trial}", f"Iteration {len(res.func_vals)+1}",
+        print_tags((f"Iteration {len(res.func_vals)+1}",
                     f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals[-1]}")
 
     def run(self):
