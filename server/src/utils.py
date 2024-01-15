@@ -530,7 +530,7 @@ form_hdd = {
             }
         },
         'thal': {
-            'title': 'Thalassemia',
+            'title': 'Thallium myocardial perfusion scan results',
             'type': 'categorical',
             'options': {
                 'Normal': '0',
