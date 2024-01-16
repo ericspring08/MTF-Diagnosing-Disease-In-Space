@@ -23,8 +23,6 @@ class MTF(object):
         self.outputs = None
         self.models_to_use = None
         self.x_dataset = None
-        self.main_task = None
-        self.progress = None
         self.dataset = None
         self.results_path = None
         self.outputs_selection = None
@@ -39,9 +37,6 @@ class MTF(object):
         self.config_path = config_path
         self.null_character = None
         self.dataset_path = dataset
-
-    def set_progress(self, progress):
-        self.progress = progress
 
     def read_config(self):
         try:
@@ -77,11 +72,6 @@ class MTF(object):
                     exit()
                 self.models_to_use[value] = model_options[value]
 
-            # Create Progress Bar for Main Task
-            self.main_task = self.progress.add_task("Main Task", total=len(self.models_to_use)*len(
-                self.outputs_selection)*(len(self.metrics_selection)+self.tuning_iterations))
-            # Create Progress Bar for Trials
-
         except FileExistsError:
             raise FileExistsError(
                 "Error loading config file. Please check your spelling and try again.")
@@ -113,7 +103,6 @@ class MTF(object):
         for feature in self.numerical_features:
             dataset[feature] = dataset[feature].fillna(dataset[feature].mean())
 
-        self.progress.update(self.main_task, advance=1)
         print("Preprocessing Data")
 
         # Normalize Inputs
@@ -143,7 +132,7 @@ class MTF(object):
 
     def main_loop(self):
         self.models_results = ModelResults(
-            self.models_to_use, self.outputs, self.metrics_selection, self.x_dataset, self.outputs, self.progress, self.main_task)
+            self.models_to_use, self.outputs, self.metrics_selection, self.x_dataset, self.outputs)
 
         # Random Train Test Split
         # Sample 500 rows of the dataset for testing
@@ -164,6 +153,8 @@ class MTF(object):
         self.y_train = y_train
         self.x_test = x_test
         self.y_test = y_test
+
+        self.run_trial()
 
     def run_trial(self):
         # Iterate through models
@@ -229,15 +220,12 @@ class MTF(object):
 
                     for metric, value in performance.items():
                         print_tags(
-                            (f"{self.model_name}", f"{output}"), f"{metric}: {value}")
+                            (f"{model_name}", f"{output}"), f"{metric}: {value}")
                         self.models_results.add_result(
                             model_name, output, metric, value)
-                        self.progress.advance(self.main_task, 1)
                 except Exception as e:
                     print(e)
                     print(f"Error with {model_name} {output}")
-                    for metric, value in performance.items():
-                        self.progress.advance(self.main_task, 1)
 
     def save_results(self):
         print("Saving Results")
@@ -245,10 +233,8 @@ class MTF(object):
             self.results_path + "/results_raw.csv")
         self.models_results.save_results_averages_csv(
             self.results_path + "/results_average.csv")
-        self.progress.update(self.main_task, advance=1)
 
     def logging_callback_fit(self, res, model_name, output):
-        self.progress.advance(self.main_task, 1)
         print_tags((f"Iteration {len(res.func_vals)+1}",
                     f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals[-1]}")
 

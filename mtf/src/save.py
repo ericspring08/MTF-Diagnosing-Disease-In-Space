@@ -8,11 +8,9 @@ from datetime import datetime
 class ModelResults:
     results = {}
 
-    def __init__(self, models, outputs, metrics, x_dataset, y_dataset, progress, main_task):
+    def __init__(self, models, outputs, metrics, x_dataset, y_dataset):
         self.x_dataset = x_dataset
         self.y_dataset = y_dataset
-        self.progress = progress
-        self.main_task = main_task
         for model in models:
             self.results[model] = {}
             for output in outputs:
@@ -73,9 +71,8 @@ class ModelResults:
                     with open(os.path.join(path, model, output, f"{model}-{output}.pkl"), 'wb') as f:
                         pickle.dump(training_model, f)
                 except Exception as e:
-                    self.progress.print(
+                    print(
                         f"[{datetime.now().strftime('%H:%M:%S')}] Error with {model} on {output}, {e}")
-                self.progress.update(self.main_task, advance=1)
 
     def save_model(self, model, path):
         # Create if don't exist

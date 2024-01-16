@@ -15,9 +15,6 @@ from loop import MTF
 import builtins
 from datetime import datetime
 
-from rich.progress import Progress, TimeElapsedColumn, SpinnerColumn, BarColumn, TextColumn, TaskProgressColumn
-from rich import print
-
 title = text2art("MTF", font="3d_diagonal")
 print(title)
 print("Model Training Platform")
@@ -41,10 +38,8 @@ builtins.print = time_print
 # Experiment
 def experiment(args):
     print(f"Running experiment {args.config}")
-    with Progress(SpinnerColumn(), TextColumn(text_format="[progress.description]{task.description}"), BarColumn(), TaskProgressColumn(), TimeElapsedColumn()) as progress:
-        mtf = MTF(args.config, args.dataset)
-        mtf.set_progress(progress)
-        mtf.run()
+    mtf = MTF(args.config, args.dataset)
+    mtf.run()
     print('-' * 100)
 
 
