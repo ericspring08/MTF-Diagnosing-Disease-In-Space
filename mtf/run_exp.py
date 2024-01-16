@@ -2,10 +2,22 @@ import docker
 
 client = docker.from_env()
 
+# read config and dataset path from config file
+
+config_path = input("Enter config path: ")
+dataset_path = input("Enter dataset path: ")
+
 buildargs = {
-    'CONFIG_PATH': './configs/config_cad.json',
-    'DATASET_PATH': './data/CADE.csv'
+    'CONFIG_PATH': config_path,
+    'DATASET_PATH': dataset_path,
 }
+
+# delte old image and container
+try:
+    client.images.remove("mtf")
+    print("Previous Image removed")
+except docker.errors.ImageNotFound:
+    print("Previous Image not found")
 
 # print build logs
 for line in client.api.build(path=".", buildargs=buildargs, tag="mtf", decode=True):
