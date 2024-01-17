@@ -3,6 +3,7 @@ import pickle
 from models import model_options
 import pandas as pd
 from datetime import datetime
+import docker
 
 
 class ModelResults:
@@ -34,6 +35,9 @@ class ModelResults:
                         self.results[model][output][metric] = sum(
                             self.results[model][output][metric]) / len(self.results[model][output][metric])
         df = pd.DataFrame.from_dict(self.results)
+        # create /results folder if doesn't exist
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
         df.to_csv(path, index=False)
 
     def save_results_raw_csv(self, path):
@@ -45,6 +49,9 @@ class ModelResults:
                     raw_results.append(
                         [model, output, metric, self.results[model][output][metric]])
         df = pd.DataFrame.from_dict(raw_results, orient='columns')
+        # create /results folder if doesn't exist
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
         df.to_csv(path, header=['model', 'output',
                   'metric', 'value'], index=False)
 
