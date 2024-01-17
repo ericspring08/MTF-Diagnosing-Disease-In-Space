@@ -67,7 +67,7 @@ export const createPDF = (
 
   doc.setFontSize(16);
   doc.setTextColor(0);
-  doc.text(`Diagnosis: ${diagnosis === '0' ? 'Positive' : 'Negative'}`, 20, 45);
+  doc.text(`Diagnosis: ${diagnosis === '0' ? 'Negative' : 'Positive'}`, 20, 45);
   doc.text(
     `Diagnosis Confidence: ${(diagnosis_confidence * 100).toFixed(2)}%`,
     20,
