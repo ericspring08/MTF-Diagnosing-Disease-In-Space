@@ -121,8 +121,11 @@ class MTF(object):
         self.x_dataset = preprocessor.transform(dataset)
 
         # Save Preprocessor
+        # create results folder if it doesn't exist
+        if not os.path.exists(os.path.join('results')):
+            os.makedirs(os.path.join('results'))
         pickle.dump(preprocessor, open(
-            self.results_path + "/preprocessor.pkl", "wb"))
+            os.path.join('results', 'preprocessor.pkl'), "wb"))
 
         # Map the outputs to dictionary
         for key, value in self.config['outputs'].items():
@@ -216,7 +219,7 @@ class MTF(object):
 
                     # Save Model pickle
                     self.models_results.save_model(
-                        opt.best_estimator_, os.path.join(self.results_path, "models/", f"{output}/", f"{model_name}_{output}.pkl"))
+                        opt.best_estimator_, os.path.join('results', "models", f"{output}", f"{model_name}_{output}.pkl"))
 
                     for metric, value in performance.items():
                         print_tags(

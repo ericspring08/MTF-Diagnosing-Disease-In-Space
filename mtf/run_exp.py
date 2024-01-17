@@ -2,7 +2,6 @@ import docker
 import json
 import os
 import tarfile
-import shutil
 
 client = docker.from_env()
 
@@ -81,13 +80,10 @@ for index, container in enumerate(trial_containers):
 
     # extract results
     tar = tarfile.open(f"results_{index}.tar")
-    tar.extractall(f"results_{index}")
+    tar.extractall(f'results_{index}')
     tar.close()
 
-    # move results
-    shutil.move(f"results_{index}", f"results/results_{index}")
-
-    # delete tar
+  # delete tar
     os.remove(f"results_{index}.tar")
 
 # delete containers
