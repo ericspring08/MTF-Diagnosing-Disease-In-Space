@@ -3,9 +3,14 @@ hdd_features = ["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thala
 kdd_features =["age", "bp", "sg", "al", "su", "rbc", "pc", "pcc", "ba", "bgr", "bu", "sc", "sod", "pot", "hemo", "pcv", "wc", "rc", "htn", "dm", "cad", "appet", "pe", "ane"]
 kdd_categorical_features = ["su", "rbc", "pc", "pcc", "ba", "htn", "dm", "cad", "appet", "pe", "ane"]
 kdd_numerical_features = ["age", "bp", "sg", "al", "bgr", "bu", "sc", "sod", "pot", "hemo", "pcv", "wc", "rc"]
-
+ldd_features = ["smoke", "FVC", "FEC1", "PEFR", "O2", "ABG-P-O2", "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseases", "AGE"]
+ldd_categorical_features = ["smoke", "PEFR", "O2", "ABG-P-O2", "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseases"]
+ldd_numerical_features = ["FVC", "FEC1", "AGE"]
 hdd_categorical_features = ["sex", "cp", "fbs", "restecg", "exang", "slope", "ca", "thal"]
 hdd_numerical_features = ["age", "trestbps", "chol", "thalach", "oldpeak"]
+tdd_features = ["age", "sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery", "I131_treatment", "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary", "TSH", "T3", "TT4", "T4U", "FTI", "TBG"]
+tdd_numerical_features = ["age", "TSH", "T3", "TT4", "T4U", "FTI", "TBG"]
+tdd_categorical_features = ["sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery", "I131_treatment", "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary"]
 hdd_types = {
     "age": int,
     "sex": int,
@@ -46,6 +51,253 @@ kdd_types = {
     "appet": str,
     "pe": str,
     "ane": str
+}
+ldd_types = {
+    "smoke": str,
+    "FVC": float,
+    "FEC1": float,
+    "PEFR": str,
+    "O2": str,
+    "ABG-P-O2": str,
+    "ABG-P-CO2": str,
+    "ABG-pH Level": str,
+    "Scan": str,
+    "Asthama": str,
+    "Other diseases": str,
+    "AGE": int
+}
+tdd_types = {
+    "age": int,
+    "sex": str,
+    "on_thyroxine": bool,
+    "on antithyroid meds": bool,
+    "sick": bool,
+    "thyroid_surgery": bool,
+    "I131_treatment": bool,
+    "query_hypothyroid": bool,
+    "query_hyperthyroid": bool,
+    "goitre": bool,
+    "tumor": bool,
+    "hypopituitary": bool,
+    "TSH": float,
+    "T3": float,
+    "TT4": float,
+    "T4U": float,
+    "FTI": float,
+    "TBG": float
+}
+form_tdd = {
+    'Basics': {
+        'age': {
+            'title': 'Age',
+            'type': 'numerical'
+        },
+        'sex': {
+            'title': 'Sex',
+            'type': 'categorical',
+            'options': {
+                'Male': 'M',
+                'Female': 'F'
+            }
+        },
+        'on_thyroxine': {
+            'title': 'On thyroxine?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'on antithyroid meds': {
+            'title': 'On Antithyroid meds?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'sick': {
+            'title': 'Sick?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'thyroid_surgery': {
+            'title': 'Have had Thyroid Surgery?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'I131_treatment': {
+            'title': 'Have had I131 treatment?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'query_hypothyroid': {
+            'title': 'Do you think you have Hypothyroidism?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'query_hyperthyroid': {
+            'title': 'Do you think you have Hyperthyroidism?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'goitre': {
+            'title': 'Do you have goiter?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'tumor': {
+            'title': 'Do you have a thyroid tumor?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+        'hypopituitary': {
+            'title': 'Do you have hypopituitarism?',
+            'type': 'categorical',
+            'options': {
+                'Yes': 't',
+                'No': 'f'
+            }
+        },
+    },
+    'Bloodwork': {
+        'TSH': {    
+            'title': 'TSH in Blood (µU/mL)',
+            'type': 'numerical'
+        },
+        'T3': {    
+            'title': 'T3 in Blood (nmol/L)',
+            'type': 'numerical'
+        },
+        'TT4': {    
+            'title': 'TT4 in Blood (nmol/L)',
+            'type': 'numerical'
+        },
+        'T4U': {    
+            'title': 'T4U in Blood (mcg/dL)',
+            'type': 'numerical'
+        },
+        'FTI': {    
+            'title': 'FTI in Blood (μg/dL)',
+            'type': 'numerical'
+        },
+        'TBG': {    
+            'title': 'TBG in Blood (mcg/dL)',
+            'type': 'numerical'
+        },
+    }
+    
+}
+form_ldd = {
+    'Basics': {
+        'AGE': {
+            'title': 'Age',
+            'type': 'numerical'
+        },
+    'smoke' : { 
+            'title': 'Have Smoked?',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'T',
+                'No': 'F'
+            }
+        },
+    'Asthama' : { 
+            'title': 'Have Asthama?',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'T',
+                'No': 'F'
+            }
+        },
+    'Other diseases' : { 
+            'title': 'Currently Have Other Diseases?',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'T',
+                'No': 'F'
+            }
+        },
+    },
+    'Testing Specifics': {
+        'FVC': {
+            'title': 'Forced Vital Capacity (L)',
+            'type': 'numerical'
+        },
+        'FEC1': {
+            'title': 'Forced Expiratory Volume (L)',
+            'type': 'numerical'
+        },
+        'PEFR' : { 
+            'title': 'Normal Levels of Peak Expiratory Flow Rate? (320-550L/min)',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'F',
+                'No': 'T'
+            }
+        },
+        'O2' : { 
+            'title': 'Normal Oxygen Saturation? (95-100%)',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'F',
+                'No': 'T'
+            }
+        },
+        'ABG-P-O2' : { 
+            'title': 'Normal Arterial Blood Gas Partial Pressure of Oxygen? (75-100mmHg)',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'F',
+                'No': 'T'
+            }
+        },
+        'ABG-P-CO2' : { 
+            'title': 'Normal Arterial Blood Gas Partial Pressure of Carbon Dioxide? (35-40mmHg)',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'F',
+                'No': 'T'
+            }
+        },
+        'ABG-pH Level' : { 
+            'title': 'Normal Arterial Blood Acidity? (7.35-7.45pH)',
+            'type': 'categorical',
+            'options': {
+                'Yes' : 'F',
+                'No': 'T'
+            }
+        },
+        'Scan' : { 
+            'title': 'Type of Imaging Scan performed',
+            'type': 'categorical',
+            'options': {
+                'X-ray' : 'X-ray',
+                'MRI': 'MRI'
+            }
+        }
+    }
 }
 form_kdd = {
     'Basic Patient and Urine Information': {
@@ -278,7 +530,7 @@ form_hdd = {
             }
         },
         'thal': {
-            'title': 'Thalassemia',
+            'title': 'Thallium myocardial perfusion scan results',
             'type': 'categorical',
             'options': {
                 'Normal': '0',
@@ -303,15 +555,34 @@ format_dict = {
     'kdd' : {
         'features': kdd_features,
         'target': 'target',
-        'model': './src/models/SVC_kdd_classifier.pkl',
-        'standard_scaler': './src/preprocessor/kdd_preprocessor.pkl',
+        'model': '',
+        'standard_scaler': './src/preprocessor/hdd_standard_scaler.pkl',
         'categorical': kdd_categorical_features,
         'numerical': kdd_numerical_features,
         'type': kdd_types,
         'form': form_kdd,
-    }
+    },
+    'ldd' : {
+        'features' : ldd_features,
+        'target': 'target',
+        'model': '',
+        'standard_scaler': './src/preprocessor/ldd_standard_scaler.pkl',
+        'categorical': ldd_categorical_features,
+        'numerical': ldd_numerical_features,
+        'type': ldd_types,
+        'form': form_ldd,
+    },
+    'tdd' : {
+        'features' : tdd_features,
+        'target': 'target',
+        'model': '',
+        'standard_scaler': './src/preprocessor/tdd_standard_scaler.pkl',
+        'categorical': tdd_categorical_features,
+        'numerical': tdd_numerical_features,
+        'type': tdd_types,
+        'form': form_tdd,
 }
-
+}
 disease_options = {
     'diseases': [
         {
@@ -323,6 +594,16 @@ disease_options = {
             'value': 'kdd',
             'label': 'Kidney Disease',
             'description': 'Kidney disease means your kidneys are damaged and can’t filter blood the way they should. You are at greater risk for kidney disease if you have diabetes or high blood pressure. If you experience kidney failure, treatments include kidney transplant or dialysis.',
+        },
+        {
+            'value': 'ldd',
+            'label': 'Lung Disease',
+            'description': 'Lung disease refers to various conditions affecting the lungs, impairing their function and often causing symptoms like coughing, shortness of breath, and decreased oxygen intake. These conditions range from infections like pneumonia to chronic diseases such as COPD and asthma, impacting breathing and overall respiratory health.'
+        },
+        {
+            'value': 'tdd',
+            'label': 'Thyroid Disease',
+            'description': 'Thyroid disease refers to conditions affecting the thyroid glands function, leading to hormonal imbalances that can impact metabolism, energy levels, and various bodily functions',
         }
     ]
 }
