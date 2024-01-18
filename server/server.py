@@ -24,10 +24,10 @@ def get_features():
     })
 
 
-@app.route('/hdd', methods=['POST'])
-def hdd():
+@app.route('/predict/<disease>', methods=['POST'])
+def predict(disease):
     data = request.get_json(force=True)
-    predictor = Prediction(data, 'hdd')
+    predictor = Prediction(data, disease)
     predictor.preprocess()
     prediction, probability = predictor.predict()
     print(prediction, probability)

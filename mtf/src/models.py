@@ -8,15 +8,13 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis, LinearD
 from catboost import CatBoostClassifier
 from sklearn.linear_model import RidgeClassifier, PassiveAggressiveClassifier, SGDOneClassSVM, SGDClassifier
 from sklearn.dummy import DummyClassifier
-from sklearn.utils import all_estimators
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
-from sklvq import GLVQ, GMLVQ, LGMLVQ
 
 model_params = {
     'SVC': {
-        'kernel': ['rbf', 'linear', 'sigmoid'],
-        'C': [0.1, 1, 10],
+        'kernel': ['rbf', 'linear', 'poly', 'sigmoid'],
+        'C': [0.1, 1, 10, 100],
         'gamma': ['scale', 'auto']
     },
     'GradientBoosting': {
@@ -56,6 +54,7 @@ model_params = {
     },
     'QDA': {
         'reg_param': [0.0, 0.1, 0.5, 1.0],
+        'priors': [None, [0.1, 0.9], [0.2, 0.8], [0.3, 0.7], [0.4, 0.6], [0.5, 0.5], [0.6, 0.4], [0.7, 0.3], [0.8, 0.2], [0.9, 0.1]],
         'tol': [0.0001, 0.001, 0.01, 0.1],
     },
     'CatBoost': {
@@ -73,23 +72,20 @@ model_params = {
         'min_samples_leaf': [1, 2, 3, 4, 5]
     },
     'Ridge': {
-        'alpha': [0.1, 1, 10, 100],
-        'solver': ['auto', 'svd', 'cholesky', 'lsqr', 'sparse_cg', 'sag', 'saga'],
-        'tol': [1e-03, 1e-04, 1e-05],
+        'alpha': [0.1, 1, 10, 100]
     },
     'PA': {
-        'C': [0.1, 1, 10, 100],
-        'max_iter': [1000, 2000, 3000],
-        'tol': [1e-03, 1e-04, 1e-05],
+        'C': [0.1, 1, 10, 100]
+    },
+    'SGDOneClass': {
+        'alpha': [0.1, 1, 10, 100]
     },
     'SGD': {
-        'alpha': [0.1, 1, 10, 100],
-        'loss': ['log_loss', 'squared_error', 'huber', 'squared_epsilon_insensitive', 'squared_hinge', 'modified_huber', 'hinge', 'perceptron', 'epsilon_insensitive'],
-        'penalty': ['l2', 'l1', 'elasticnet'],
+        'alpha': [0.1, 1, 10, 100]
     },
     'Dummy': {
-        'strategy': ['uniform', 'stratified', 'most_frequent'],
-    },
+
+        },
     'HGB': {
         'learning_rate': [0.1, 0.5, 1.0],
         'max_depth': [3, 5, 7, 9],
@@ -103,7 +99,7 @@ model_params = {
         'n_iter_no_change': [10, 20, 30],
         'early_stopping': [True, False]
     },
-    'LGBMGBDT': {
+    'LGBM': {
         'learning_rate': [0.1, 0.5, 1.0],
         'max_depth': [3, 5, 7, 9],
         'min_samples_leaf': [1, 2, 3, 4, 5],
@@ -112,34 +108,8 @@ model_params = {
         'n_estimators': [50, 100, 200],
         'num_leaves': [31, 127, 255],
         'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
-        'bagging_fraction': [0.1, 0.5, 1.0],
-        'bagging_freq': [0, 1, 2, 3, 4, 5],
     },
-    'LGBMDart': {
-        'learning_rate': [0.1, 0.5, 1.0],
-        'max_depth': [3, 5, 7, 9],
-        'min_samples_leaf': [1, 2, 3, 4, 5],
-        'max_bins': [32, 64, 128],
-        'tol': [1e-07, 1e-06, 1e-05],
-        'n_estimators': [50, 100, 200],
-        'num_leaves': [31, 127, 255],
-        'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
-        'bagging_fraction': [0.1, 0.5, 1.0],
-        'bagging_freq': [0, 1, 2, 3, 4, 5],
-    },
-    'LGBMrf': {
-        'learning_rate': [0.1, 0.5, 1.0],
-        'max_depth': [3, 5, 7, 9],
-        'min_samples_leaf': [1, 2, 3, 4, 5],
-        'max_bins': [32, 64, 128],
-        'tol': [1e-07, 1e-06, 1e-05],
-        'n_estimators': [50, 100, 200],
-        'num_leaves': [31, 127, 255],
-        'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
-        'bagging_fraction': [0.1, 0.5],
-        'bagging_freq': [1],
-    },
-    'XGBDart': {
+    'XGB': {
         'learning_rate': [0.1, 0.5, 1.0],
         'max_depth': [3, 5, 7, 9],
         'min_samples_leaf': [1, 2, 3, 4, 5],
@@ -152,56 +122,23 @@ model_params = {
         'n_iter_no_change': [10, 20, 30],
         'early_stopping': [True, False],
     },
-    'XGBTree': {
-        'learning_rate': [0.1, 0.5, 1.0],
-        'max_depth': [3, 5, 7, 9],
-        'min_samples_leaf': [1, 2, 3, 4, 5],
-        'max_bins': [32, 64, 128],
-        'l2_regularization': [0.0, 0.1, 0.5, 1.0],
-        'max_iter': [50, 100, 200],
-        'tol': [1e-07, 1e-06, 1e-05],
-        'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
-        'validation_fraction': [0.1, 0.2, 0.3],
-        'n_iter_no_change': [10, 20, 30],
-        'early_stopping': [True, False],
-    },
-    'XGBLinear': {
-        'learning_rate': [0.1, 0.5, 1.0],
-        'max_depth': [3, 5, 7, 9],
-        'min_samples_leaf': [1, 2, 3, 4, 5],
-        'max_bins': [32, 64, 128],
-        'l2_regularization': [0.0, 0.1, 0.5, 1.0],
-        'max_iter': [50, 100, 200],
-        'tol': [1e-07, 1e-06, 1e-05],
-        'scoring': ['loss', 'accuracy', 'balanced_accuracy', 'f1', 'precision', 'recall', 'roc_auc'],
-        'validation_fraction': [0.1, 0.2, 0.3],
-        'n_iter_no_change': [10, 20, 30],
-        'early_stopping': [True, False],
+    'IsolationForest': {
+        'n_estimators': [50, 100, 200],
+        'max_samples': [0.1, 0.5, 1.0],
+        'contamination': [0.1, 0.5, 1.0]
     },
     'ExtraTree': {
         'criterion': ['gini', 'entropy'],
         'max_depth': [3, 5, 7, 9],
         'min_samples_split': [2, 3, 4, 5],
         'min_samples_leaf': [1, 2, 3, 4, 5]
-    },
-    'GLVQ': {
-        'activation_type': ['sigmoid', 'identity', 'soft+', 'swish'],
-        'solver_type': ['sgd', 'adam', 'bgd', 'bfgs', 'lbfgs'],
-    },
-    'GMLVQ': {
-        'activation_type': ['sigmoid', 'identity', 'soft+', 'swish'],
-        'solver_type': ['sgd', 'adam', 'bgd', 'bfgs', 'lbfgs'],
-    },
-    'LGMLVQ': {
-        'activation_type': ['sigmoid', 'identity', 'soft+', 'swish'],
-        'solver_type': ['sgd', 'adam', 'bgd', 'bfgs', 'lbfgs'],
     }
 }
 
 model_options = {
     # SVC is SVCRBF
     'SVC': SVC(),
-    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=5, random_state=0),
+    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=5, random_state=0),
     'GaussianNB': GaussianNB(),
     'DecisionTree': DecisionTreeClassifier(),
     'KNeighbors': KNeighborsClassifier(n_neighbors=5, n_jobs=-1),
@@ -209,21 +146,16 @@ model_options = {
     'RandomForest': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42, n_jobs=-1),
     'MLP': MLPClassifier(),
     'QDA': QuadraticDiscriminantAnalysis(),
-    'CatBoost': CatBoostClassifier(logging_level="Silent", thread_count=-1),
+    'CatBoost': CatBoostClassifier(verbose=False, thread_count=-1),
     'ExtraTrees': ExtraTreesClassifier(n_jobs=-1),
     'Ridge': RidgeClassifier(),
     'PA': PassiveAggressiveClassifier(n_jobs=-1),
+    'SGDOneClass': SGDOneClassSVM(verbose=False),
     'SGD': SGDClassifier(n_jobs=-1),
     'Dummy': DummyClassifier(strategy="uniform"),
     'HGB': HistGradientBoostingClassifier(verbose=False),
-    'LGBMGBDT': LGBMClassifier(verbose=-1, n_jobs=-1, boosting_type='gbdt'),
-    'LGBMDart': LGBMClassifier(verbose=-1, n_jobs=-1, boosting_type='dart'),
-    'LGBMrf': LGBMClassifier(verbose=-1, n_jobs=-1, boosting_type='rf'),
-    'XGBTree': XGBClassifier(verbosity=0, booster='gbtree'),
-    'XGBDart': XGBClassifier(verbosity=0, booster='dart'),
-    'XGBLinear': XGBClassifier(verbosity=0, booster='gblinear'),
+    'LGBM': LGBMClassifier(verbose=-1, n_jobs=-1),
+    'XGB': XGBClassifier(verbose=1),
+    'IsolationForest': IsolationForest(n_jobs=-1),
     'ExtraTree': ExtraTreeClassifier(),
-    'GLVQ': GLVQ(),
-    'GMLVQ': GMLVQ(),
-    'LGMLVQ': LGMLVQ(),
 }

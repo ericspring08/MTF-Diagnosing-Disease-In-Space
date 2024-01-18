@@ -27,8 +27,8 @@ const HomePage = () => {
                                    href={`/form/${disease.value}`}
                                    key={disease.value}
                               >
-                                   <div class="card card-bordered w-80 bg-base-100 shadow-xl hover:shadow-2xl hover:opacity-60">
-                                        <figure class="px-10 pt-10">
+                                   <div className="card card-bordered w-80 bg-base-100 shadow-xl hover:shadow-2xl hover:opacity-60">
+                                        <figure className="px-10 pt-10">
                                              <Image
                                                   src={`/img/${disease.value}.png`}
                                                   alt={disease}
@@ -36,8 +36,8 @@ const HomePage = () => {
                                                   height={500}
                                              />
                                         </figure>
-                                        <div class="card-body items-center text-center">
-                                             <h2 class="card-title">
+                                        <div className="card-body items-center text-center">
+                                             <h2 className="card-title">
                                                   {disease.label}
                                              </h2>
                                              <p className="text-sm">
