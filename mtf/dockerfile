@@ -1,0 +1,14 @@
+FROM python:3.10
+
+ARG DATASET_PATH
+ARG CONFIG_PATH
+
+COPY ./src ./
+COPY requirements.txt .
+COPY $DATASET_PATH ./dataset.csv
+COPY $CONFIG_PATH ./config.json
+
+RUN pip install -r requirements.txt
+RUN ls -a
+
+ENTRYPOINT ["python", "mtf.py", "experiment", "-c", "./config.json", "-d", "./dataset.csv"]
