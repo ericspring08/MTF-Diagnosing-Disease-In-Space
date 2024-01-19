@@ -46,7 +46,7 @@
       "Dummy",
       "DecisionTree"
     ],
-    "trials": 1,
+    "trials": 5,
     "tuning_iterations": 1,
     "null_character": null
   },

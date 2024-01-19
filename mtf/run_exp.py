@@ -3,6 +3,7 @@ import json
 import os
 import tarfile
 import argparse
+import shutil
 
 client = docker.from_env()
 
@@ -32,6 +33,28 @@ buildargs = {
 print("Dataset path: ", dataset_path)
 print("Results path: ", results_path)
 print("Trials: ", trials)
+
+# delete old results_path
+if os.path.exists(results_path):
+    delete = input("Delete old results? (y/n): ")
+
+    if delete == 'y':
+        print("Deleting old results")
+        shutil.rmtree(results_path)
+    else:
+        print("Keeping old results, exiting")
+        exit()
+
+# delete extraction_interum
+if os.path.exists('./interum_extranction'):
+    print("Deleting interum extraction folder")
+    for file in os.listdir('./interum_extranction'):
+        try:
+            shutil.rmtree('./interum_extranction/')
+        except Exception as e:
+            print(e)
+
+    os.rmdir('./interum_extranction')
 
 # create results folder
 if not os.path.exists(results_path):
@@ -101,8 +124,9 @@ for index, container in enumerate(trial_containers):
               f'{results_path}/results_{index}')
 
     # delete interum folder
+    shutil.rmtree('./interum_extranction')
 
-  # delete tar
+    # delete tar
     os.remove(f"results_{index}.tar")
 
 # delete containers
