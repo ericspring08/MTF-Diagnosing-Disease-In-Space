@@ -84,8 +84,8 @@ model_params = {
         'alpha': [0.1, 1, 10, 100]
     },
     'Dummy': {
-
-        },
+        'strategy': ['uniform', 'most_frequent', 'stratified']
+    },
     'HGB': {
         'learning_rate': [0.1, 0.5, 1.0],
         'max_depth': [3, 5, 7, 9],
@@ -138,7 +138,7 @@ model_params = {
 model_options = {
     # SVC is SVCRBF
     'SVC': SVC(),
-    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0,max_depth=5, random_state=0),
+    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=1.0, max_depth=5, random_state=0),
     'GaussianNB': GaussianNB(),
     'DecisionTree': DecisionTreeClassifier(),
     'KNeighbors': KNeighborsClassifier(n_neighbors=5, n_jobs=-1),

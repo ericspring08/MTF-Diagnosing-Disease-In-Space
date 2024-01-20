@@ -234,8 +234,6 @@ class MTF(object):
         print("Saving Results")
         self.models_results.save_results_raw_csv(
             '/results' + "/results_raw.csv")
-        self.models_results.save_results_averages_csv(
-            '/results' + "/results_average.csv")
 
     def logging_callback_fit(self, res, model_name, output):
         print_tags((f"Iteration {len(res.func_vals)+1}",

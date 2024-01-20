@@ -42,11 +42,8 @@
       "Sex",
       "Education"
     ],
-    "models": [
-      "Dummy",
-      "DecisionTree"
-    ],
-    "trials": 1,
+    "models": "all",
+    "trials": 5,
     "tuning_iterations": 1,
     "null_character": null
   },
