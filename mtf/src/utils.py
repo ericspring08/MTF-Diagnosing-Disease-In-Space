@@ -3,6 +3,11 @@
 import math
 import statistics as st
 
+from datetime import datetime
+from art import text2art
+import warnings
+import builtins
+
 # Metrics
 from sklearn.metrics import accuracy_score, precision_score, balanced_accuracy_score, f1_score, recall_score, log_loss
 
@@ -68,6 +73,26 @@ def print_tags(tags, message):
 
 def hasmethod(obj, method_name):
     return hasattr(obj, method_name) and callable(getattr(obj, method_name))
+
+
+def print_header():
+    title = text2art("MTF", font="3d_diagonal")
+    print(title)
+    print("Model Training Platform")
+    print("By Eric Zhang, 2023")
+    print('-' * 100)
+    warnings.filterwarnings('ignore')
+
+
+def enable_tagged_print():
+    # All prints have a timestamp
+    _print = print
+
+    def time_print(*args, **kwargs):
+        curr_time = datetime.now().strftime("%H:%M:%S")
+        _print(f"[{curr_time}]", *args, **kwargs)
+
+    builtins.print = time_print
 
 
 # Variables

@@ -11,4 +11,4 @@ COPY $CONFIG_PATH ./config.json
 RUN pip install -r requirements.txt
 RUN ls -a
 
-ENTRYPOINT ["python", "mtf.py", "experiment", "-c", "./config.json", "-d", "./dataset.csv"]
+ENTRYPOINT ["python", "mtf.py", "-c", "./config.json", "-d", "./dataset.csv"]

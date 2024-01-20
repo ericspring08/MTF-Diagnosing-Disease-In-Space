@@ -4,19 +4,27 @@ import os
 import tarfile
 import argparse
 import shutil
+import pandas as pd
+from src.utils import print_header
+
+
+print_header()
 
 client = docker.from_env()
 
 # parse arguments
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--config', type=str,
-                    default="./configs/config_cad.json", help='path to config file')
+parser.add_argument('--config', type=str, help='path to config file')
 
 args = parser.parse_args()
 config_path = args.config
 
 config = None
+
+agg_results = pd.DataFrame(
+    columns=['model', 'output', 'metric', 'value']
+)
 # load config
 with open(config_path) as f:
     config = json.load(f)
@@ -59,6 +67,7 @@ if os.path.exists('./interum_extranction'):
 # create results folder
 if not os.path.exists(results_path):
     os.makedirs(results_path)
+    os.makedirs(f'{results_path}/aggregate')
 
 # delete old results
 for file in os.listdir(results_path):
@@ -128,6 +137,16 @@ for index, container in enumerate(trial_containers):
 
     # delete tar
     os.remove(f"results_{index}.tar")
+
+    # aggregate results
+    results = pd.read_csv(f'{results_path}/results_{index}/results_raw.csv')
+
+    for index, row in results.iterrows():
+        agg_results = pd.concat(
+            [agg_results, pd.DataFrame(row).transpose()], ignore_index=True)
+
+# save aggregate results
+agg_results.to_csv(f'{results_path}/aggregate/results_raw.csv', index=False)
 
 # delete containers
 for container in trial_containers:
