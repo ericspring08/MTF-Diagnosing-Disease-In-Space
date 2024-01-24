@@ -95,6 +95,23 @@ def enable_tagged_print():
     builtins.print = time_print
 
 
+def fprime(y_true, y_pred):
+    precision = precision_score(y_true, y_pred, average='macro')
+    specificity = recall_score(
+        y_true, y_pred, pos_label=0, average='macro')
+
+    return 2 * (precision * specificity) / (precision + specificity)
+
+
+def scoring_function(estimator, X, Y):
+
+    y_pred = estimator.predict(X)
+
+    score = fprime(Y, y_pred)
+
+    return score
+
+
 # Variables
 metric_options = {
     'accuracy': accuracy_score,

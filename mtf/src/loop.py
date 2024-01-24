@@ -7,11 +7,12 @@ import pandas as pd
 
 from models import model_options, model_params
 from save import ModelResults
-from utils import get_metric, hasmethod, print_tags
+from utils import get_metric, hasmethod, print_tags, scoring_function
 
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.metrics import precision_score, recall_score
 
 from skopt import BayesSearchCV
 import pickle
@@ -188,8 +189,10 @@ class MTF(object):
                     opt = BayesSearchCV(
                         model,
                         model_params[model_name],
+                        scoring=scoring_function,
                         n_iter=self.tuning_iterations,
-                        cv=3,
+                        # no cross validation as we are using train test split
+                        cv=2,
                         verbose=0,
                     )
 
