@@ -10,7 +10,8 @@
       "recall",
       "f1",
       "train_time",
-      "predict_time"
+      "predict_time",
+      "shscore"
     ],
     "outputs": [
       "HeartDiseaseorAttack"
@@ -45,7 +46,7 @@
     "models": "all",
     "trials": 5,
     "tuning_iterations": 1,
-    "null_character": null
+    "null_character": "NA"
   },
   "outputs": {}
 }

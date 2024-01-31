@@ -7,13 +7,11 @@ import pandas as pd
 
 from models import model_options, model_params
 from save import ModelResults
-from utils import get_metric, hasmethod, print_tags, scoring_function
+from utils import get_metric, print_tags, shscorewrapper
 
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.metrics import precision_score, recall_score
 
 from skopt import BayesSearchCV
 import pickle
@@ -39,7 +37,6 @@ class MTF(object):
         self.config_path = config_path
         self.null_character = None
         self.dataset_path = dataset
-        self.cv_folds = None
 
     def read_config(self):
         try:
@@ -57,8 +54,6 @@ class MTF(object):
             self.tuning_iterations = config["experiment"]["tuning_iterations"]
 
             self.null_character = config["experiment"]["null_character"]
-
-            self.cv_folds = config["experiment"]["cv_folds"]
 
             self.config = config
 
@@ -190,14 +185,12 @@ class MTF(object):
                     # Train Model
                     # Tune Hyperparameters with Bayesian Optimization
                     np.int = int
-                    sk = StratifiedKFold(n_splits=self.cv_folds, shuffle=True)
                     opt = BayesSearchCV(
                         model,
                         model_params[model_name],
-                        scoring=scoring_function,
-                        n_iter=self.tuning_iterations,
-                        # no cross validation as we are using train test split
-                        cv=sk,
+                        scoring=shscorewrapper,
+                        cv=[(np.arange(len(self.x_train)),
+                             np.arange(len(self.x_test)))],
                         verbose=0,
                     )
 
@@ -218,8 +211,7 @@ class MTF(object):
 
                     y_prob = None
                     # Get Model Probability
-                    if hasmethod(opt, 'predict_proba'):
-                        y_prob = opt.predict_proba(self.x_test)
+                    y_prob = opt.predict_proba(self.x_test)
 
                     # Calculate Metrics
                     performance = get_metric(
@@ -229,6 +221,7 @@ class MTF(object):
                     self.models_results.save_model(
                         opt.best_estimator_, os.path.join('results', "models", f"{output}", f"{model_name}_{output}.pkl"))
 
+                    # print performance
                     for metric, value in performance.items():
                         print_tags(
                             (f"{model_name}", f"{output}"), f"{metric}: {value}")

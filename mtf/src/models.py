@@ -151,7 +151,7 @@ model_options = {
     'Dummy': DummyClassifier(strategy="uniform"),
     'HGB': HistGradientBoostingClassifier(verbose=False),
     'LGBM': LGBMClassifier(verbose=-1, n_jobs=-1),
-    'XGB': XGBClassifier(verbose=1),
+    'XGB': XGBClassifier(verbosity=0),
     'IsolationForest': IsolationForest(n_jobs=-1),
     'ExtraTree': ExtraTreeClassifier(),
 }
