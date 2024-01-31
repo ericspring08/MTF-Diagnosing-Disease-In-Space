@@ -11,6 +11,7 @@ from utils import get_metric, hasmethod, print_tags, scoring_function
 
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.metrics import precision_score, recall_score
 
@@ -38,6 +39,7 @@ class MTF(object):
         self.config_path = config_path
         self.null_character = None
         self.dataset_path = dataset
+        self.cv_folds = None
 
     def read_config(self):
         try:
@@ -55,6 +57,8 @@ class MTF(object):
             self.tuning_iterations = config["experiment"]["tuning_iterations"]
 
             self.null_character = config["experiment"]["null_character"]
+
+            self.cv_folds = config["experiment"]["cv_folds"]
 
             self.config = config
 
@@ -186,13 +190,14 @@ class MTF(object):
                     # Train Model
                     # Tune Hyperparameters with Bayesian Optimization
                     np.int = int
+                    sk = StratifiedKFold(n_splits=self.cv_folds, shuffle=True)
                     opt = BayesSearchCV(
                         model,
                         model_params[model_name],
                         scoring=scoring_function,
                         n_iter=self.tuning_iterations,
                         # no cross validation as we are using train test split
-                        cv=2,
+                        cv=sk,
                         verbose=0,
                     )
 
