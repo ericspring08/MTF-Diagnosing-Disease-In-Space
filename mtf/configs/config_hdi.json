@@ -44,8 +44,8 @@
       "Education"
     ],
     "models": "all",
-    "trials": 5,
-    "tuning_iterations": 1,
+    "trials": 1,
+    "tuning_iterations": 2,
     "null_character": "NA"
   },
   "outputs": {}

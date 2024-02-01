@@ -86,14 +86,34 @@ def enable_tagged_print():
 
 def fprime(y_true, y_pred):
     precision = precision_score(y_true, y_pred, average='macro')
-    specificity = recall_score(
-        y_true, y_pred, pos_label=0, average='macro')
+    recall = recall_score(y_true, y_pred, average='macro')
+    specificity = recall_score(y_true, y_pred, average='macro', pos_label=0)
 
-    return 2 * (precision * specificity) / (precision + specificity)
+    precision_coeff = 0.25
+    recall_coeff = 0.5
+    specificity_coeff = 0.25
+
+    score = 3 / ((precision_coeff / precision) + (recall_coeff /
+                 recall) + (specificity_coeff / specificity))
+
+    return score
 
 
 def aoc(y_pred, y_prob, y_test):
-    return log_loss(y_test, y_prob, labels=y_test.unique())
+    wfn = 0.75
+    wfp = 0.25
+
+    logloss = 0
+
+    for i in range(len(y_pred)):
+        row_score = wfn * (y_test[i] * y_prob[i][0]) + \
+            wfp * (y_test[i] * y_prob[i][1])
+
+        logloss += row_score
+
+    logloss = (-1/len(y_pred)) * logloss
+
+    return logloss
 
 
 def shscore(y_pred, y_prob, y_test):

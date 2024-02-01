@@ -164,6 +164,7 @@ class MTF(object):
         for model_name, model in self.models_to_use.items():
             # Iterate through outputs
             for output in self.outputs:
+                self.perf_curve = []
                 try:
                     # Special cases for some models that require multiclass specification
                     if "LGBM" in model_name and self.outputs[output].nunique() > 2:
@@ -223,6 +224,11 @@ class MTF(object):
                     self.models_results.save_model(
                         opt.best_estimator_, os.path.join('results', "models", f"{output}", f"{model_name}_{output}.pkl"))
 
+                    # Save perf_curve
+                    print_tags(f"Saving perf_curve for {model_name} {output}")
+                    self.models_results.save_perf_curve(
+                        self.perf_curve, os.path.join('results', "perf_curve", f"{output}", f"{model_name}_{output}.csv"))
+
                     for metric, value in performance.items():
                         print_tags(
                             (f"{model_name}", f"{output}"), f"{metric}: {value}")
@@ -238,6 +244,8 @@ class MTF(object):
             '/results' + "/results_raw.csv")
 
     def logging_callback_fit(self, res, model_name, output):
+        # append latest results to self.perf_curve
+        self.perf_curve.append(res.func_vals[-1])
         print_tags((f"Iteration {len(res.func_vals)+1}",
                     f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals[-1]}")
 
