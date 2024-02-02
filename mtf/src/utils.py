@@ -84,10 +84,10 @@ def enable_tagged_print():
     builtins.print = time_print
 
 
-def fprime(y_true, y_pred):
-    precision = precision_score(y_true, y_pred, average='macro')
-    recall = recall_score(y_true, y_pred, average='macro')
-    specificity = recall_score(y_true, y_pred, average='macro', pos_label=0)
+def fprime(y_test, y_pred):
+    precision = precision_score(y_test, y_pred, average='macro')
+    recall = recall_score(y_test, y_pred, average='macro')
+    specificity = recall_score(y_test, y_pred, average='macro', pos_label=0)
 
     precision_coeff = 0.25
     recall_coeff = 0.5
@@ -125,6 +125,8 @@ def shscorewrapper(estimator, X, Y):
     y_pred = estimator.predict(X)
     y_prob = estimator.predict_proba(X)
 
+    print("Calculating SHScore")
     score = fprime(Y, y_pred) - aoc(y_pred, y_prob, Y)
+    print(f"SHScore: {score}")
 
     return score

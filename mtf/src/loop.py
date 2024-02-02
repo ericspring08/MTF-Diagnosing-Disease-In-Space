@@ -190,11 +190,9 @@ class MTF(object):
                         model,
                         model_params[model_name],
                         scoring=shscorewrapper,
-                        n_iter=self.tuning_iterations,
-                        # iterable for cv to do train test Split
                         cv=[(np.arange(len(self.x_train)),
                              np.arange(len(self.x_test)))],
-                        verbose=0,
+                        verbose=5,
                     )
 
                     # Fit
@@ -228,7 +226,7 @@ class MTF(object):
                     print_tags(f"Saving perf_curve for {model_name} {output}")
                     self.models_results.save_perf_curve(
                         self.perf_curve, os.path.join('results', "perf_curve", f"{output}", f"{model_name}_{output}.csv"))
-
+                    # print performance
                     for metric, value in performance.items():
                         print_tags(
                             (f"{model_name}", f"{output}"), f"{metric}: {value}")
