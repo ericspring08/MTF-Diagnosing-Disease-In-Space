@@ -86,14 +86,6 @@ for file in os.listdir(results_path):
     except Exception as e:
         print(e)
 
-# delte old image and container
-try:
-    client.images.remove("mtf")
-    print("Previous Image removed")
-except docker.errors.ImageNotFound:
-    print("Previous Image not found")
-
-
 # build image with logs
 for line in client.api.build(path=".", buildargs=buildargs, tag="mtf", decode=True, rm=True):
     if 'stream' in line:

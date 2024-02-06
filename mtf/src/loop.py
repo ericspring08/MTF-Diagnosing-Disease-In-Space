@@ -190,12 +190,12 @@ class MTF(object):
                         model,
                         model_params[model_name],
                         scoring=shscorewrapper,
-                        cv=[(np.arange(len(self.x_train)),
-                             np.arange(len(self.x_test)))],
-                        verbose=5,
+                        cv=3,
+                        n_iter=self.tuning_iterations,
                     )
 
                     # Fit
+                    print(f"Fitting {model_name} {output}")
                     time_before_fit = time.perf_counter_ns()
                     opt.fit(self.x_train, self.y_train[output], callback=lambda res: self.logging_callback_fit(
                         res, model_name, output,))
@@ -204,16 +204,17 @@ class MTF(object):
                     # Calculate Training Time
                     train_time = (time_after_fit - time_before_fit)
 
+                    print(f"Predicting {model_name} {output}")
                     # Predict
                     before_predict = time.perf_counter_ns()
                     y_pred = opt.predict(self.x_test)
                     after_predict = time.perf_counter_ns()
                     predict_time = (after_predict - before_predict)
 
-                    y_prob = None
                     # Get Model Probability
                     y_prob = opt.predict_proba(self.x_test)
 
+                    print(f"Calculating Metrics for {model_name} {output}")
                     # Calculate Metrics
                     performance = get_metric(
                         y_pred, y_prob, self.y_test[output], self.metrics_selection, train_time, predict_time)
@@ -223,7 +224,7 @@ class MTF(object):
                         opt.best_estimator_, os.path.join('results', "models", f"{output}", f"{model_name}_{output}.pkl"))
 
                     # Save perf_curve
-                    print_tags(f"Saving perf_curve for {model_name} {output}")
+                    print(f"Saving perf_curve for {model_name} {output}")
                     self.models_results.save_perf_curve(
                         self.perf_curve, os.path.join('results', "perf_curve", f"{output}", f"{model_name}_{output}.csv"))
                     # print performance

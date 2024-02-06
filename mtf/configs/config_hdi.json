@@ -5,12 +5,6 @@
   },
   "experiment": {
     "metrics": [
-      "accuracy",
-      "precision",
-      "recall",
-      "f1",
-      "train_time",
-      "predict_time",
       "shscore"
     ],
     "outputs": [

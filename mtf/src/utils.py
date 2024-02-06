@@ -7,6 +7,8 @@ import builtins
 
 from sklearn.metrics import log_loss, precision_score, recall_score
 
+import numpy as np
+
 
 def get_metric(y_pred, y_prob, y_test, metrics, train_time, predict_time):
 
@@ -26,7 +28,7 @@ def get_metric(y_pred, y_prob, y_test, metrics, train_time, predict_time):
                 y_test, y_prob, labels=y_test.unique())
         elif metric == "shscore":
             # SHScore Metric
-            all_metrics[metric] = shscore(y_pred, y_prob, y_test)
+            all_metrics[metric] = shscore(y_pred, y_prob, y_test.values)
         # Standard Metrics
         else:
             # import from sklearn
@@ -93,8 +95,9 @@ def fprime(y_test, y_pred):
     recall_coeff = 0.5
     specificity_coeff = 0.25
 
-    score = 3 / ((precision_coeff / precision) + (recall_coeff /
-                 recall) + (specificity_coeff / specificity))
+    # harmonic mean with all variables and coefficients
+    score = 1 / (precision_coeff / precision + recall_coeff /
+                 recall + specificity_coeff / specificity)
 
     return score
 
@@ -106,8 +109,8 @@ def aoc(y_pred, y_prob, y_test):
     logloss = 0
 
     for i in range(len(y_pred)):
-        row_score = wfn * (y_test[i] * y_prob[i][0]) + \
-            wfp * (y_test[i] * y_prob[i][1])
+        row_score = wfn * (y_test[i] * np.log(y_prob[i][0])) + \
+            wfp * (y_test[i] * np.log(y_prob[i][1]))
 
         logloss += row_score
 
@@ -125,8 +128,6 @@ def shscorewrapper(estimator, X, Y):
     y_pred = estimator.predict(X)
     y_prob = estimator.predict_proba(X)
 
-    print("Calculating SHScore")
-    score = fprime(Y, y_pred) - aoc(y_pred, y_prob, Y)
-    print(f"SHScore: {score}")
+    score = shscore(y_pred, y_prob, Y.values)
 
     return score
