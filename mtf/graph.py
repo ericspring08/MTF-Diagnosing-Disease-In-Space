@@ -108,7 +108,9 @@ with Progress(
 
         # loop through all rows
         for index, row in data.iterrows():
-            # Get the key for the dictionary
+            if row['value'] == None:
+                continue
+                # Get the key for the dictionary
             key = f"{row['output']}*{row['metric']}*{row['model']}"
             # Check if key exists
             if key in combine_trials:
@@ -126,19 +128,20 @@ with Progress(
         for key in combine_trials:
             # Get the output, metric, model from the key
             output, metric, model = key.split('*')
-            try:
-                mean_values = mean(combine_trials[key])
-                stdev_values = stdev(combine_trials[key])
-                # create the key if it doesn't exist
-                if output not in processed_trials:
-                    processed_trials[output] = dict()
-                if metric not in processed_trials[output]:
-                    processed_trials[output][metric] = list()
 
-                processed_trials[output][metric].append(
-                    (model, mean_values, stdev_values))
+            mean_values = mean(combine_trials[key])
+            try:
+                stdev_values = stdev(combine_trials[key])
             except:
-                continue
+                stdev_values = 0.001
+            # create the key if it doesn't exist
+            if output not in processed_trials:
+                processed_trials[output] = dict()
+            if metric not in processed_trials[output]:
+                processed_trials[output][metric] = list()
+
+            processed_trials[output][metric].append(
+                (model, mean_values, stdev_values))
 
         for output in processed_trials:
             for metric in processed_trials[output]:
