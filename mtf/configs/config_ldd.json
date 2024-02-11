@@ -11,7 +11,11 @@
       "f1",
       "train_time",
       "predict_time",
-      "logloss"
+      "logloss",
+      "shscore",
+      "roc_auc",
+      "balanced_accuracy",
+      "jaccard"
     ],
     "outputs": [
       "Risk"
@@ -34,8 +38,8 @@
     ],
     "models": "all",
     "trials": 5,
-    "tuning_iterations": 32,
-    "null_character": "NA"
+    "tuning_iterations": 24,
+    "sample_size": 100
   },
   "outputs": {
     "Risk": {
