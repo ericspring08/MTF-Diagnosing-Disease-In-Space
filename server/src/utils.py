@@ -1,16 +1,24 @@
 hdd_features = ["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach",
                 "exang", "oldpeak", "slope", "ca", "thal"]
-kdd_features =["age", "bp", "sg", "al", "su", "rbc", "pc", "pcc", "ba", "bgr", "bu", "sc", "sod", "pot", "hemo", "pcv", "wc", "rc", "htn", "dm", "cad", "appet", "pe", "ane"]
-kdd_categorical_features = ["su", "rbc", "pc", "pcc", "ba", "htn", "dm", "cad", "appet", "pe", "ane"]
-kdd_numerical_features = ["age", "bp", "sg", "al", "bgr", "bu", "sc", "sod", "pot", "hemo", "pcv", "wc", "rc"]
-ldd_features = ["smoke", "FVC", "FEC1", "PEFR", "O2", "ABG-P-O2", "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseases", "AGE"]
-ldd_categorical_features = ["smoke", "PEFR", "O2", "ABG-P-O2", "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseases"]
+kdd_features = ["age", "bp", "sg", "al", "su", "rbc", "pc", "pcc", "ba", "bgr", "bu",
+                "sc", "sod", "pot", "hemo", "pcv", "wc", "rc", "htn", "dm", "cad", "appet", "pe", "ane"]
+kdd_categorical_features = ["su", "rbc", "pc", "pcc",
+                            "ba", "htn", "dm", "cad", "appet", "pe", "ane"]
+kdd_numerical_features = ["age", "bp", "sg", "al", "bgr",
+                          "bu", "sc", "sod", "pot", "hemo", "pcv", "wc", "rc"]
+ldd_features = ["smoke", "FVC", "FEC1", "PEFR", "O2", "ABG-P-O2",
+                "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseases", "AGE"]
+ldd_categorical_features = ["smoke", "PEFR", "O2", "ABG-P-O2",
+                            "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseases"]
 ldd_numerical_features = ["FVC", "FEC1", "AGE"]
-hdd_categorical_features = ["sex", "cp", "fbs", "restecg", "exang", "slope", "ca", "thal"]
+hdd_categorical_features = ["sex", "cp", "fbs",
+                            "restecg", "exang", "slope", "ca", "thal"]
 hdd_numerical_features = ["age", "trestbps", "chol", "thalach", "oldpeak"]
-tdd_features = ["age", "sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery", "I131_treatment", "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary", "TSH", "T3", "TT4", "T4U", "FTI", "TBG"]
+tdd_features = ["age", "sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery", "I131_treatment",
+                "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary", "TSH", "T3", "TT4", "T4U", "FTI", "TBG"]
 tdd_numerical_features = ["age", "TSH", "T3", "TT4", "T4U", "FTI", "TBG"]
-tdd_categorical_features = ["sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery", "I131_treatment", "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary"]
+tdd_categorical_features = ["sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery",
+                            "I131_treatment", "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary"]
 hdd_types = {
     "age": int,
     "sex": int,
@@ -182,32 +190,32 @@ form_tdd = {
         },
     },
     'Bloodwork': {
-        'TSH': {    
+        'TSH': {
             'title': 'TSH in Blood (µU/mL)',
             'type': 'numerical'
         },
-        'T3': {    
+        'T3': {
             'title': 'T3 in Blood (nmol/L)',
             'type': 'numerical'
         },
-        'TT4': {    
+        'TT4': {
             'title': 'TT4 in Blood (nmol/L)',
             'type': 'numerical'
         },
-        'T4U': {    
+        'T4U': {
             'title': 'T4U in Blood (mcg/dL)',
             'type': 'numerical'
         },
-        'FTI': {    
+        'FTI': {
             'title': 'FTI in Blood (μg/dL)',
             'type': 'numerical'
         },
-        'TBG': {    
+        'TBG': {
             'title': 'TBG in Blood (mcg/dL)',
             'type': 'numerical'
         },
     }
-    
+
 }
 form_ldd = {
     'Basics': {
@@ -215,27 +223,27 @@ form_ldd = {
             'title': 'Age',
             'type': 'numerical'
         },
-    'smoke' : { 
+        'smoke': {
             'title': 'Have Smoked?',
             'type': 'categorical',
             'options': {
-                'Yes' : 'T',
+                'Yes': 'T',
                 'No': 'F'
             }
         },
-    'Asthama' : { 
+        'Asthama': {
             'title': 'Have Asthama?',
             'type': 'categorical',
             'options': {
-                'Yes' : 'T',
+                'Yes': 'T',
                 'No': 'F'
             }
         },
-    'Other diseases' : { 
+        'Other diseases': {
             'title': 'Currently Have Other Diseases?',
             'type': 'categorical',
             'options': {
-                'Yes' : 'T',
+                'Yes': 'T',
                 'No': 'F'
             }
         },
@@ -249,51 +257,51 @@ form_ldd = {
             'title': 'Forced Expiratory Volume (L)',
             'type': 'numerical'
         },
-        'PEFR' : { 
+        'PEFR': {
             'title': 'Normal Levels of Peak Expiratory Flow Rate? (320-550L/min)',
             'type': 'categorical',
             'options': {
-                'Yes' : 'F',
+                'Yes': 'F',
                 'No': 'T'
             }
         },
-        'O2' : { 
+        'O2': {
             'title': 'Normal Oxygen Saturation? (95-100%)',
             'type': 'categorical',
             'options': {
-                'Yes' : 'F',
+                'Yes': 'F',
                 'No': 'T'
             }
         },
-        'ABG-P-O2' : { 
+        'ABG-P-O2': {
             'title': 'Normal Arterial Blood Gas Partial Pressure of Oxygen? (75-100mmHg)',
             'type': 'categorical',
             'options': {
-                'Yes' : 'F',
+                'Yes': 'F',
                 'No': 'T'
             }
         },
-        'ABG-P-CO2' : { 
+        'ABG-P-CO2': {
             'title': 'Normal Arterial Blood Gas Partial Pressure of Carbon Dioxide? (35-40mmHg)',
             'type': 'categorical',
             'options': {
-                'Yes' : 'F',
+                'Yes': 'F',
                 'No': 'T'
             }
         },
-        'ABG-pH Level' : { 
+        'ABG-pH Level': {
             'title': 'Normal Arterial Blood Acidity? (7.35-7.45pH)',
             'type': 'categorical',
             'options': {
-                'Yes' : 'F',
+                'Yes': 'F',
                 'No': 'T'
             }
         },
-        'Scan' : { 
+        'Scan': {
             'title': 'Type of Imaging Scan performed',
             'type': 'categorical',
             'options': {
-                'X-ray' : 'X-ray',
+                'X-ray': 'X-ray',
                 'MRI': 'MRI'
             }
         }
@@ -305,27 +313,27 @@ form_kdd = {
             'title': 'Age',
             'type': 'numerical'
         },
-        'bp' : {
+        'bp': {
             'title': 'Blood Pressure in mm/Hg',
             'type': 'numerical'
         },
-        'sg' : {
+        'sg': {
             'title': 'Specific Gravity of Urine',
             'type': 'numerical'
         },
-        'appet' : { 
+        'appet': {
             'title': 'Appetite',
             'type': 'categorical',
             'options': {
-                'Poor' : 'poor',
+                'Poor': 'poor',
                 'Good': 'good'
             }
         },
-        'su' : {
+        'su': {
             'title': 'Urine Sugar',
             'type': 'categorical',
             'options': {
-                'Essentially None' : '0',
+                'Essentially None': '0',
                 'Trace amounts': '2',
                 'Moderately High Levels': '4',
                 'Very High Levels': '5'
@@ -333,39 +341,39 @@ form_kdd = {
         },
     },
     'Blood Work': {
-        'al' : {
+        'al': {
             'title': 'Albumin g/dL',
             'type': 'numerical'
         },
-        'rbc' : {
+        'rbc': {
             'title': 'Red Blood Cell Count Category',
             'type': 'categorical',
             'options': {
-                'Normal' : 'normal',
+                'Normal': 'normal',
                 'Abnormal': 'abnormal'
             }
         },
-        'pc' : {
+        'pc': {
             'title': 'Pus Cell Count Category',
             'type': 'categorical',
             'options': {
-                'Normal' : 'normal',
+                'Normal': 'normal',
                 'Abnormal': 'abnormal'
             }
         },
-        'pcc' : {
+        'pcc': {
             'title': 'Pus Cell Clumps',
             'type': 'categorical',
             'options': {
-                'Present' : 'present',
+                'Present': 'present',
                 'Not Present': 'notpresent'
             }
         },
-        'ba' : {
+        'ba': {
             'title': 'Bacteria in Bloodstream',
             'type': 'categorical',
             'options': {
-                'Present' : 'present',
+                'Present': 'present',
                 'Not Present': 'notpresent'
             }
         },
@@ -373,69 +381,69 @@ form_kdd = {
             'title': 'Blood Glucose Random mg/dL',
             'type': 'numerical'
         },
-        'bu' : {
+        'bu': {
             'title': 'Blood Urea mg/dL',
             'type': 'numerical'
         },
-        'sc' : {
+        'sc': {
             'title': 'Serum Creatine mg/dL',
             'type': 'numerical'
         },
-        'sod': { 
+        'sod': {
             'title': 'Blood Sodium mEg/L',
             'type': 'numerical'
         },
-        'pot' : {
+        'pot': {
             'title': 'Blood Potassium mEq/L',
             'type': 'numerical'
         },
-        'hemo' : {
+        'hemo': {
             'title': 'Hemoglobin Count g/dL',
             'type': 'numerical'
         },
-        'pcv' : {
+        'pcv': {
             'title': 'Packed Cell Volume (%)',
             'type': 'numerical'
         },
-        'wc' : {
+        'wc': {
             'title': 'White Blood Cell Count #/μL',
             'type': 'numerical'
         },
-        'rc' : {
+        'rc': {
             'title': 'Red Blood Cell Count million/mm^3',
             'type': 'numerical'
         },
     },
     'Other Conditions': {
-        'ane' : {
+        'ane': {
             'title': 'Anemia',
             'type': 'categorical',
             'options': {
-                'Yes' : 'yes',
+                'Yes': 'yes',
                 'No': 'no'
             }
         },
-        'pe' : {
+        'pe': {
             'title': 'Pedal Edema',
             'type': 'categorical',
             'options': {
-                'Yes' : 'yes',
+                'Yes': 'yes',
                 'No': 'no'
             }
         },
-        'cad' : {
+        'cad': {
             'title': 'Coronary Artery Disese',
             'type': 'categorical',
             'options': {
-                'Yes' : 'yes',
+                'Yes': 'yes',
                 'No': 'no'
             }
         },
-        'htn' : {
+        'htn': {
             'title': 'Hypertension',
             'type': 'categorical',
             'options': {
-                'Yes' : 'yes',
+                'Yes': 'yes',
                 'No': 'no'
             }
         },
@@ -546,34 +554,34 @@ format_dict = {
         'features': hdd_features,
         'target': 'target',
         'model': './src/models/hdd_model.pkl',
-        'standard_scaler': './src/preprocessor/hdd_standard_scaler.pkl',
+        'standard_scaler': './src/preprocessor/hdd_preprocessor.pkl',
         'categorical': hdd_categorical_features,
         'numerical': hdd_numerical_features,
         'type': hdd_types,
         'form': form_hdd,
     },
-    'kdd' : {
+    'kdd': {
         'features': kdd_features,
         'target': 'target',
-        'model': '',
-        'standard_scaler': './src/preprocessor/hdd_standard_scaler.pkl',
+        'model': './src/models/kdd_model.pkl',
+        'standard_scaler': './src/preprocessor/kdd_preprocessor.pkl',
         'categorical': kdd_categorical_features,
         'numerical': kdd_numerical_features,
         'type': kdd_types,
         'form': form_kdd,
     },
-    'ldd' : {
-        'features' : ldd_features,
+    'ldd': {
+        'features': ldd_features,
         'target': 'target',
-        'model': '',
-        'standard_scaler': './src/preprocessor/ldd_standard_scaler.pkl',
+        'model': './src/models/ldd_model.pkl',
+        'standard_scaler': './src/preprocessor/ldd_preprocessor.pkl',
         'categorical': ldd_categorical_features,
         'numerical': ldd_numerical_features,
         'type': ldd_types,
         'form': form_ldd,
     },
-    'tdd' : {
-        'features' : tdd_features,
+    'tdd': {
+        'features': tdd_features,
         'target': 'target',
         'model': '',
         'standard_scaler': './src/preprocessor/tdd_standard_scaler.pkl',
@@ -581,7 +589,7 @@ format_dict = {
         'numerical': tdd_numerical_features,
         'type': tdd_types,
         'form': form_tdd,
-}
+    }
 }
 disease_options = {
     'diseases': [
