@@ -1,6 +1,5 @@
 env
 catboost_info
-Results
 .idea
 .DS_Store
 __pycache__
