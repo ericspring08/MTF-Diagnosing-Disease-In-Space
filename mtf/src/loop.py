@@ -7,7 +7,7 @@ import pandas as pd
 
 from models import model_options, model_params
 from save import ModelResults
-from utils import get_metric, hasmethod, print_tags
+from utils import get_metric, print_tags, shscorewrapper
 
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
@@ -35,8 +35,8 @@ class MTF(object):
         self.tuning_iterations = None
         self.current_model = None
         self.config_path = config_path
-        self.null_character = None
         self.dataset_path = dataset
+        self.sample_size = 1000
 
     def read_config(self):
         try:
@@ -52,8 +52,7 @@ class MTF(object):
             self.numerical_features = config["experiment"]["numerical"]
             # Options
             self.tuning_iterations = config["experiment"]["tuning_iterations"]
-
-            self.null_character = config["experiment"]["null_character"]
+            self.sample_size = config["experiment"]["sample_size"]
 
             self.config = config
 
@@ -71,6 +70,18 @@ class MTF(object):
                         f"Model {value} not found. Please check your spelling and try again.")
                     exit()
                 self.models_to_use[value] = model_options[value]
+
+            print("Outputs Selected: ", self.outputs_selection)
+            print("Metrics Selected: ", self.metrics_selection)
+            print("Models Selected: ", self.models_selection)
+            print("Categorical Features: ", self.categorical_features)
+            print("Numerical Features: ", self.numerical_features)
+            print("Tuning Iterations: ", self.tuning_iterations)
+            print("Sample Size: ", self.sample_size)
+            print("Results Path: ", self.results_path)
+            print("Config Path: ", self.config_path)
+            print("Dataset Path: ", self.dataset_path)
+            print("Config Loaded Successfully")
 
         except FileExistsError:
             raise FileExistsError(
@@ -90,10 +101,6 @@ class MTF(object):
         dataset = self.dataset.drop(self.outputs_selection, axis=1)
 
         # Loop through categorical features and fill null values with most frequent
-        # If null character is specified, replace with null character
-        if self.null_character != None:
-            for feature in self.categorical_features:
-                dataset[feature] = dataset[feature].fillna(self.null_character)
 
         for feature in self.categorical_features:
             dataset[feature] = dataset[feature].fillna(
@@ -141,10 +148,10 @@ class MTF(object):
         # Sample 500 rows of the dataset for testing
         combined_dataset = pd.concat(
             [self.x_dataset, self.outputs], axis=1)
-        if len(self.dataset) < 2000:
+        if len(self.dataset) < self.sample_size:
             sampled_dataset = combined_dataset
         else:
-            sampled_dataset = combined_dataset.sample(n=2000)
+            sampled_dataset = combined_dataset.sample(n=self.sample_size)
         x_sampled_dataset = sampled_dataset.drop(
             self.outputs_selection, axis=1)
         y_sampled_dataset = sampled_dataset[self.outputs_selection]
@@ -164,6 +171,7 @@ class MTF(object):
         for model_name, model in self.models_to_use.items():
             # Iterate through outputs
             for output in self.outputs:
+                self.perf_curve = []
                 try:
                     # Special cases for some models that require multiclass specification
                     if "LGBM" in model_name and self.outputs[output].nunique() > 2:
@@ -188,12 +196,15 @@ class MTF(object):
                     opt = BayesSearchCV(
                         model,
                         model_params[model_name],
+                        scoring=shscorewrapper,
+                        # train test split iterator
+                        cv=[(np.arange(len(self.x_train)),
+                             np.arange(len(self.x_test)))],
                         n_iter=self.tuning_iterations,
-                        cv=3,
-                        verbose=0,
                     )
 
                     # Fit
+                    print(f"Fitting {model_name} {output}")
                     time_before_fit = time.perf_counter_ns()
                     opt.fit(self.x_train, self.y_train[output], callback=lambda res: self.logging_callback_fit(
                         res, model_name, output,))
@@ -202,17 +213,17 @@ class MTF(object):
                     # Calculate Training Time
                     train_time = (time_after_fit - time_before_fit)
 
+                    print(f"Predicting {model_name} {output}")
                     # Predict
                     before_predict = time.perf_counter_ns()
                     y_pred = opt.predict(self.x_test)
                     after_predict = time.perf_counter_ns()
                     predict_time = (after_predict - before_predict)
 
-                    y_prob = None
                     # Get Model Probability
-                    if hasmethod(opt, 'predict_proba'):
-                        y_prob = opt.predict_proba(self.x_test)
+                    y_prob = opt.predict_proba(self.x_test)
 
+                    print(f"Calculating Metrics for {model_name} {output}")
                     # Calculate Metrics
                     performance = get_metric(
                         y_pred, y_prob, self.y_test[output], self.metrics_selection, train_time, predict_time)
@@ -221,6 +232,11 @@ class MTF(object):
                     self.models_results.save_model(
                         opt.best_estimator_, os.path.join('results', "models", f"{output}", f"{model_name}_{output}.pkl"))
 
+                    # Save perf_curve
+                    print(f"Saving perf_curve for {model_name} {output}")
+                    self.models_results.save_perf_curve(
+                        self.perf_curve, os.path.join('results', "perf_curve", f"{output}", f"{model_name}_{output}.csv"))
+                    # print performance
                     for metric, value in performance.items():
                         print_tags(
                             (f"{model_name}", f"{output}"), f"{metric}: {value}")
@@ -236,8 +252,10 @@ class MTF(object):
             '/results' + "/results_raw.csv")
 
     def logging_callback_fit(self, res, model_name, output):
+        # append latest results to self.perf_curve
+        self.perf_curve.append(res.func_vals[-1])
         print_tags((f"Iteration {len(res.func_vals)+1}",
-                    f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals[-1]}")
+                    f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals}")
 
     def run(self):
         self.read_config()

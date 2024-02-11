@@ -1,32 +1,16 @@
 # Models
 # Mathematical
-import math
-import statistics as st
-
 from datetime import datetime
 from art import text2art
 import warnings
 import builtins
 
-# Metrics
-from sklearn.metrics import accuracy_score, precision_score, balanced_accuracy_score, f1_score, recall_score, log_loss
+from sklearn.metrics import log_loss, precision_score, recall_score
 
-# Functions
-
-
-def ammp(accuracy, precision, time_to_fit):
-    precision_reciprocal_sum = sum(precision.rdiv(1))
-    trials_num = len(accuracy)
-    accuracy_sum = sum(accuracy)
-    # Divide by 1000000 to convert nanoseconds to milliseconds
-    time_to_fit_ms = st.mean(time_to_fit/1000000)
-
-    return 0.14 * (trials_num / precision_reciprocal_sum) + 0.85 * (accuracy_sum / trials_num) - (0.01 * math.log(time_to_fit_ms, 12))
+import numpy as np
 
 
 def get_metric(y_pred, y_prob, y_test, metrics, train_time, predict_time):
-    global metric_params
-    global metric_options
 
     all_metrics = {}
 
@@ -40,26 +24,37 @@ def get_metric(y_pred, y_prob, y_test, metrics, train_time, predict_time):
             all_metrics[metric] = predict_time
         elif metric == "logloss":
             # Log Loss Metric
-            if y_prob is None:
-                all_metrics[metric] = 0
-            else:
-                all_metrics[metric] = log_loss(
-                    y_test, y_prob, labels=y_test.unique())
-        elif metric == "ammp":
-            # AMMP Metric
-            all_metrics[metric] = ammp(accuracy_score(
-                y_pred, y_test), precision_score(y_pred, y_test), train_time)
+            all_metrics[metric] = log_loss(
+                y_test, y_prob, labels=y_test.unique())
+        elif metric == "shscore":
+            # SHScore Metric
+            all_metrics[metric] = shscore(y_pred, y_prob, y_test.values)
         # Standard Metrics
-        elif metric in metric_options:
-            # Traditional metrics
-            metric_func = metric_options[metric]
-            parameters = metric_params[metric]
-            metric_value = metric_func(y_pred, y_test, **parameters)
-            all_metrics[metric] = metric_value
         else:
-            print(
-                f"Metric {metric} not found. Please check your spelling and try again.")
-            exit()
+            # import from sklearn
+            try:
+                metric_func = __import__(
+                    "sklearn.metrics", globals(), locals(), [metric], 0)
+            except ImportError:
+                print(
+                    f"Metric {metric} not found. Please check your spelling and try again.")
+                exit()
+
+            # Get metric function
+            # check if metric_func has averge option
+            # check if metric_func.metric_func has average option
+            # set metric_func to metric_func.metric_func
+            # set params to average=macro
+
+            if hasattr(metric_func, metric+"_score"):
+                metric_func = metric_func.__getattribute__(metric+"_score")
+
+            params = {}
+            if hasattr(metric_func, "average"):
+                params["average"] = "macro"
+
+            # Get metric score
+            all_metrics[metric] = metric_func(y_test, y_pred, **params)
 
     return all_metrics
 
@@ -69,10 +64,6 @@ def print_tags(tags, message):
     for value in tags:
         tag += f"[{value}] "
     print(f"{tag} {message}")
-
-
-def hasmethod(obj, method_name):
-    return hasattr(obj, method_name) and callable(getattr(obj, method_name))
 
 
 def print_header():
@@ -95,25 +86,58 @@ def enable_tagged_print():
     builtins.print = time_print
 
 
-# Variables
-metric_options = {
-    'accuracy': accuracy_score,
-    'precision': precision_score,
-    'balanced_accuracy': balanced_accuracy_score,
-    'f1': f1_score,
-    'ammp': None,
-    'train_time': None,
-    'predict_time': None,
-    'recall': recall_score
-}
+def fprime(y_test, y_pred):
+    precision = precision_score(y_test, y_pred, average='macro')
+    recall = recall_score(y_test, y_pred, average='macro')
+    specificity = recall_score(y_test, y_pred, average='macro', pos_label=0)
 
-metric_params = {
-    'accuracy': {},
-    'precision': {'average': 'weighted'},
-    'balanced_accuracy': {},
-    'f1': {'average': 'weighted'},
-    'recall': {'average': 'weighted'},
-    'ammp': {},
-    'train_time': {},
-    'predict_time': {}
-}
+    precision_coeff = 0.25
+    recall_coeff = 0.5
+    specificity_coeff = 0.25
+
+    # harmonic mean with all variables and coefficients
+    score = 1 / (precision_coeff / precision + recall_coeff /
+                 recall + specificity_coeff / specificity)
+
+    return score
+
+
+def aoc(y_pred, y_prob, y_test):
+    wfn = 0.75
+    wfp = 0.25
+
+    epsilon = 1e-15
+
+    logloss = 0
+
+    for i in range(len(y_pred)):
+        predicted_probability = y_prob[i][1]
+        predicted_probability = min(
+            max(predicted_probability, epsilon), 1 - epsilon)
+
+        if y_test[i] == 0:
+            row_score = wfn * \
+                ((1 - y_test[i]) * np.log(1 - predicted_probability))
+        else:
+            row_score = wfp * \
+                (y_test[i] * np.log(predicted_probability))
+
+        logloss += row_score
+
+    logloss = (-1/len(y_pred)) * logloss
+
+    return logloss
+
+
+def shscore(y_pred, y_prob, y_test):
+    return fprime(y_test, y_pred) - aoc(y_pred, y_prob, y_test)
+
+
+def shscorewrapper(estimator, X, Y):
+
+    y_pred = estimator.predict(X)
+    y_prob = estimator.predict_proba(X)
+
+    score = shscore(y_pred, y_prob, Y.values)
+
+    return score
