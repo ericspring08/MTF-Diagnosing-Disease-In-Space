@@ -15,7 +15,7 @@ model_params = {
     'SVC': {
         'kernel': ['rbf', 'linear', 'poly', 'sigmoid'],
         'C': [0.1, 1, 10, 100],
-        'gamma': ['scale', 'auto']
+        'gamma': ['scale', 'auto'],
     },
     'GradientBoosting': {
         'learning_rate': [0.1, 0.5, 1.0],
@@ -38,7 +38,8 @@ model_params = {
     },
     'AdaBoost': {
         'n_estimators': [50, 100, 200],
-        'learning_rate': [0.1, 0.5, 1.0]
+        'learning_rate': [0.1, 0.5, 1.0],
+        'algorithm': ['SAMME', 'SAMME.R']
     },
     'RandomForest': {
         'n_estimators': [50, 100, 200],
@@ -51,11 +52,6 @@ model_params = {
         'solver': ['sgd', 'adam'],
         'alpha': [0.0001, 0.05],
         'learning_rate': ['constant', 'adaptive'],
-    },
-    'QDA': {
-        'reg_param': [0.0, 0.1, 0.5, 1.0],
-        'priors': [None, [0.1, 0.9], [0.2, 0.8], [0.3, 0.7], [0.4, 0.6], [0.5, 0.5], [0.6, 0.4], [0.7, 0.3], [0.8, 0.2], [0.9, 0.1]],
-        'tol': [0.0001, 0.001, 0.01, 0.1],
     },
     'CatBoost': {
         'iterations': [50, 100, 200],
@@ -122,11 +118,6 @@ model_params = {
         'n_iter_no_change': [10, 20, 30],
         'early_stopping': [True, False],
     },
-    'IsolationForest': {
-        'n_estimators': [50, 100, 200],
-        'max_samples': [0.1, 0.5, 1.0],
-        'contamination': [0.1, 0.5, 1.0]
-    },
     'ExtraTree': {
         'criterion': ['gini', 'entropy'],
         'max_depth': [3, 5, 7, 9],
@@ -145,13 +136,11 @@ model_options = {
     'AdaBoost': AdaBoostClassifier(),
     'RandomForest': RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1, random_state=42, n_jobs=-1),
     'MLP': MLPClassifier(),
-    'QDA': QuadraticDiscriminantAnalysis(),
     'CatBoost': CatBoostClassifier(verbose=False, thread_count=-1),
     'ExtraTrees': ExtraTreesClassifier(n_jobs=-1),
     'Dummy': DummyClassifier(strategy="uniform"),
     'HGB': HistGradientBoostingClassifier(verbose=False),
     'LGBM': LGBMClassifier(verbose=-1, n_jobs=-1),
     'XGB': XGBClassifier(verbosity=0),
-    'IsolationForest': IsolationForest(n_jobs=-1),
     'ExtraTree': ExtraTreeClassifier(),
 }

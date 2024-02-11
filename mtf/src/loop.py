@@ -35,8 +35,8 @@ class MTF(object):
         self.tuning_iterations = None
         self.current_model = None
         self.config_path = config_path
-        self.null_character = None
         self.dataset_path = dataset
+        self.sample_size = 1000
 
     def read_config(self):
         try:
@@ -52,8 +52,7 @@ class MTF(object):
             self.numerical_features = config["experiment"]["numerical"]
             # Options
             self.tuning_iterations = config["experiment"]["tuning_iterations"]
-
-            self.null_character = config["experiment"]["null_character"]
+            self.sample_size = config["experiment"]["sample_size"]
 
             self.config = config
 
@@ -71,6 +70,18 @@ class MTF(object):
                         f"Model {value} not found. Please check your spelling and try again.")
                     exit()
                 self.models_to_use[value] = model_options[value]
+
+            print("Outputs Selected: ", self.outputs_selection)
+            print("Metrics Selected: ", self.metrics_selection)
+            print("Models Selected: ", self.models_selection)
+            print("Categorical Features: ", self.categorical_features)
+            print("Numerical Features: ", self.numerical_features)
+            print("Tuning Iterations: ", self.tuning_iterations)
+            print("Sample Size: ", self.sample_size)
+            print("Results Path: ", self.results_path)
+            print("Config Path: ", self.config_path)
+            print("Dataset Path: ", self.dataset_path)
+            print("Config Loaded Successfully")
 
         except FileExistsError:
             raise FileExistsError(
@@ -90,10 +101,6 @@ class MTF(object):
         dataset = self.dataset.drop(self.outputs_selection, axis=1)
 
         # Loop through categorical features and fill null values with most frequent
-        # If null character is specified, replace with null character
-        if self.null_character != None:
-            for feature in self.categorical_features:
-                dataset[feature] = dataset[feature].fillna(self.null_character)
 
         for feature in self.categorical_features:
             dataset[feature] = dataset[feature].fillna(
@@ -141,10 +148,10 @@ class MTF(object):
         # Sample 500 rows of the dataset for testing
         combined_dataset = pd.concat(
             [self.x_dataset, self.outputs], axis=1)
-        if len(self.dataset) < 2000:
+        if len(self.dataset) < self.sample_size:
             sampled_dataset = combined_dataset
         else:
-            sampled_dataset = combined_dataset.sample(n=2000)
+            sampled_dataset = combined_dataset.sample(n=self.sample_size)
         x_sampled_dataset = sampled_dataset.drop(
             self.outputs_selection, axis=1)
         y_sampled_dataset = sampled_dataset[self.outputs_selection]
@@ -190,7 +197,9 @@ class MTF(object):
                         model,
                         model_params[model_name],
                         scoring=shscorewrapper,
-                        cv=3,
+                        # train test split iterator
+                        cv=[(np.arange(len(self.x_train)),
+                             np.arange(len(self.x_test)))],
                         n_iter=self.tuning_iterations,
                     )
 
@@ -246,7 +255,7 @@ class MTF(object):
         # append latest results to self.perf_curve
         self.perf_curve.append(res.func_vals[-1])
         print_tags((f"Iteration {len(res.func_vals)+1}",
-                    f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals[-1]}")
+                    f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals}")
 
     def run(self):
         self.read_config()

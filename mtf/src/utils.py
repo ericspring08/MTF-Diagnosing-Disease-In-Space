@@ -106,11 +106,21 @@ def aoc(y_pred, y_prob, y_test):
     wfn = 0.75
     wfp = 0.25
 
+    epsilon = 1e-15
+
     logloss = 0
 
     for i in range(len(y_pred)):
-        row_score = wfn * (y_test[i] * np.log(y_prob[i][0])) + \
-            wfp * (y_test[i] * np.log(y_prob[i][1]))
+        predicted_probability = y_prob[i][1]
+        predicted_probability = min(
+            max(predicted_probability, epsilon), 1 - epsilon)
+
+        if y_test[i] == 0:
+            row_score = wfn * \
+                ((1 - y_test[i]) * np.log(1 - predicted_probability))
+        else:
+            row_score = wfp * \
+                (y_test[i] * np.log(predicted_probability))
 
         logloss += row_score
 

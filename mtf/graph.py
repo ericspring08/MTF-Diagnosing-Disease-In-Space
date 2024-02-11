@@ -18,12 +18,6 @@ parser.add_argument('-f', '--file', type=str, required=True,
 
 parser.add_argument('-o', '--output', type=str, required=True,
                     help='The folder to output the graphs to')
-
-parser.add_argument('-d', '--distribution', action='store_true',
-                    help='Graph the distributions of the results')
-parser.add_argument('-r', '--ranking', action='store_true',
-                    help='Graph the rankings of the results')
-
 args = parser.parse_args()
 
 
@@ -34,72 +28,22 @@ total_tasks = 0
 # Create folder if doesn't exist
 if not os.path.exists(output_location):
     os.makedirs(output_location)
-if args.distribution:
-    total_tasks += len(df['output'].unique()) * \
-        len(df['metric'].unique()) * len(df['model'].unique())
-    if not os.path.exists(os.path.join(output_location, 'distributions')):
-        os.makedirs(os.path.join(output_location, 'distributions'))
-        # Create folder for every output
-        for output in df['output'].unique():
-            if not os.path.exists(os.path.join(output_location, 'distributions', output)):
-                os.makedirs(os.path.join(
-                    output_location, 'distributions', output))
-            # Create folder for every metric
-            for metric in df['metric'].unique():
-                if not os.path.exists(os.path.join(output_location, 'distributions', output, metric)):
-                    os.makedirs(os.path.join(output_location,
-                                'distributions', output, metric))
 
-if args.ranking:
-    total_tasks += len(df['output'].unique()) * len(df['metric'].unique())
-    if not os.path.exists(os.path.join(output_location, 'rankings')):
-        os.makedirs(os.path.join(output_location, 'rankings'))
-        # Create folder for every output
-        for output in df['output'].unique():
-            if not os.path.exists(os.path.join(output_location, 'rankings', output)):
-                os.makedirs(os.path.join(
-                    output_location, 'rankings', output))
+
+total_tasks += len(df['output'].unique()) * len(df['metric'].unique())
+if not os.path.exists(os.path.join(output_location, 'rankings')):
+    os.makedirs(os.path.join(output_location, 'rankings'))
+    # Create folder for every output
+    for output in df['output'].unique():
+        if not os.path.exists(os.path.join(output_location, 'rankings', output)):
+            os.makedirs(os.path.join(
+                output_location, 'rankings', output))
 
 with Progress(
     SpinnerColumn(),
     *Progress.get_default_columns(),
     TimeElapsedColumn()
 ) as progress:
-    def generate_distribution_graphs(data):
-        plt.figure(figsize=(20, 10))
-        # Generate histogram for combination of output, metric, model
-        outputs = data['output'].unique()
-        # Go through every output
-        for output in outputs:
-            df_output = data[data['output'] == output]
-
-            # Go through every metric
-            for metric in df_output['metric'].unique():
-                print(f'Distribution Graph - {output} - {metric}')
-                df_metric = df_output[df_output['metric'] == metric]
-
-                # Go through every model
-                for model in df_metric['model'].unique():
-                    df_model = df_metric[df_metric['model'] == model]
-                    try:
-                        # Get the average of all the individual results of every trial of that model, output, metric combination
-                        value = [
-                            n.strip() for n in df_model['value'].means[0][1:-1].split(',')]
-                        # Convert string means to float
-                        value = [float(n) for n in value]
-                        # Plot the histogram
-                        plt.title(f'{output} - {metric} - {model}')
-                        plt.hist(value, bins=20)
-                        plt.xlabel(metric)
-                        plt.ylabel('Frequency')
-                        plt.grid()
-                        plt.savefig(os.path.join(
-                            output_location, 'distributions', output, metric, f'{output}_{metric}_{model}.png'))
-                        plt.clf()
-                        progress.update(main_task, advance=1)
-                    except:
-                        progress.update(main_task, advance=1)
-
     main_task = progress.add_task(
         "[red]Graphing Results", total=total_tasks)
 
@@ -108,9 +52,11 @@ with Progress(
 
         # loop through all rows
         for index, row in data.iterrows():
-            if row['value'] == None:
+            # pass if value is nan
+            if pd.isna(row['value']):
                 continue
-                # Get the key for the dictionary
+
+            # Get the key for the dictionary
             key = f"{row['output']}*{row['metric']}*{row['model']}"
             # Check if key exists
             if key in combine_trials:
@@ -156,26 +102,29 @@ with Progress(
                 progress.update(main_task, advance=1)
 
     def graph_model_metric(models, means, stdevs, metric, output, output_location):
-        plt.figure(figsize=(20, 20))
+        plt.figure(figsize=(20, 10))
+        plt.rcParams.update({'axes.titlesize': 22})
+        # bold the title
+        # bold the x and y labels
+        plt.rcParams.update({'axes.labelweight': 'bold'})
+        plt.rcParams.update({'axes.titleweight': 'bold'})
+        # increase size of title
         plt.title(f'{output} - {metric}')
+        # make sure y label is not cut off
         plt.barh(models, means, xerr=stdevs)
         # increase size of xerr bar
         plt.errorbar(means, models, xerr=stdevs, fmt='o',
-                     ecolor='black', elinewidth=2, capsize=4)
+                     ecolor = 'black', elinewidth = 2, capsize = 4)
         plt.xlabel(metric)
         plt.ylabel('Model')
-        # make ticks for every 0.1
-        plt.xticks([i/10 for i in range(0, 11)])
         # text labels
         for index, value in enumerate(means):
-            plt.text(value, index + 0.2, str(round(value, 5)))
+            # check if positive or negative
+            # increase the text size
+            plt.text(value, index + 0.2, str(round(value, 5)), fontsize=14)
         plt.grid()
         plt.savefig(os.path.join(
             output_location, 'rankings', output, f'{output}_{metric}.png'))
         plt.clf()
 
-    # Generate graphs
-    if args.ranking:
-        generate_rank_graphs(df, output_location, progress, main_task)
-    if args.distribution:
-        generate_distribution_graphs(df)
+generate_rank_graphs(df, output_location, progress, main_task)

@@ -5,7 +5,17 @@
   },
   "experiment": {
     "metrics": [
-      "shscore"
+      "shscore",
+      "accuracy",
+      "logloss",
+      "f1",
+      "precision",
+      "recall",
+      "roc_auc",
+      "jaccard",
+      "predict_time",
+      "train_time",
+      "balanced_accuracy"
     ],
     "outputs": [
       "HeartDiseaseorAttack"
@@ -38,9 +48,9 @@
       "Education"
     ],
     "models": "all",
-    "trials": 1,
-    "tuning_iterations": 2,
-    "null_character": "NA"
+    "trials": 5,
+    "tuning_iterations": 32,
+    "sample_size": 600
   },
   "outputs": {}
 }

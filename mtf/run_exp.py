@@ -6,19 +6,12 @@ import argparse
 import shutil
 import pandas as pd
 from src.utils import print_header
+import threading
 
 
 print_header()
 
 client = docker.from_env()
-
-# delete previous containers that match mtf image
-# get all containers including stopped
-for container in client.containers.list(all=True):
-    for tag in container.image.tags:
-        if 'mtf' in tag:
-            print("Removing container: ", container.name)
-            container.remove(force=True)
 
 # parse arguments
 parser = argparse.ArgumentParser()
@@ -106,7 +99,6 @@ print(trial_containers)
 for container in trial_containers:
     for line in container.logs(stream=True):
         print(line.decode('utf-8'), end='')
-
 
 # copy results
 for index, container in enumerate(trial_containers):
