@@ -116,7 +116,7 @@ const Page = ({ params }) => {
             <div>
               <p className="text-2xl">
                 Prediction:{' '}
-                {predictionResults.prediction === 1
+                {predictionResults.prediction === '1'
                   ? 'Positive'
                   : 'Negative'}
               </p>
@@ -130,7 +130,7 @@ const Page = ({ params }) => {
               </p>
               <div className="pb-5">
                 {
-                  predictionResults.prediction === 1
+                  predictionResults.prediction === '1'
                     ? (
                       <progress className="progress progress-warning" value={predictionResults.probability * 100} max="100" />
                     ) : (
