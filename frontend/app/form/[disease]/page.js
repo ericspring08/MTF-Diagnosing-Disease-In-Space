@@ -130,7 +130,7 @@ const Page = ({ params }) => {
               </p>
               <div className="pb-5">
                 {
-                  predictionResults.prediction === 1
+                  predictionResults.prediction === 0
                     ? (
                       <progress className="progress progress-warning" value={predictionResults.probability * 100} max="100" />
                     ) : (
