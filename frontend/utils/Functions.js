@@ -67,7 +67,7 @@ export const createPDF = (
 
   doc.setFontSize(16);
   doc.setTextColor(0);
-  doc.text(`Diagnosis: ${diagnosis === '0' ? 'Negative' : 'Positive'}`, 20, 45);
+  doc.text(`Diagnosis: ${diagnosis === 0 ? 'Negative' : 'Positive'}`, 20, 45);
   doc.text(
     `Diagnosis Confidence: ${(diagnosis_confidence * 100).toFixed(2)}%`,
     20,
@@ -85,9 +85,8 @@ export const createPDF = (
   }
 
   const currentDate = new Date();
-  const date = `${currentDate.getFullYear()}-${
-    currentDate.getMonth() + 1
-  }-${currentDate.getDate()}`;
+  const date = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1
+    }-${currentDate.getDate()}`;
   doc.setTextColor(100);
   doc.setFontSize(10);
   doc.text(`Generated on: ${date}`, 20, 280);
