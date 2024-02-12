@@ -36,9 +36,20 @@ class ModelResults:
             os.makedirs(os.path.dirname(path))
         df.to_csv(path, header=['model', 'output',
                   'metric', 'value'], index=False)
+        print(self.results)
 
     def save_model(self, model, path):
         # Create if don't exist
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
         pickle.dump(model, open(path, "wb"))
+        print('Model saved to', path)
+
+    def save_perf_curve(self, perf, path):
+        # save array to csv
+        # Create if don't exist
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+        pd.DataFrame(perf, columns=['shscore']).to_csv(
+            path, header=True, index=False)
+        print('Performance curve saved to', path)
