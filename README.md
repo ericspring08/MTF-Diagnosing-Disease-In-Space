@@ -6,6 +6,7 @@ Advisor: Stewart Mayer
 
 ## Abstract
 
+
 MTF (Model Testing Framework) evaluates machine learning algorithms based on factors specifically tailored to diagnosing disease in microgravity. We created multiple literature reviews, a new score for machine learning models that considers medical factors, and a user-friendly website to support the implementation of this framework.
 
 ## Tackling Disease Diagnosis in Space
@@ -18,13 +19,21 @@ Diseases to focus on for research and analysis were chosen based on likely frequ
 - Thyroid Disease 
 - Liver Disease 
 
-Root causes of these diseases are likely to differ in microgravity environments versus on earth, but symptomatically they will present similarly, and treatment usually correlates as well. 
+All of these are pertinent disorders and malfunctions that affect astronauts on the ISS, but not always in the most intuitive fashion. For example, our datasets were often based on disorders that would not in any way be applicable to astronauts at first glance. Our patient set was not the picture of health like astronauts are required to be, and the disorders occasionally had to do with substances not even present on the ISS, like alcohol and fatty foods. After researching data analytics in relation to space health, however, we uncovered some interesting parallels to be drawn here:
+
+- One disease we chose was CAD, using a database verified by UC Berkeley's Biomedical branch, Coronary artery disease symptomatically and treatment-wise presents very similarly to a variety of heart malfunctions present in space, such as anatomical ovular reformation due to gravitational changes or loss of blood volume and atrophy of transport vessels 
+This means we can look at datasets of individuals suffering from these illnesses on earth and draw conclusions about astronauts in space 
+- Another example would be the slinky effect, were astronauts have poor pulmonary ventilation due to microgravity-induced compression of lung tissue, these changes are similar physiologically to pulmonary disorders on earth like early stage-lung cancer and COPD
+
 
 The datasets were chosen to reflect a variety of racial, sexual, and other physical demographics. 
 
 ## Research
 
 More than 50 papers and reputable articles were read and considered before, during, and after the design process. Of those works, the most thorough and overarching papers were assimilated into multiple literature reviews or used to design preliminary symptom formalizations. 
+
+Link to Review:
+https://1drv.ms/x/s!AuAo3fIYJbLehAbY97Ew8uRGxJ_V?e=Gl6TZ3
 
 ## Experimentation
 
