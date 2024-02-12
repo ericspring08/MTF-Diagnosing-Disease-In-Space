@@ -88,7 +88,7 @@ const Page = ({ params }) => {
 
   return (
     <div
-      className="h-screen w-screen flex flex-col justify-center items-center"
+      className="w-screen min-h-screen flex flex-col justify-center items-center"
       data-theme="corporate"
     >
       <Link href="/" className="absolute h-14 w-30 top-5 start-5">
