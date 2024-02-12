@@ -71,7 +71,7 @@ ldd_types = {
     "ABG-pH Level": str,
     "Scan": str,
     "Asthama": str,
-    "Other diseaes": str,
+    "Other diseases": str,
     "AGE": int
 }
 tdd_types = {
@@ -239,7 +239,7 @@ form_ldd = {
                 'No': 'F'
             }
         },
-        'Other diseaes': {
+        'Other diseases': {
             'title': 'Currently Have Other Diseases?',
             'type': 'categorical',
             'options': {
