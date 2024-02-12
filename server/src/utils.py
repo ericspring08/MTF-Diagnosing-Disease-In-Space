@@ -7,9 +7,9 @@ kdd_categorical_features = ["su", "rbc", "pc", "pcc",
 kdd_numerical_features = ["age", "bp", "sg", "al", "bgr",
                           "bu", "sc", "sod", "pot", "hemo", "pcv", "wc", "rc"]
 ldd_features = ["smoke", "FVC", "FEC1", "PEFR", "O2", "ABG-P-O2",
-                "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseases", "AGE"]
+                "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseaes", "AGE"]
 ldd_categorical_features = ["smoke", "PEFR", "O2", "ABG-P-O2",
-                            "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseases"]
+                            "ABG-P-CO2", "ABG-pH Level", "Scan", "Asthama", "Other diseaes"]
 ldd_numerical_features = ["FVC", "FEC1", "AGE"]
 hdd_categorical_features = ["sex", "cp", "fbs",
                             "restecg", "exang", "slope", "ca", "thal"]
@@ -71,7 +71,7 @@ ldd_types = {
     "ABG-pH Level": str,
     "Scan": str,
     "Asthama": str,
-    "Other diseases": str,
+    "Other diseaes": str,
     "AGE": int
 }
 tdd_types = {
@@ -239,7 +239,7 @@ form_ldd = {
                 'No': 'F'
             }
         },
-        'Other diseases': {
+        'Other diseaes': {
             'title': 'Currently Have Other Diseases?',
             'type': 'categorical',
             'options': {
