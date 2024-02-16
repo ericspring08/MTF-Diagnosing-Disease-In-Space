@@ -6,7 +6,6 @@ import argparse
 import shutil
 import pandas as pd
 from src.utils import print_header
-import threading
 
 
 print_header()

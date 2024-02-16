@@ -91,20 +91,22 @@ def fprime(y_test, y_pred):
     recall = recall_score(y_test, y_pred, average='macro')
     specificity = recall_score(y_test, y_pred, average='macro', pos_label=0)
 
-    precision_coeff = 0.25
-    recall_coeff = 0.5
-    specificity_coeff = 0.25
+    precision_coeff = 0.3
+    recall_coeff = 0.4
+    specificity_coeff = 0.3
 
     # harmonic mean with all variables and coefficients
     score = 1 / (precision_coeff / precision + recall_coeff /
                  recall + specificity_coeff / specificity)
 
+    print(f"Fprime: {score}")
+
     return score
 
 
 def aoc(y_pred, y_prob, y_test):
-    wfn = 0.75
-    wfp = 0.25
+    wfn = 1
+    wfp = 1
 
     epsilon = 1e-15
 
@@ -122,9 +124,14 @@ def aoc(y_pred, y_prob, y_test):
             row_score = wfp * \
                 (y_test[i] * np.log(predicted_probability))
 
+        if row_score < - 1:
+            row_score = -1
+
         logloss += row_score
 
     logloss = (-1/len(y_pred)) * logloss
+
+    print(f"AOC: {logloss}")
 
     return logloss
 

@@ -1,21 +1,11 @@
 {
   "location": {
     "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/data/HDI.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/hdi_results/"
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/nosave_hdi_results/"
   },
   "experiment": {
     "metrics": [
-      "shscore",
-      "accuracy",
-      "logloss",
-      "f1",
-      "precision",
-      "recall",
-      "roc_auc",
-      "jaccard",
-      "predict_time",
-      "train_time",
-      "balanced_accuracy"
+      "shscore"
     ],
     "outputs": [
       "HeartDiseaseorAttack"
@@ -47,10 +37,13 @@
       "Sex",
       "Education"
     ],
-    "models": "all",
-    "trials": 5,
-    "tuning_iterations": 32,
-    "sample_size": 600
+    "models": [
+      "RandomForest"
+    ],
+    "trials": 1,
+    "tuning_iterations": 1,
+    "sample_size": 100,
+    "optimization_metric": "shscore"
   },
   "outputs": {}
 }

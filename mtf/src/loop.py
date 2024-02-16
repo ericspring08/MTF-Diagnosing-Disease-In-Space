@@ -37,6 +37,7 @@ class MTF(object):
         self.config_path = config_path
         self.dataset_path = dataset
         self.sample_size = 1000
+        self.optimization_metric = None
 
     def read_config(self):
         try:
@@ -53,6 +54,7 @@ class MTF(object):
             # Options
             self.tuning_iterations = config["experiment"]["tuning_iterations"]
             self.sample_size = config["experiment"]["sample_size"]
+            self.optimization_metric = config["experiment"]["optimization_metric"]
 
             self.config = config
 
@@ -78,6 +80,7 @@ class MTF(object):
             print("Numerical Features: ", self.numerical_features)
             print("Tuning Iterations: ", self.tuning_iterations)
             print("Sample Size: ", self.sample_size)
+            print("Optimization Metric: ", self.optimization_metric)
             print("Results Path: ", self.results_path)
             print("Config Path: ", self.config_path)
             print("Dataset Path: ", self.dataset_path)
@@ -89,6 +92,12 @@ class MTF(object):
 
     def load_data(self):
         self.dataset = pd.read_csv(self.dataset_path)
+
+    def set_optimization_metric(self, metric):
+        if metric == "shscore":
+            self.optimization_metric = shscorewrapper
+        else:
+            self.optimization_metric = metric
 
     def preprocess(self):
         print("Extract Outputs")
@@ -201,6 +210,7 @@ class MTF(object):
                         cv=[(np.arange(len(self.x_train)),
                              np.arange(len(self.x_test)))],
                         n_iter=self.tuning_iterations,
+                        return_train_score=True
                     )
 
                     # Fit
@@ -232,10 +242,16 @@ class MTF(object):
                     self.models_results.save_model(
                         opt.best_estimator_, os.path.join('results', "models", f"{output}", f"{model_name}_{output}.pkl"))
 
-                    # Save perf_curve
-                    print(f"Saving perf_curve for {model_name} {output}")
-                    self.models_results.save_perf_curve(
-                        self.perf_curve, os.path.join('results', "perf_curve", f"{output}", f"{model_name}_{output}.csv"))
+                    # Save cv_results_
+                    # convert to dataframe
+                    cv_results = pd.DataFrame(opt.cv_results_)
+                    # save to csv
+                    # create cv_results folder if it doesn't exist
+                    # if not os.path.exists(os.path.join('results', "cv_results")):
+                    #     os.makedirs(os.path.join('results', "cv_results"))
+                    # cv_results.to_csv(
+                    #     os.path.join('results', "cv_results", f"{output}", f"{model_name}_{output}_cv_results.csv"))
+
                     # print performance
                     for metric, value in performance.items():
                         print_tags(
