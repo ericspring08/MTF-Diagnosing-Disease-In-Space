@@ -29,6 +29,7 @@ class Prediction(object):
             preprocessor = load(preprocessor_file)
         # Convert the data into dataframe
         df = pd.DataFrame([self.data], columns=headers)
+        print(df)
         # Convert the categorical features into one-hot encoding
         df = preprocessor.transform(df)
         self.data = df
