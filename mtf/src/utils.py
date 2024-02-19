@@ -141,7 +141,6 @@ def shscore(y_pred, y_prob, y_test):
 
 
 def shscorewrapper(estimator, X, Y):
-
     y_pred = estimator.predict(X)
     y_prob = estimator.predict_proba(X)
 
