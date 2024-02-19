@@ -13,7 +13,8 @@ class Prediction(object):
         # Preprocess the data
         # encode in types
         for key in self.data.keys():
-            self.data[key] = format_dict[self.disease]['type'][key](self.data[key])
+            self.data[key] = format_dict[self.disease]['type'][key](
+                self.data[key])
         headers = format_dict[self.disease]['features']
         categorical = format_dict[self.disease]['categorical']
         numerical = format_dict[self.disease]['numerical']
@@ -27,6 +28,10 @@ class Prediction(object):
         df = preprocessor.transform(df)
         self.data = df
 
+        # print the data with type and headers
+        for key in self.data.keys():
+            print(key, type(self.data[key]))
+
     def predict(self):
         # Load the model
         model_file = format_dict[self.disease]['model']
@@ -35,4 +40,6 @@ class Prediction(object):
         # Predict the data
         prediction = model.predict(self.data)
         probability = model.predict_proba(self.data)
+        print("Prediction: ", prediction)
+        print("Probability: ", probability)
         return prediction, probability
