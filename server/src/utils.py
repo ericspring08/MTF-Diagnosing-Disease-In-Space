@@ -553,8 +553,8 @@ format_dict = {
     'hdd': {
         'features': hdd_features,
         'target': 'target',
-        'model': './src/models/hdd_model.pkl',
-        'standard_scaler': './src/preprocessor/hdd_preprocessor.pkl',
+        'model': './src/models/hdd_model_accuracy.pkl',
+        'standard_scaler': './src/preprocessor/hdd_preprocessor_accuracy.pkl',
         'categorical': hdd_categorical_features,
         'numerical': hdd_numerical_features,
         'type': hdd_types,
