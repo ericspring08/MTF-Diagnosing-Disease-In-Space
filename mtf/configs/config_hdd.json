@@ -1,7 +1,7 @@
 {
   "location": {
     "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/data/hdd.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/hdd_results_shscore_update/"
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/hdd_results_accuracy_update/"
   },
   "experiment": {
     "metrics": [
@@ -38,9 +38,9 @@
     ],
     "models": "all",
     "trials": 1,
-    "tuning_iterations": 24,
+    "tuning_iterations": 15,
     "sample_size": 500,
-    "optimization_metric": "shscore"
+    "optimization_metric": "accuracy_score"
   },
   "outputs": {}
 }
