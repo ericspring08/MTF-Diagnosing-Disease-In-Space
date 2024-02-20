@@ -216,8 +216,7 @@ class MTF(object):
                         model_params[model_name],
                         scoring=shscorewrapper,
                         # train test split iterator
-                        cv=[(np.arange(len(self.x_train)),
-                             np.arange(len(self.x_test)))],
+                        cv=3,
                         n_iter=self.tuning_iterations,
                         return_train_score=True
                     )
