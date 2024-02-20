@@ -15,22 +15,24 @@ class Prediction(object):
         for key in self.data.keys():
             self.data[key] = format_dict[self.disease]['type'][key](
                 self.data[key])
+
         headers = format_dict[self.disease]['features']
         categorical = format_dict[self.disease]['categorical']
         numerical = format_dict[self.disease]['numerical']
         preprocessor_file = format_dict[self.disease]['standard_scaler']
+
+        # print info
+        for key in self.data.keys():
+            print(key, type(self.data[key]), self.data[key])
         # Load the preprocessor
         with open(preprocessor_file, 'rb') as preprocessor_file:
             preprocessor = load(preprocessor_file)
         # Convert the data into dataframe
         df = pd.DataFrame([self.data], columns=headers)
+        print(df)
         # Convert the categorical features into one-hot encoding
         df = preprocessor.transform(df)
         self.data = df
-
-        # print the data with type and headers
-        for key in self.data.keys():
-            print(key, type(self.data[key]))
 
     def predict(self):
         # Load the model
