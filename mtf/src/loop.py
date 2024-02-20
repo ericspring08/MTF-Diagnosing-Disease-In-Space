@@ -11,7 +11,7 @@ from utils import get_metric, print_tags, shscorewrapper
 
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler, RobustScaler
 
 from skopt import BayesSearchCV
 import pickle
@@ -38,6 +38,7 @@ class MTF(object):
         self.dataset_path = dataset
         self.sample_size = 1000
         self.optimization_metric = None
+        self.scaler = None
 
     def read_config(self):
         try:
@@ -55,6 +56,7 @@ class MTF(object):
             self.tuning_iterations = config["experiment"]["tuning_iterations"]
             self.sample_size = config["experiment"]["sample_size"]
             self.optimization_metric = config["experiment"]["optimization_metric"]
+            self.scaler = config["experiment"]["scaler"]
 
             self.config = config
 
@@ -121,6 +123,13 @@ class MTF(object):
 
         print("Preprocessing Data")
 
+        if self.scaler == "StandardScaler":
+            scaler = StandardScaler()
+        elif self.scaler == "MinMaxScaler":
+            scaler = MinMaxScaler()
+        elif self.scaler == "RobustScaler":
+            scaler = RobustScaler()
+
         # Normalize Inputs
         preprocessor = ColumnTransformer(
             transformers=[('ohe',
@@ -128,7 +137,7 @@ class MTF(object):
                                          sparse_output=False),
                            self.categorical_features),
                           ('scaler',
-                           StandardScaler(),
+                           scaler,
                            self.numerical_features)],
             remainder='passthrough',
             verbose_feature_names_out=False).set_output(transform='pandas')

@@ -40,7 +40,8 @@
     "trials": 1,
     "tuning_iterations": 15,
     "sample_size": 500,
-    "optimization_metric": "accuracy_score"
+    "optimization_metric": "accuracy_score",
+    "scaler": "MinMaxScaler"
   },
   "outputs": {}
 }
