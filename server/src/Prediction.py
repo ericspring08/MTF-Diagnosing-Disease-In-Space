@@ -32,6 +32,7 @@ class Prediction(object):
         print(df)
         # Convert the categorical features into one-hot encoding
         df = preprocessor.transform(df)
+        print(df)
         self.data = df
 
     def predict(self):
