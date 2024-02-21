@@ -1,7 +1,7 @@
 {
   "location": {
     "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/data/hdd.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/hdd_results_accuracy_update/"
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/hdd_results_accuracy_robustscaler_update/"
   },
   "experiment": {
     "metrics": [
@@ -38,10 +38,10 @@
     ],
     "models": "all",
     "trials": 1,
-    "tuning_iterations": 15,
-    "sample_size": 500,
+    "tuning_iterations": 10,
+    "sample_size": 800,
     "optimization_metric": "accuracy_score",
-    "scaler": "MinMaxScaler"
+    "scaler": "RobustScaler"
   },
   "outputs": {}
 }
