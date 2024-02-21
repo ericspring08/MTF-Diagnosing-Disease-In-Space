@@ -139,6 +139,9 @@ for index, container in enumerate(trial_containers):
 # save aggregate results
 agg_results.to_csv(f'{results_path}/aggregate/results_raw.csv', index=False)
 
+# copy config file to results
+shutil.copy(config_path, f'{results_path}/config.json')
+
 # delete containers
 for container in trial_containers:
     container.remove(force=True)
