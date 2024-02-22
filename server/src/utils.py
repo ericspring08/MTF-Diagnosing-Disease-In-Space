@@ -522,9 +522,9 @@ form_hdd = {
             'title': 'Slope of the Peak Exercise ST Segment',
             'type': 'categorical',
             'options': {
-                'Upsloping': '0',
+                'Upsloping': '2',
                 'Flat': '1',
-                'Downsloping': '2'
+                'Downsloping': '0'
             }
         },
         'ca': {
@@ -541,9 +541,9 @@ form_hdd = {
             'title': 'Thallium myocardial perfusion scan results',
             'type': 'categorical',
             'options': {
-                'Normal': '0',
-                'Fixed Defect': '1',
-                'Reversable Defect': '2'
+                'Normal': '1',
+                'Fixed Defect': '2',
+                'Reversable Defect': '3'
             }
         },
     },
