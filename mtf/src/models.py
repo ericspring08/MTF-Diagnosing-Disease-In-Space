@@ -6,7 +6,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis, LinearDiscriminantAnalysis
 from catboost import CatBoostClassifier
-from sklearn.linear_model import RidgeClassifier, PassiveAggressiveClassifier, SGDOneClassSVM, SGDClassifier
+from sklearn.linear_model import RidgeClassifier, SGDClassifier
 from sklearn.dummy import DummyClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
@@ -77,7 +77,12 @@ model_params = {
         'alpha': [0.1, 1, 10, 100]
     },
     'SGD': {
-        'alpha': [0.1, 1, 10, 100]
+        'alpha': [0.1, 1, 10, 100],
+        'loss': ['hinge', 'log', 'modified_huber', 'squared_hinge'],
+        'penalty': ['l2', 'l1', 'elasticnet'],
+        'learning_rate': ['constant', 'optimal', 'invscaling', 'adaptive'],
+        'eta0': [0.01, 0.1, 1.0],
+        'power_t': [0.5, 1.0],
     },
     'Dummy': {
         'strategy': ['uniform', 'most_frequent', 'stratified']
@@ -169,7 +174,11 @@ model_params = {
         'max_depth': [3, 5, 7, 9],
         'min_samples_split': [2, 3, 4, 5],
         'min_samples_leaf': [1, 2, 3, 4, 5]
-    }
+    },
+    'QDA': {
+        'reg_param': [0.0, 0.1, 0.5, 1.0],
+        'tol': [1e-07, 1e-06, 1e-05],
+    },
 }
 
 model_options = {
@@ -193,4 +202,5 @@ model_options = {
     'XGB_DART': XGBClassifier(verbosity=0, booster='dart'),
     'XGB_GBLINEAR': XGBClassifier(verbosity=0, booster='gblinear'),
     'ExtraTree': ExtraTreeClassifier(),
+    'QDA': QuadraticDiscriminantAnalysis(),
 }

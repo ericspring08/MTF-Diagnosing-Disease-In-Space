@@ -114,7 +114,7 @@ with Progress(
         plt.barh(models, means, xerr=stdevs)
         # increase size of xerr bar
         plt.errorbar(means, models, xerr=stdevs, fmt='o',
-                     ecolor = 'black', elinewidth = 2, capsize = 4)
+                     ecolor='black', elinewidth=2, capsize=4)
         plt.xlabel(metric)
         plt.ylabel('Model')
         # text labels

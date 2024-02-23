@@ -218,7 +218,8 @@ class MTF(object):
                         # train test split iterator
                         cv=3,
                         n_iter=self.tuning_iterations,
-                        return_train_score=True
+                        return_train_score=True,
+                        error_score=0,
                     )
 
                     # Fit
@@ -282,7 +283,7 @@ class MTF(object):
     def logging_callback_fit(self, res, model_name, output):
         # append latest results to self.perf_curve
         self.perf_curve.append(res.func_vals[-1])
-        print_tags((f"Iteration {len(res.func_vals)+1}",
+        print_tags((f"Iteration {len(res.func_vals)}",
                     f"{model_name}", f"{output}"), f"{res.x_iters[-1]} -> {res.func_vals}")
 
     def run(self):
