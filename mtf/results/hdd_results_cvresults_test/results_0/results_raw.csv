@@ -1,0 +1,12 @@
+model,output,metric,value
+AdaBoost,target,accuracy,0.7
+AdaBoost,target,precision,0.75
+AdaBoost,target,recall,0.75
+AdaBoost,target,f1,0.75
+AdaBoost,target,train_time,3253471960.0
+AdaBoost,target,predict_time,3707333.0
+AdaBoost,target,logloss,0.4946126139695486
+AdaBoost,target,shscore,0.19955214581429864
+AdaBoost,target,roc_auc,0.6875
+AdaBoost,target,balanced_accuracy,0.6875
+AdaBoost,target,jaccard,0.6

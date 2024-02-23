@@ -255,10 +255,14 @@ class MTF(object):
                     cv_results = pd.DataFrame(opt.cv_results_)
                     # save to csv
                     # create cv_results folder if it doesn't exist
-                    # if not os.path.exists(os.path.join('results', "cv_results")):
-                    #     os.makedirs(os.path.join('results', "cv_results"))
-                    # cv_results.to_csv(
-                    #     os.path.join('results', "cv_results", f"{output}", f"{model_name}_{output}_cv_results.csv"))
+                    if not os.path.exists(os.path.join('results', "cv_results")):
+                        os.makedirs(os.path.join('results', "cv_results"))
+
+                    if not os.path.exists(os.path.join('results', "cv_results", f"{output}")):
+                        os.makedirs(os.path.join(
+                            'results', "cv_results", f"{output}"))
+                    cv_results.to_csv(
+                        os.path.join('results', "cv_results", f"{output}", f"{model_name}_{output}_cv_results.csv"))
 
                     # print performance
                     for metric, value in performance.items():
