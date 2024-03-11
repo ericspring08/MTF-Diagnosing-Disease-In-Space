@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import axios from 'axios';
+import Navbar from '../utils/Navbar';
 
 const HomePage = () => {
   const [diseases, setDiseases] = React.useState(null);
@@ -53,23 +54,26 @@ const HomePage = () => {
   };
 
   return (
-    <div
-      className="h-screen w-screen flex flex-col items-center"
-      data-theme="corporate"
-    >
-      <h1
-        className="text-5xl text-center font-bold mt-10 mb-5"
+    <div>
+      <Navbar />
+      <div
+        className="h-screen w-screen flex flex-col items-center"
         data-theme="corporate"
       >
-        Welcome to the Disease Diagnosis System
-      </h1>
-      <h2
-        className="text-3xl text-center mt-5 mb-10"
-        data-theme="corporate"
-      >
-        Select a disease to diagnose
-      </h2>
-      <DiseaseCards />
+        <h1
+          className="text-5xl text-center font-bold mt-10 mb-5"
+          data-theme="corporate"
+        >
+          Welcome to the Disease Diagnosis System
+        </h1>
+        <h2
+          className="text-3xl text-center mt-5 mb-10"
+          data-theme="corporate"
+        >
+          Select a disease to diagnose
+        </h2>
+        <DiseaseCards />
+      </div>
     </div>
   );
 };
