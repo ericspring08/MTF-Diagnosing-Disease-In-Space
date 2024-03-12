@@ -1,5 +1,4 @@
 'use client'
-import { firestore } from '../../utils/firebase'
 
 const MyData = () => {
   return (
@@ -8,3 +7,5 @@ const MyData = () => {
     </div>
   )
 }
+
+export default MyData
