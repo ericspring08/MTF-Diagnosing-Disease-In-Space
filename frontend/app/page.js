@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import axios from 'axios';
-import Navbar from '../utils/Navbar';
 
 const HomePage = () => {
   const [diseases, setDiseases] = React.useState(null);
@@ -55,7 +54,6 @@ const HomePage = () => {
 
   return (
     <div>
-      <Navbar />
       <div
         className="h-screen w-screen flex flex-col items-center"
         data-theme="corporate"

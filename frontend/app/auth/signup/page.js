@@ -9,7 +9,6 @@ import { auth } from '../../../utils/firebase';
 import { useRouter } from 'next/navigation';
 import GoogleButton from 'react-google-button'
 import Link from 'next/link';
-import Navbar from "../../../utils/Navbar"
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -62,7 +61,6 @@ const SignUp = () => {
 
   return (
     <div data-theme="corperate">
-      <Navbar />
       <div className="h-screen w-screen flex flex-col justify-center items-center">
         <div className="card shadow-xl xl:w-1/3 lg:w-1/2 md:w-1/2 sm:w-2/3 p-10 flex flex-col justify-center items-center">
           <h1 className="text-3xl py-5">Sign Up</h1>
