@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import {
   createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup
 } from "firebase/auth";
+import { firestore } from '../../../utils/firebase';
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth } from '../../../utils/firebase';
 import { useRouter } from 'next/navigation';
 import GoogleButton from 'react-google-button'
@@ -26,6 +28,7 @@ const SignUp = () => {
     console.log(email, password)
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
+        createUserData(userCredential.user);
         router.push('/')
       })
   }
@@ -37,6 +40,7 @@ const SignUp = () => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
         const user = result.user;
+        createUserData(user);
         router.push('/')
       }).catch((error) => {
         const errorCode = error.code;
@@ -45,6 +49,15 @@ const SignUp = () => {
         const credential = GoogleAuthProvider.credentialFromError(error);
       });
 
+  }
+
+  const createUserData = (user) => {
+    const userRef = doc(firestore, "users", user.uid);
+    setDoc(userRef, {
+      email: user.email,
+      uid: user.uid,
+      accountCreationDate: serverTimestamp()
+    });
   }
 
   return (

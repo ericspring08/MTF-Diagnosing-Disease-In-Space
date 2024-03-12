@@ -29,6 +29,9 @@ const Navbar = () => {
             <Link href="/" className="btn btn-ghost text-xl">Smart Diagnosis</Link>
           </div>
           <div className="flex-none">
+            <Link href="mydata" className="btn btn-ghost mr-1">
+              My Data
+            </Link>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                 <svg className="w-10 h-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
