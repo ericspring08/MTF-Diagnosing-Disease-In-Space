@@ -5,6 +5,9 @@ import axios from 'axios';
 import Link from 'next/link';
 import { createPDF } from '../../../utils/Functions';
 import Form from './form';
+import { auth, firestore } from '../../../utils/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 const Page = ({ params }) => {
   const [formIndex, setFormIndex] = React.useState(0);
@@ -34,8 +37,25 @@ const Page = ({ params }) => {
     }
   }, [formData, formIndex, formStructure, formHeaders]);
 
+  const uploadResults = async (formData, results) => {
+    try {
+      const user = auth.currentUser;
+      // add new doc to /users/{userId}/results collection
+      const collectionRef = await collection(firestore, "users", user.uid, "results");
+      const docData = {
+        disease: params.disease,
+        formData: formData,
+        prediction: results,
+        timestamp: serverTimestamp(),
+      };
+
+      await addDoc(collectionRef, docData);
+    } catch (error) {
+      console.error('Error uploading results:', error);
+    }
+  };
+
   const handleSubmit = async () => {
-    console.log(formData);
     try {
       setSubmitted(true);
       const res = await axios.post(
@@ -43,6 +63,12 @@ const Page = ({ params }) => {
         formData,
       );
       const { prediction, probability } = res.data;
+      // upload results to firestore if logged in
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          uploadResults(formData, { prediction, probability });
+        }
+      });
       setPredictionResults({ prediction, probability });
     } catch (error) {
       console.error('Error fetching prediction:', error);
@@ -148,7 +174,6 @@ const Page = ({ params }) => {
                 <button
                   className="btn btn-success ml-5"
                   onClick={() => {
-                    // TODO: Save the report as a PDF
                     createPDF(
                       'Cardiovascular Page',
                       formData,
@@ -187,9 +212,7 @@ const Page = ({ params }) => {
               onClick={() => {
                 if (formIndex > 0) {
                   setFormIndex(formIndex - 1);
-                  console.log(formData);
                 }
-                console.log(formData);
               }}
               className="btn btn-warning mt-5 mb-5"
               disabled={formIndex === 0}
@@ -234,7 +257,6 @@ const Page = ({ params }) => {
               <button
                 onClick={() => {
                   setFormIndex(formIndex + 1);
-                  console.log(formData);
                 }}
                 className="btn btn-info mt-5 mb-5"
                 disabled={disableNext}
