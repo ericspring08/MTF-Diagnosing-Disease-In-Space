@@ -40,6 +40,9 @@ const Navbar = () => {
                   <div className="text-xl">{user.email}</div>
                 </li>
                 <li>
+                  <div>Profile</div>
+                </li>
+                <li className="flex flex-row">
                   <Link href="/settings">Settings</Link>
                 </li>
                 <li><div onClick={() => { signOut(auth) }}>Logout</div></li>
