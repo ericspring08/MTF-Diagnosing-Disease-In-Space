@@ -8,12 +8,10 @@ import Link from 'next/link';
 const Navbar = () => {
 
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [email, setEmail] = useState('');
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        setEmail(user.email)
         setIsSignedIn(true)
       } else {
         setIsSignedIn(false)
@@ -37,13 +35,9 @@ const Navbar = () => {
               </div>
               <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                 <li>
-                  <div className="text-xl">{email}</div>
-                </li>
-                <li>
                   <div>Profile</div>
                 </li>
                 <li><div>Settings</div></li>
-
                 <li><div onClick={() => { signOut(auth) }}>Logout</div></li>
               </ul>
             </div>
