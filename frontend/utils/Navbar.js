@@ -56,11 +56,11 @@ const Navbar = () => {
           <div className="flex-1">
             <Link href="/" className="btn btn-ghost text-xl">Smart Diagnosis</Link>
           </div>
-          <div className="flex-none pr-2">
-            <Link href="/auth/signup" className="btn btn-ghost text-lg">Sign Up</Link>
+          <div className="flex-none mr-1">
+            <Link href="/auth/signup" className="btn btn-ghost">Sign Up</Link>
           </div>
           <div className="flex-none">
-            <Link href="/auth/signin" className="btn btn-primary text-white text-lg">Sign In</Link>
+            <Link href="/auth/signin" className="btn btn-primary text-white">Sign In</Link>
           </div>
         </div>
       </div>
