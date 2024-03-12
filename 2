@@ -15,8 +15,8 @@ const MyData = () => {
         const collectionRef = collection(firestore, "users", user.uid, "results");
         await getDocs(collectionRef).then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            // add data to state array
-            setData(prev => [...prev, doc.data()])
+            // add data to state
+            setData([...data, doc.data()])
           });
         });
       } else {
@@ -28,20 +28,19 @@ const MyData = () => {
   }, [])
 
   return (
-    <div className="h-screen w-screen" data-theme="corperate">
+    <div>
       <h1>My Data</h1>
-      <div className="flex justify-center items-center">
-        {
-          data.map((item, index) =>
-            <div className="card shadow-xl w-1/2" key={index}>
-              <div>{item.disease}</div>
-              <div>{item.prediction.prediction}</div>
-              <div>{item.prediction.probability}</div>
+      {
+        data.map((item, index) => {
+          return (
+            <div key={index}>
+              <p>{item.name}</p>
+              <p>{item.email}</p>
+              <p>{item.age}</p>
+              )
+      }
             </div>
           )
         }
-      </div>
-    </div>
-  )
-}
+
 export default MyData
