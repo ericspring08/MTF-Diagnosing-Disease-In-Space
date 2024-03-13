@@ -23,18 +23,18 @@ const Navbar = () => {
 
   if (isSignedIn) {
     return (
-      <div data-theme="coperate">
-        <div className="navbar bg-base-100">
+      <div data-theme="corporate">
+        <div className="navbar bg-blue-600">
           <div className="flex-1">
-            <Link href="/" className="btn btn-ghost text-xl">Smart Diagnosis</Link>
+            <Link href="/" className="btn btn-ghost text-xl text-white">Smart Diagnosis</Link>
           </div>
           <div className="flex-none">
-            <Link href="mydata" className="btn btn-ghost mr-1">
+            <Link href="mydata" className="btn btn-ghost mr-1 text-white">
               My Data
             </Link>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                <svg className="w-10 h-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <svg className="w-10 h-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                 </svg>
               </div>
