@@ -29,7 +29,7 @@ const Navbar = () => {
             <Link href="/" className="btn btn-ghost text-xl text-white">Smart Diagnosis</Link>
           </div>
           <div className="flex-none">
-            <Link href="mydata" className="btn btn-ghost mr-1 text-white">
+            <Link href="/mydata" className="btn btn-ghost mr-1 text-white">
               My Data
             </Link>
             <div className="dropdown dropdown-end">

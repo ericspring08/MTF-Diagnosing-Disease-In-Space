@@ -17,6 +17,7 @@ const Page = ({ params }) => {
   const [disableNext, setDisableNext] = React.useState(true);
   const [submitted, setSubmitted] = React.useState(false);
   const [predictionResults, setPredictionResults] = React.useState(null);
+  const [formName, setFormName] = React.useState('');
 
   useEffect(() => {
     if (formHeaders.length > 0 && formHeaders[formIndex]) {
@@ -93,7 +94,7 @@ const Page = ({ params }) => {
         const response = await axios.get(
           `/api/get_features?disease=${params.disease}`,
         );
-        const { features, form } = response.data;
+        const { features, form, name } = response.data;
 
         // Initialize form data, structure, and headers
         const newFormData = {};
@@ -104,6 +105,7 @@ const Page = ({ params }) => {
         setFormData(newFormData);
         setFormHeaders(Object.keys(form));
         setFormStructure(form);
+        setFormName(name)
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -179,6 +181,7 @@ const Page = ({ params }) => {
         <span className="loading loading-dots loading-lg"></span>
       ) : (
         <div className="p-5 m-5 card card-bordered shadow-2xl mt-10">
+          <h1 className="text-6xl">{formName}</h1>
           <div className="mb-4">
             <p>
               Page {formIndex + 1} of {formHeaders.length}

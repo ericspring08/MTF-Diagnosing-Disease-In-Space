@@ -15,14 +15,21 @@ const MyData = () => {
       if (user) {
         const collectionRef = collection(firestore, "users", user.uid, "results");
         const q = query(collectionRef, orderBy("timestamp", "desc"), limit(5));
-        
+
         await getDocs(q).then((querySnapshot) => {
           const newData = [];
-          querySnapshot.forEach((doc) => {
-            newData.push(doc.data());
-          });
-          setData(newData);
-        });
+          // check if the querySnapshot is empty
+          if (querySnapshot.empty) {
+            console.log('No matching documents.');
+          } else {
+            querySnapshot.forEach((doc) => {
+              newData.push(doc.data());
+            })
+            setData(newData);
+          }
+        }).catch((error) => {
+          console.error("Error getting documents: ", error);
+        })
       } else {
         // User is signed out
         // ...
@@ -30,6 +37,19 @@ const MyData = () => {
       }
     });
   }, [])
+
+  if (data.length == 0) {
+    return (
+      <div className="h-screen w-screen" data-theme="corperate">
+        <h1 className="text-3xl font-bold mb-4">My Data</h1>
+        <div className="flex justify-center items-center">
+          <div className="card shadow-xl w-1/2">
+            <div className="font-bold">No data available</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="h-screen w-screen" data-theme="corperate">
