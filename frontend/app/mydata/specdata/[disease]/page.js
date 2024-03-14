@@ -57,17 +57,28 @@ const MyData = ({ params }) => {
 
   return (
     <div className="h-screen w-screen" data-theme="corperate">
-      <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
-      <div className="flex justify-center items-center">
-        {
-          data.map((item, index) =>
-            <div className="card shadow-xl w-1/2" key={index}>
-              <div className="font-bold">{item.disease}</div>
-              <div>{item.prediction.prediction}</div>
-              <div>{item.prediction.probability}</div>
-            </div>
-          )
-        }
+      <h1 className="text-3xl font-bold p-6">My Data for {params.disease}</h1>
+      <div className="overflow-x-auto w-screen">
+        <table className="table table-zebra">
+          <thead>
+            <tr>
+              <th>Prediction</th>
+              <th>Probability</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              data.map((item, index) =>
+                <tr>
+                  <td>{item.prediction.prediction}</td>
+                  <td>{item.prediction.probability}</td>
+                  <td>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
+                </tr>
+              )
+            }
+          </tbody>
+        </table>
       </div>
     </div>
   )
