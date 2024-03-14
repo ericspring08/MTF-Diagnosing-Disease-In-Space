@@ -551,6 +551,7 @@ form_hdd = {
 
 format_dict = {
     'hdd': {
+        'name': 'Heart Disease',
         'features': hdd_features,
         'target': 'target',
         'model': './src/models/hdd_model_accuracy.pkl',
@@ -561,6 +562,7 @@ format_dict = {
         'form': form_hdd,
     },
     'kdd': {
+        'name': 'Kidney Disease',
         'features': kdd_features,
         'target': 'target',
         'model': './src/models/kdd_model.pkl',
@@ -571,6 +573,7 @@ format_dict = {
         'form': form_kdd,
     },
     'ldd': {
+        'name': 'Lung Disease',
         'features': ldd_features,
         'target': 'target',
         'model': './src/models/ldd_model.pkl',
@@ -581,6 +584,7 @@ format_dict = {
         'form': form_ldd,
     },
     'tdd': {
+        'name': 'Thyroid Disease',
         'features': tdd_features,
         'target': 'target',
         'model': '',
