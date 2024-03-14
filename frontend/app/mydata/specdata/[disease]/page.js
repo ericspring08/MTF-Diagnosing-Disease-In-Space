@@ -7,6 +7,7 @@ import { auth, firestore } from '../../../../utils/firebase'
 
 const MyData = ({ params }) => {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter()
 
   useEffect(() => {
@@ -23,12 +24,36 @@ const MyData = ({ params }) => {
             newData.push(doc.data());
           });
           setData(newData);
+          setLoading(false);
         });
       } else {
         router.push('/auth/signin')
       }
     });
   }, []);
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen" data-theme="corperate">
+        <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
+        <div className="flex justify-center items-center h-full">
+          <span className="loading loading-lg loading-dots" />
+        </div>
+      </div >)
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="h-screen w-screen" data-theme="corperate">
+        <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
+        <div className="flex justify-center items-center">
+          <div className="card shadow-xl w-1/2">
+            <div className="font-bold">No data found</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="h-screen w-screen" data-theme="corperate">
