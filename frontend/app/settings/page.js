@@ -36,14 +36,14 @@ const Settings = () => {
 
   return (
     <div data-theme="corporate h-screen w-screen flex flex-col items-center">
-      <div className="flex flex-row justify-between items-center">
-        <div>
-          <h1 className="pl-10 font-bold text-4xl pt-10">Account Settings</h1>
-          <div className="ml-10 my-1 text-lg font-light">Change your account settings</div>
+      <div className="flex flex-row justify-between items-center px-10 pt-10 pb-5 flex-wrap">
+        <div className="flex flex-col">
+          <h1 className="font-bold text-4xl">Account Settings</h1>
+          <div className="text-lg font-light">Change your account settings</div>
         </div>
-        <div className="pr-10 font-bold text-3xl">{user.email}</div>
+        <div className="font-bold text-3xl pt-5">{user.email}</div>
       </div>
-      <div className="card shadow-xl m-10 p-5">
+      <div className="card shadow-xl mx-5 p-5">
         <div className="font-bold text-2xl pb-1">Delete My Account</div>
         <button className="btn btn-error w-64" onClick={deleteAccount}>Delete Account</button>
       </div>

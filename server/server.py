@@ -20,7 +20,8 @@ def get_features():
         'features': format_dict[disease]['features'],
         'categorical': format_dict[disease]['categorical'],
         'numerical': format_dict[disease]['numerical'],
-        'form': format_dict[disease]['form']
+        'form': format_dict[disease]['form'],
+        'diseaseName': format_dict[disease]['name']
     })
 
 

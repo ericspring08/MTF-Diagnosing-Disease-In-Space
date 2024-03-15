@@ -45,6 +45,7 @@ const Page = ({ params }) => {
       const collectionRef = await collection(firestore, "users", user.uid, "results");
       const docData = {
         disease: params.disease,
+        diseaseName: formName,
         formData: formData,
         prediction: results,
         timestamp: serverTimestamp(),
@@ -94,7 +95,7 @@ const Page = ({ params }) => {
         const response = await axios.get(
           `/api/get_features?disease=${params.disease}`,
         );
-        const { features, form, name } = response.data;
+        const { features, form, diseaseName } = response.data;
 
         // Initialize form data, structure, and headers
         const newFormData = {};
@@ -105,7 +106,7 @@ const Page = ({ params }) => {
         setFormData(newFormData);
         setFormHeaders(Object.keys(form));
         setFormStructure(form);
-        setFormName(name)
+        setFormName(diseaseName)
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -161,7 +162,7 @@ const Page = ({ params }) => {
                   className="btn btn-success ml-5"
                   onClick={() => {
                     createPDF(
-                      'Cardiovascular Page',
+                      formName,
                       formData,
                       predictionResults.prediction,
                       predictionResults.probability,
