@@ -1,9 +1,10 @@
-'use client'
-import { useEffect, useState } from 'react'
+'use client';
+import { useEffect, useState } from 'react';
 import { collection, getDocs, query, orderBy, where, limit, startAfter, endBefore } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { useRouter } from 'next/navigation'
-import { auth, firestore } from '../../../../utils/firebase'
+import { useRouter } from 'next/navigation';
+import { auth, firestore } from '../../../../utils/firebase';
+import { Chart, registerables } from 'chart.js';
 
 const MyData = ({ params }) => {
   const [data, setData] = useState([]);
@@ -87,7 +88,45 @@ const MyData = ({ params }) => {
     setCurrentPage((prevPage) => prevPage - 1);
     fetchDataPrevious();
   };
-  
+
+  useEffect(() => {
+    Chart.register(...registerables);
+
+    const ctx = document.getElementById('myChart');
+    
+    const myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.map((item, index) => index + 1), // Successful entries on the x-axis
+        datasets: [{
+          label: 'Confidence of negative prediction',
+          data: data.map(item => item.prediction.prediction === 1 ? 100 - item.prediction.probability : item.prediction.probability), // Adjusted confidence of negative prediction on the y-axis
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Successful Entries'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Confidence of Negative Prediction'
+            }
+          }
+        }
+      }
+    });
+
+    return () => {
+      myChart.destroy();
+    };
+  }, [data]);
 
   if (loading) {
     return (
@@ -97,59 +136,64 @@ const MyData = ({ params }) => {
           <span className="loading loading-lg loading-dots" />
         </div>
       </div>
-    );
-  }
-
-  if (data.length === 0) {
-    return (
-      <div className="h-screen w-screen" data-theme="corperate">
-        <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
-        <div className="flex justify-center items-center">
-          <div className="card shadow-xl w-1/2">
-            <div className="font-bold">No data found</div>
+          );
+        }
+      
+        if (data.length === 0) {
+          return (
+            <div className="h-screen w-screen" data-theme="corperate">
+              <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
+              <div className="flex justify-center items-center">
+                <div className="card shadow-xl w-1/2">
+                  <div className="font-bold">No data found </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+      
+        return (
+          <div className="h-screen w-screen" data-theme="corperate">
+            <h1 className="text-3xl font-bold p-6">My Data for {params.disease}</h1>
+            <div className="overflow-x-auto w-screen">
+              <table className="table table-zebra">
+                <thead>
+                  <tr>
+                    <th>Prediction</th>
+                    <th>Probability</th>
+                    <th>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.prediction.prediction}</td>
+                      <td>{item.prediction.prediction === 1 ? 100 - item.prediction.probability : item.prediction.probability}</td>
+                      <td>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex justify-center mt-4">
+              {currentPage > 1 && (
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={handlePreviousPage}>
+                  Back
+                </button>
+              )}
+              {hasNextPage && (
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleNextPage}>
+                  Next
+                </button>
+              )}
+            </div>
+            <div className="mt-8 p-6">
+              <h2 className="text-xl font-bold">Chart: Confidence of Negative Prediction vs. Successful Entries</h2>
+              <canvas id="myChart" width="800" height="400"></canvas>
+            </div>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="h-screen w-screen" data-theme="corperate">
-      <h1 className="text-3xl font-bold p-6">My Data for {params.disease}</h1>
-      <div className="overflow-x-auto w-screen">
-        <table className="table table-zebra">
-          <thead>
-            <tr>
-              <th>Prediction</th>
-              <th>Probability</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index}>
-                <td>{item.prediction.prediction}</td>
-                <td>{item.prediction.probability}</td>
-                <td>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex justify-center mt-4">
-        {currentPage > 1 && (
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={handlePreviousPage}>
-            Back
-          </button>
-        )}
-        {hasNextPage && (
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleNextPage}>
-            Next
-          </button>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default MyData;
+        );
+      };
+      
+      export default MyData;
+      
