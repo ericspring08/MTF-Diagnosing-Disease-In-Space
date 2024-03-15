@@ -114,69 +114,71 @@ const MyData = () => {
   };
 
   return (
-    <div className="h-screen w-screen" data-theme="corporate">
-      <h1 className="text-3xl font-bold p-6">My Data</h1>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <h2 className="text-xl font-bold mb-4 ml-4">Entries by Category</h2>
-          <div className="bg-white p-4 rounded shadow">
-            {diseases && diseases.map((category) => (
-              <div key={category.value} className="flex justify-between items-center mb-2 border-b py-2">
-                <span>{category.label}</span>
-                <span>{data.filter(item => item.disease === category.value).length}</span>
-              </div>
-            ))}
+    <div className="flex flex-wrap justify-center items-center h-screen w-screen" data-theme="corporate">
+      <div className="w-full p-6">
+        <h1 className="text-3xl font-bold">My Data</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <h2 className="text-xl font-bold mb-4">Entries by Category</h2>
+            <div className="bg-white p-4 rounded shadow">
+              {diseases && diseases.map((category) => (
+                <div key={category.value} className="flex justify-between items-center mb-2 border-b py-2">
+                  <span>{category.label}</span>
+                  <span>{data.filter(item => item.disease === category.value).length}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-        <div>
-          <h2 className="text-xl font-bold mb-4">Entries by Day</h2>
-          <div className="bg-white p-4 rounded shadow overflow-y-auto max-h-80">
-            <table className="table-auto w-full">
-              <thead>
-                <tr>
-                  <th className="border px-4 py-2 bg-gray-100">Date</th>
-                  <th className="border px-4 py-2 bg-gray-100">Entries</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(entriesByDay).map(([date, count], index) => (
-                  <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                    <td className="border px-4 py-2">{date}</td>
-                    <td className="border px-4 py-2">{count}</td>
+          <div>
+            <h2 className="text-xl font-bold mb-4">Entries by Day</h2>
+            <div className="bg-white p-4 rounded shadow overflow-y-auto max-h-80">
+              <table className="table-auto w-full">
+                <thead>
+                  <tr>
+                    <th className="border px-4 py-2 bg-gray-100">Date</th>
+                    <th className="border px-4 py-2 bg-gray-100">Entries</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {Object.entries(entriesByDay).map(([date, count], index) => (
+                    <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                      <td className="border px-4 py-2">{date}</td>
+                      <td className="border px-4 py-2">{count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="overflow-x-auto w-screen">
-        <table className="table table-zebra">
-          <thead>
-            <tr>
-              <th>Disease</th>
-              <th>Prediction</th>
-              <th>Probability</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                <th className="font-bold border px-4 py-2">{item.disease}</th>
-                <td className="border px-4 py-2">{item.prediction.prediction}</td>
-                <td className="border px-4 py-2">{item.prediction.probability}</td>
-                <td className="border px-4 py-2">{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
+        <div className="overflow-x-auto w-full">
+          <table className="table table-zebra">
+            <thead>
+              <tr>
+                <th>Disease</th>
+                <th>Prediction</th>
+                <th>Probability</th>
+                <th>Timestamp</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <DiseaseCards />
-      <div className="flex justify-center mt-6">
-        <button onClick={generatePDF} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-          Download PDF
-        </button>
+            </thead>
+            <tbody>
+              {data.map((item, index) => (
+                <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                  <th className="font-bold border px-4 py-2">{item.disease}</th>
+                  <td className="border px-4 py-2">{item.prediction.prediction}</td>
+                  <td className="border px-4 py-2">{item.prediction.probability}</td>
+                  <td className="border px-4 py-2">{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <DiseaseCards />
+        <div className="flex justify-center mt-6">
+          <button onClick={generatePDF} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Download PDF
+          </button>
+        </div>
       </div>
     </div>
   );
