@@ -1,9 +1,9 @@
-'use client'
-import Link from 'next/link';
+'use client';
+import Link from 'next/link'; 
 import { useEffect, useState } from 'react';
-import { getDocs, collection, orderBy, query } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
-import { useRouter } from 'next/navigation';
+import { getDocs, collection, orderBy, query } from "firebase/firestore"; 
+import { onAuthStateChanged } from "firebase/auth"; 
+import { useRouter } from 'next/navigation'; 
 import { auth, firestore } from '../../utils/firebase';
 import axios from 'axios';
 
@@ -75,7 +75,7 @@ const MyData = () => {
           <h2 className="text-xl font-bold mb-4 ml-4">Entries by Category</h2>
           <div className="bg-white p-4 rounded shadow">
             {diseases && diseases.map((category) => (
-              <div key={category.value} className="flex justify-between items-center mb-2">
+              <div key={category.value} className="flex justify-between items-center mb-2 border-b py-2">
                 <span>{category.label}</span>
                 <span>{data.filter(item => item.disease === category.value).length}</span>
               </div>
@@ -88,13 +88,13 @@ const MyData = () => {
             <table className="table-auto w-full">
               <thead>
                 <tr>
-                  <th className="border px-4 py-2">Date</th>
-                  <th className="border px-4 py-2">Entries</th>
+                  <th className="border px-4 py-2 bg-gray-100">Date</th>
+                  <th className="border px-4 py-2 bg-gray-100">Entries</th>
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(entriesByDay).map(([date, count]) => (
-                  <tr key={date}>
+                {Object.entries(entriesByDay).map(([date, count], index) => (
+                  <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
                     <td className="border px-4 py-2">{date}</td>
                     <td className="border px-4 py-2">{count}</td>
                   </tr>
@@ -116,11 +116,11 @@ const MyData = () => {
           </thead>
           <tbody>
             {data.map((item, index) => (
-              <tr key={index}>
-                <th className="font-bold">{item.disease}</th>
-                <td>{item.prediction.prediction}</td>
-                <td>{item.prediction.probability}</td>
-                <td>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
+              <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                <th className="font-bold border px-4 py-2">{item.disease}</th>
+                <td className="border px-4 py-2">{item.prediction.prediction}</td>
+                <td className="border px-4 py-2">{item.prediction.probability}</td>
+                <td className="border px-4 py-2">{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
