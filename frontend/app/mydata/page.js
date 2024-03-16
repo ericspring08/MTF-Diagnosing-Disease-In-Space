@@ -90,7 +90,7 @@ const MyData = () => {
               {diseases && diseases.map((category) => (
                 <div key={category.value} className="flex justify-between items-center mb-2 border-b py-2">
                   <span>{category.label}</span>
-                  <span>{data.filter(item => item.disease === category.value).length}</span>
+                  <span>{data.filter(item => item.data.disease === category.value).length}</span>
                 </div>
               ))}
             </div>
