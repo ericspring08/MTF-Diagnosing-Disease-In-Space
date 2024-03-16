@@ -19,9 +19,7 @@ const DiagnosisPage = ({ params }) => {
 
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-
             setData(docSnap.data());
-            console.log("Document data:", docSnap.data());
           } else {
             console.log("No such document!");
           }
