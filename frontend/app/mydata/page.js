@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { auth, firestore } from '../../utils/firebase';
 import axios from 'axios';
 
-// import { generateMyDataPDF } from '../../utils/pdfgen';
+import { generateMyDataPDF } from '../../utils/pdfgen';
 
 const MyData = () => {
   const router = useRouter();
@@ -133,11 +133,11 @@ const MyData = () => {
           </div>
         </div>
         <DiseaseCards />
-        {/* <div className="flex justify-center mt-6"> */}
-        {/*   <button onClick={() => { generateMyDataPDF(data) }} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"> */}
-        {/*     Download PDF */}
-        {/*   </button> */}
-        {/* </div> */}
+        <div className="flex justify-center mt-6">
+          <button onClick={() => { generateMyDataPDF(data) }} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Download PDF
+          </button>
+        </div>
       </div>
     </div>
   );
