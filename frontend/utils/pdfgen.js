@@ -1,45 +1,28 @@
-import pdfMake from 'pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export const generateMyDataPDF = (data) => {
-  const docDefinition = {
-    content: [
-      { text: 'My Data', style: 'header' },
-      { text: `Date Generated: ${new Date().toLocaleDateString()}`, style: 'date' },
-      { text: '\n' },
-      { text: 'Last Ten Entries', style: 'subheader' },
-      { text: '\n' },
-      {
-        table: {
-          headerRows: 1,
-          widths: ['*', '*', '*', '*'],
-          body: [
-            ['Disease', 'Prediction', 'Probability', 'Timestamp'],
-            ...data.slice(0, 10).map(item => [item.disease, item.prediction.prediction, item.prediction.probability, new Date(item.timestamp.seconds * 1000).toLocaleString()])
-          ]
-        }
-      }
-    ],
-    styles: {
-      header: {
-        fontSize: 18,
-        bold: true,
-        alignment: 'center',
-        margin: [0, 0, 0, 20]
-      },
-      subheader: {
-        fontSize: 16,
-        bold: true,
-        margin: [0, 10, 0, 5]
-      },
-      date: {
-        fontSize: 12,
-        margin: [0, 0, 0, 10]
-      }
-    }
-  };
 
-  pdfMake.createPdf(docDefinition).download('my_data.pdf');
+  const doc = new jsPDF();
+
+  doc.setFontSize(18);
+
+  doc.text('My Data', 105, 20, null, null, 'center');
+
+  doc.setFontSize(12);
+
+  doc.text(`Date Generated: ${new Date().toLocaleDateString()}`, 105, 30, null, null, 'center');
+
+  doc.setFontSize(16);
+
+  doc.text('Last Ten Entries', 105, 50, null, null, 'center');
+
+  autoTable(doc, {
+    head: [['Disease', 'Prediction', 'Probability', 'Timestamp']],
+    body: data.slice(0, 10).map(item => [item.disease, item.prediction.prediction, item.prediction.probability, new Date(item.timestamp.seconds * 1000).toLocaleString()]),
+    startY: 54,
+    theme: 'grid'
+  });
+
+  doc.save('my_data.pdf');
 };

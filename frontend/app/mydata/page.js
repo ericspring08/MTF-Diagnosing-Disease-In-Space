@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getDocs, collection, orderBy, query } from "firebase/firestore";
+import { getDocs, collection, orderBy, query, limit } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { auth, firestore } from '../../utils/firebase';
@@ -23,7 +23,7 @@ const MyData = () => {
           setDiseases(response.data.diseases);
         });
         const collectionRef = collection(firestore, "users", user.uid, "results");
-        const q = query(collectionRef, orderBy("timestamp", "desc"));
+        const q = query(collectionRef, orderBy("timestamp", "desc"), limit(5));
 
         await getDocs(q).then((querySnapshot) => {
           const newData = [];
@@ -109,7 +109,7 @@ const MyData = () => {
         </div>
         <div className="card card-bordered my-5 rounded outline-black">
           <div className="overflow-x-auto w-full ">
-            <h2 className="text-xl font-bold m-4">Last Ten Entries</h2>
+            <h2 className="text-xl font-bold m-4">Last Five Entries</h2>
             <table className="table table-zebra">
               <thead>
                 <tr>
