@@ -15,11 +15,11 @@ export const generateMyDataPDF = (data) => {
 
   doc.setFontSize(16);
 
-  doc.text('Last Ten Entries', 105, 50, null, null, 'center');
+  doc.text('Last Five Entries', 105, 50, null, null, 'center');
 
   autoTable(doc, {
     head: [['Disease', 'Prediction', 'Probability', 'Timestamp']],
-    body: data.slice(0, 10).map(item => [item.data.disease, item.data.prediction.prediction, item.data.prediction.probability, new Date(item.data.timestamp.seconds * 1000).toLocaleString()]),
+    body: data.slice(0, 5).map(item => [item.data.disease, item.data.prediction.prediction, item.data.prediction.probability, new Date(item.data.timestamp.seconds * 1000).toLocaleString()]),
     startY: 54,
     theme: 'grid'
   });
@@ -70,4 +70,3 @@ export const generateDiagnosisPDF = (
   const date = new Date().toLocaleDateString().split('/').join('-');
   doc.save(`${disease}_Diagnosis_Report_${date}.pdf`);
 };
-

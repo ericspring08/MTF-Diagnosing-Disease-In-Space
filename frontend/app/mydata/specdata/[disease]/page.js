@@ -116,7 +116,7 @@ const MyData = ({ params }) => {
         labels: data.map((item, index) => index + 1), // Successful entries on the x-axis
         datasets: [{
           label: 'Confidence of negative prediction',
-          data: data.map(item => item.data.prediction.prediction === 1 ? 100 - item.data.prediction.probability : item.data.prediction.probability), // Adjusted confidence of negative prediction on the y-axis
+          data: data.map(item => item.data.prediction.prediction === 1 ? (1 - item.data.prediction.probability) * 100 : item.data.prediction.probability * 100),
           borderColor: 'rgb(75, 192, 192)',
           tension: 0.1
         }]
@@ -132,7 +132,7 @@ const MyData = ({ params }) => {
           y: {
             title: {
               display: true,
-              text: 'Confidence of Negative Prediction'
+              text: 'Confidence of Positive Prediction'
             }
           }
         }
@@ -146,7 +146,7 @@ const MyData = ({ params }) => {
 
   if (loading) {
     return (
-      <div className="h-screen w-screen" data-theme="corperate">
+      <div className="h-screen w-screen" data-theme="corporate">
         <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
         <div className="flex justify-center items-center h-full">
           <span className="loading loading-lg loading-dots" />
@@ -157,17 +157,11 @@ const MyData = ({ params }) => {
 
   if (data.length === 0) {
     return (
-      <div className="h-screen w-screen" data-theme="corperate">
-        <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
-        <div className="flex justify-center items-center">
-          <div className="card shadow-xl w-1/2">
-            <div className="font-bold">No data found </div>
-          </div>
-        </div>
+      <div className="h-screen w-screen flex justify-center items-center" data-theme="corporate">
+        <div className="font-bold text-3xl">No data found </div>
       </div>
     );
   }
-
   return (
     <div className="min-h-screen w-screen flex flex-col flex-wrap" data-theme="corperate">
       <div className="flex flex-row justify-between items-center p-6 w-full">
@@ -215,7 +209,7 @@ const MyData = ({ params }) => {
       <div>
       </div>
       <div className="card card-bordered rounded m-5 h-max">
-        <h2 className="text-xl font-bold m-4">Chart: Confidence of Negative Prediction vs. Successful Entries</h2>
+        <h2 className="text-xl font-bold m-4">Chart: Confidence of Positive Prediction vs. Successful Entries</h2>
         <canvas id="myChart"></canvas>
       </div>
     </div>

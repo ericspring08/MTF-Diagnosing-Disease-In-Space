@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { auth, firestore } from '../../utils/firebase';
 import axios from 'axios';
+import Image from 'next/image';
 
 import { generateMyDataPDF } from '../../utils/pdfgen';
 
@@ -54,20 +55,46 @@ const MyData = () => {
   }, []);
 
   const DiseaseCards = () => {
+    const handleCardClick = (diseaseValue) => {
+      router.push(`/mydata/specdata/${diseaseValue}`);
+    };
+  
     if (diseases) {
       return (
-        <div className="flex justify-center items-center flex-wrap">
-          {diseases.map((category, index) => (
-            <Link href={`/mydata/specdata/${category.value}`} key={index}>
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 m-1 text-xl rounded">
-                See All Predictions for {diseases[index].label}
-              </button>
-            </Link>
+        <div className="flex flex-wrap justify-center items-stretch">
+          {diseases.map((disease, index) => (
+            <div
+              key={index}
+              className="m-3 cursor-pointer"
+              onClick={() => handleCardClick(disease.value)}
+            >
+              <div className="card card-bordered w-80 bg-base-100 hover:shadow-2xl hover:opacity-60">
+                <figure className="px-10 pt-10">
+                  <Image
+                    src={`/img/${disease.value}.png`}
+                    alt={disease.label}
+                    width={500}
+                    height={500}
+                  />
+                </figure>
+                <div className="card-body items-center text-center">
+                  <p className="text-lg font-bold">
+                    Click here for more information about {disease.label}
+                  </p>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       );
     }
   };
+  
+  
+  
+  
+  
+  
 
   return (
     <div className="flex flex-wrap justify-center h-screen w-screen" data-theme="corporate">
@@ -142,11 +169,15 @@ const MyData = () => {
             </table>
           </div>
         </div>
-        <DiseaseCards />
-
+        <div className="bg-white rounded-lg p-4">
+          <h2 className="text-2xl font-bold mb-4">Explore by Disease</h2>
+          <DiseaseCards />
+        </div>
       </div>
     </div>
   );
+  
 };
 
 export default MyData;
+
