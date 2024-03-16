@@ -36,7 +36,10 @@ const MyData = ({ params }) => {
 
         const querySnapshot = await getDocs(q);
 
-        const newData = querySnapshot.docs.map((doc) => doc.data());
+        const newData = querySnapshot.docs.map((doc) => {
+          return { id: doc.id, data: doc.data() };
+        });
+        console.log(newData)
         setData(newData);
         setHasNextPage(newData.length === 5);
         setLoading(false);
@@ -100,7 +103,7 @@ const MyData = ({ params }) => {
         labels: data.map((item, index) => index + 1), // Successful entries on the x-axis
         datasets: [{
           label: 'Confidence of negative prediction',
-          data: data.map(item => item.prediction.prediction === 1 ? 100 - item.prediction.probability : item.prediction.probability), // Adjusted confidence of negative prediction on the y-axis
+          data: data.map(item => item.data.prediction.prediction === 1 ? 100 - item.data.prediction.probability : item.data.prediction.probability), // Adjusted confidence of negative prediction on the y-axis
           borderColor: 'rgb(75, 192, 192)',
           tension: 0.1
         }]
@@ -167,10 +170,12 @@ const MyData = ({ params }) => {
           </thead>
           <tbody>
             {data.map((item, index) => (
-              <tr key={index}>
-                <td>{item.prediction.prediction}</td>
-                <td>{item.prediction.prediction === 1 ? 100 - item.prediction.probability : item.prediction.probability}</td>
-                <td>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
+              <tr key={index} onClick={() => {
+                router.push('/mydata/diagnosis/' + item.id)
+              }}>
+                <td>{item.data.prediction.prediction}</td>
+                <td>{item.data.prediction.prediction === 1 ? 100 - item.data.prediction.probability : item.data.prediction.probability}</td>
+                <td>{new Date(item.data.timestamp.seconds * 1000).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>

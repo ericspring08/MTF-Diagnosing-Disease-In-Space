@@ -2,8 +2,7 @@
 
 import React, { useEffect } from 'react';
 import axios from 'axios';
-import Link from 'next/link';
-import { createPDF } from '../../../utils/Functions';
+import { generateDiagnosisPDF } from '../../../utils/pdfgen';
 import Form from './form';
 import { auth, firestore } from '../../../utils/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -42,7 +41,7 @@ const Page = ({ params }) => {
     try {
       const user = auth.currentUser;
       // add new doc to /users/{userId}/results collection
-      const collectionRef = await collection(firestore, "users", user.uid, "results");
+      const collectionRef = collection(firestore, "users", user.uid, "results");
       const docData = {
         disease: params.disease,
         diseaseName: formName,
@@ -161,7 +160,7 @@ const Page = ({ params }) => {
                 <button
                   className="btn btn-success ml-5"
                   onClick={() => {
-                    createPDF(
+                    generateDiagnosisPDF(
                       formName,
                       formData,
                       predictionResults.prediction,

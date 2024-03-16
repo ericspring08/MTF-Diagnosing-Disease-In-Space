@@ -33,7 +33,7 @@ const MyData = () => {
           } else {
             querySnapshot.forEach((doc) => {
               const item = doc.data();
-              newData.push(item);
+              newData.push({ id: doc.id, data: item });
               const date = new Date(item.timestamp.seconds * 1000).toLocaleDateString();
               if (!entriesMap[date]) {
                 entriesMap[date] = 0;
@@ -72,7 +72,17 @@ const MyData = () => {
   return (
     <div className="flex flex-wrap justify-center h-screen w-screen" data-theme="corporate">
       <div className="w-full p-6">
-        <h1 className="text-3xl font-bold my-4">My Data</h1>
+        <div className="flex flex-row justify-between items-center mb-4">
+          <h1 className="text-3xl font-bold">My Data</h1>
+          <div className="flex justify-center">
+            <button onClick={() => { generateMyDataPDF(data) }} className="flex flex-row justify-center items-center bg-green-500 hover:bg-green-700 text-white text-xl font-bold py-2 px-4 rounded">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              Download PDF
+            </button>
+          </div>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <div className="bg-white p-4 rounded card card-bordered outline-black">
@@ -121,11 +131,11 @@ const MyData = () => {
               </thead>
               <tbody>
                 {data.map((item, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                    <th className="font-bold border px-4 py-2">{item.disease}</th>
-                    <td className="border px-4 py-2">{item.prediction.prediction}</td>
-                    <td className="border px-4 py-2">{item.prediction.probability}</td>
-                    <td className="border px-4 py-2">{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
+                  <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"} onClick={() => { router.push('/mydata/diagnosis/' + item.id) }}>
+                    <th className="font-bold border px-4 py-2">{item.data.disease}</th>
+                    <td className="border px-4 py-2">{item.data.prediction.prediction}</td>
+                    <td className="border px-4 py-2">{item.data.prediction.probability}</td>
+                    <td className="border px-4 py-2">{new Date(item.data.timestamp.seconds * 1000).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -133,14 +143,7 @@ const MyData = () => {
           </div>
         </div>
         <DiseaseCards />
-        <div className="flex justify-center mt-6">
-          <button onClick={() => { generateMyDataPDF(data) }} className="flex flex-row justify-center items-center bg-green-500 hover:bg-green-700 text-white text-xl font-bold py-2 px-4 rounded">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-            </svg>
-            Download PDF
-          </button>
-        </div>
+
       </div>
     </div>
   );
