@@ -55,11 +55,19 @@ const MyData = () => {
   }, []);
 
   const DiseaseCards = () => {
+    const handleCardClick = (diseaseValue) => {
+      router.push(`/mydata/specdata/${diseaseValue}`);
+    };
+  
     if (diseases) {
       return (
         <div className="flex flex-wrap justify-center items-stretch">
           {diseases.map((disease, index) => (
-            <div key={index} className="m-3">
+            <div
+              key={index}
+              className="m-3 cursor-pointer"
+              onClick={() => handleCardClick(disease.value)}
+            >
               <div className="card card-bordered w-80 bg-base-100 hover:shadow-2xl hover:opacity-60">
                 <figure className="px-10 pt-10">
                   <Image
@@ -70,13 +78,9 @@ const MyData = () => {
                   />
                 </figure>
                 <div className="card-body items-center text-center">
-                  <h2 className="card-title">{disease.label}</h2>
-                  <p className="text-sm">{disease.description}</p>
-                  <Link href={`/mydata/specdata/${disease.value}`} legacyBehavior>
-                    <a className="btn btn-primary mt-4">
-                      See All Predictions
-                    </a>
-                  </Link>
+                  <p className="text-lg font-bold">
+                    Click here for more information about {disease.label}
+                  </p>
                 </div>
               </div>
             </div>
@@ -85,6 +89,10 @@ const MyData = () => {
       );
     }
   };
+  
+  
+  
+  
   
   
 
