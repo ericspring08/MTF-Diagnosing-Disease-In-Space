@@ -140,32 +140,32 @@ const MyData = ({ params }) => {
     };
   }, [data]);
 
-  // if (loading) {
-  //   return (
-  //     <div className="h-screen w-screen" data-theme="corperate">
-  //       <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
-  //       <div className="flex justify-center items-center h-full">
-  //         <span className="loading loading-lg loading-dots" />
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <div className="h-screen w-screen" data-theme="corperate">
+        <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
+        <div className="flex justify-center items-center h-full">
+          <span className="loading loading-lg loading-dots" />
+        </div>
+      </div>
+    );
+  }
 
-  // if (data.length === 0) {
-  //   return (
-  //     <div className="h-screen w-screen" data-theme="corperate">
-  //       <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
-  //       <div className="flex justify-center items-center">
-  //         <div className="card shadow-xl w-1/2">
-  //           <div className="font-bold">No data found </div>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (data.length === 0) {
+    return (
+      <div className="h-screen w-screen" data-theme="corperate">
+        <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
+        <div className="flex justify-center items-center">
+          <div className="card shadow-xl w-1/2">
+            <div className="font-bold">No data found </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-screen w-screen flex flex-col flex-wrap" data-theme="corperate">
+    <div className="min-h-screen w-screen flex flex-col flex-wrap" data-theme="corperate">
       <div className="flex flex-row justify-between items-center p-6 w-full">
         <h1 className="text-3xl font-bold">My Data for {params.disease}</h1>
         <div className="flex justify-center">
@@ -177,7 +177,7 @@ const MyData = ({ params }) => {
           </button>
         </div>
       </div>
-      <div className="card card-bordered rounded mx-5">
+      <div className="card card-bordered rounded mx-5 w-full h-full">
         <h2 className="text-xl font-bold m-4">Last Five Entries</h2>
         <table className="table table-zebra">
           <thead>
@@ -208,9 +208,11 @@ const MyData = ({ params }) => {
           }}>Next</button>
         </div>
       </div>
-      <div className="card card-bordered rounded m-5">
+      <div>
+      </div>
+      <div className="card card-bordered rounded m-5 h-max">
         <h2 className="text-xl font-bold m-4">Chart: Confidence of Negative Prediction vs. Successful Entries</h2>
-        <canvas id="myChart" width="800" height="auto"></canvas>
+        <canvas id="myChart"></canvas>
       </div>
     </div>
   );
