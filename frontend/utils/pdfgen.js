@@ -19,7 +19,7 @@ export const generateMyDataPDF = (data) => {
 
   autoTable(doc, {
     head: [['Disease', 'Prediction', 'Probability', 'Timestamp']],
-    body: data.slice(0, 10).map(item => [item.disease, item.prediction.prediction, item.prediction.probability, new Date(item.timestamp.seconds * 1000).toLocaleString()]),
+    body: data.slice(0, 10).map(item => [item.data.disease, item.data.prediction.prediction, item.data.prediction.probability, new Date(item.data.timestamp.seconds * 1000).toLocaleString()]),
     startY: 54,
     theme: 'grid'
   });
