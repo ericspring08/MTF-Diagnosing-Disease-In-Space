@@ -55,6 +55,10 @@ const MyData = ({ params }) => {
     setFirstVisibleIndex(1);
     setLastVisibleIndex(querySnapshot.docs.length);
     setLoading(false);
+
+    if (querySnapshot.docs.length < 5) {
+      setDisableNext(true);
+    }
   }
 
   const fetchNextData = async (user) => {
