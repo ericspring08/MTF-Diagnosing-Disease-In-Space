@@ -1,9 +1,10 @@
-'use client'
-import { useEffect, useState } from 'react'
+'use client';
+import { useEffect, useState } from 'react';
 import { collection, getDocs, query, orderBy, where, limit, startAfter, endBefore } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { useRouter } from 'next/navigation'
-import { auth, firestore } from '../../../../utils/firebase'
+import { useRouter } from 'next/navigation';
+import { auth, firestore } from '../../../../utils/firebase';
+import { Chart, registerables } from 'chart.js';
 
 const MyData = ({ params }) => {
   const [data, setData] = useState([]);
@@ -23,7 +24,7 @@ const MyData = ({ params }) => {
         resolve(user);
       }, reject);
     });
-  
+
     if (user) {
       try {
         const collectionRef = collection(firestore, "users", user.uid, "results");
@@ -34,7 +35,7 @@ const MyData = ({ params }) => {
         }
 
         const querySnapshot = await getDocs(q);
-  
+
         const newData = querySnapshot.docs.map((doc) => doc.data());
         setData(newData);
         setHasNextPage(newData.length === 5);
@@ -54,7 +55,7 @@ const MyData = ({ params }) => {
         resolve(user);
       }, reject);
     });
-  
+
     if (user) {
       try {
         const collectionRef = collection(firestore, "users", user.uid, "results");
@@ -65,7 +66,7 @@ const MyData = ({ params }) => {
         }
 
         const querySnapshot = await getDocs(q);
-  
+
         const newData = querySnapshot.docs.map((doc) => doc.data());
         setData(newData);
         setHasNextPage(true);
@@ -87,7 +88,45 @@ const MyData = ({ params }) => {
     setCurrentPage((prevPage) => prevPage - 1);
     fetchDataPrevious();
   };
-  
+
+  useEffect(() => {
+    Chart.register(...registerables);
+
+    const ctx = document.getElementById('myChart');
+
+    const myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.map((item, index) => index + 1), // Successful entries on the x-axis
+        datasets: [{
+          label: 'Confidence of negative prediction',
+          data: data.map(item => item.prediction.prediction === 1 ? 100 - item.prediction.probability : item.prediction.probability), // Adjusted confidence of negative prediction on the y-axis
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Successful Entries'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Confidence of Negative Prediction'
+            }
+          }
+        }
+      }
+    });
+
+    return () => {
+      myChart.destroy();
+    };
+  }, [data]);
 
   if (loading) {
     return (
@@ -106,7 +145,7 @@ const MyData = ({ params }) => {
         <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
         <div className="flex justify-center items-center">
           <div className="card shadow-xl w-1/2">
-            <div className="font-bold">No data found</div>
+            <div className="font-bold">No data found </div>
           </div>
         </div>
       </div>
@@ -115,8 +154,9 @@ const MyData = ({ params }) => {
 
   return (
     <div className="h-screen w-screen" data-theme="corperate">
-      <h1 className="text-3xl font-bold p-6">My Data for {params.disease}</h1>
-      <div className="overflow-x-auto w-screen">
+      <h1 className="text-3xl font-bold p-5">My Data for {params.disease}</h1>
+      <div className="mx-5 card card-bordered rounded overflow-x-auto w-screen">
+        <h2 className="text-xl font-bold m-4">Last Five Entries</h2>
         <table className="table table-zebra">
           <thead>
             <tr>
@@ -129,7 +169,7 @@ const MyData = ({ params }) => {
             {data.map((item, index) => (
               <tr key={index}>
                 <td>{item.prediction.prediction}</td>
-                <td>{item.prediction.probability}</td>
+                <td>{item.prediction.prediction === 1 ? 100 - item.prediction.probability : item.prediction.probability}</td>
                 <td>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
               </tr>
             ))}
@@ -148,8 +188,13 @@ const MyData = ({ params }) => {
           </button>
         )}
       </div>
+      <div className="card card-bordered rounded m-5">
+        <h2 className="text-xl font-bold m-4">Chart: Confidence of Negative Prediction vs. Successful Entries</h2>
+        <canvas id="myChart" width="800" height="400"></canvas>
+      </div>
     </div>
   );
 };
 
 export default MyData;
+

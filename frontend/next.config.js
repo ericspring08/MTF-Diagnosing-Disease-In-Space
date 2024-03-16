@@ -11,6 +11,9 @@ const nextConfig = () => {
   };
   return {
     rewrites,
+    experimental: {
+      serverComponentsExternalPackages: ['@react-pdf/renderer'],
+    }
   };
 };
 
