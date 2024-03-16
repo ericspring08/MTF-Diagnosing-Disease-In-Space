@@ -157,13 +157,8 @@ const MyData = ({ params }) => {
 
   if (data.length === 0) {
     return (
-      <div className="h-screen w-screen" data-theme="corperate">
-        <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
-        <div className="flex justify-center items-center">
-          <div className="card shadow-xl w-1/2">
-            <div className="font-bold">No data found </div>
-          </div>
-        </div>
+      <div className="h-screen w-screen flex justify-center items-center" data-theme="corperate">
+        <div className="font-bold text-3xl">No data found </div>
       </div>
     );
   }
