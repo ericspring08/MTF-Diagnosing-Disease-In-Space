@@ -93,7 +93,7 @@ const MyData = () => {
             {
               data.map((item, index) =>
                 <tr>
-                  <th className="font-bold">{item.disease}</th>
+                  <th className="font-bold">{item.diseaseName}</th>
                   <td>{item.prediction.prediction}</td>
                   <td>{item.prediction.probability}</td>
                   <td>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
