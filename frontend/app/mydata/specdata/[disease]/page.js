@@ -5,6 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { auth, firestore } from '../../../../utils/firebase';
 import { Chart, registerables } from 'chart.js';
+import { generateMyDataPDF } from '../../../../utils/pdfgen';
 
 const MyData = ({ params }) => {
   const [data, setData] = useState([]);
@@ -36,7 +37,10 @@ const MyData = ({ params }) => {
 
         const querySnapshot = await getDocs(q);
 
-        const newData = querySnapshot.docs.map((doc) => doc.data());
+        const newData = querySnapshot.docs.map((doc) => {
+          return { id: doc.id, data: doc.data() };
+        });
+        console.log(newData)
         setData(newData);
         setHasNextPage(newData.length === 5);
         setLoading(false);
@@ -67,7 +71,9 @@ const MyData = ({ params }) => {
 
         const querySnapshot = await getDocs(q);
 
-        const newData = querySnapshot.docs.map((doc) => doc.data());
+        const newData = querySnapshot.docs.map((doc) => {
+          return { id: doc.id, data: doc.data() };
+        });
         setData(newData);
         setHasNextPage(true);
         setLoading(false);
@@ -100,7 +106,7 @@ const MyData = ({ params }) => {
         labels: data.map((item, index) => index + 1), // Successful entries on the x-axis
         datasets: [{
           label: 'Confidence of negative prediction',
-          data: data.map(item => item.prediction.prediction === 1 ? 100 - item.prediction.probability : item.prediction.probability), // Adjusted confidence of negative prediction on the y-axis
+          data: data.map(item => item.data.prediction.prediction === 1 ? 100 - item.data.prediction.probability : item.data.prediction.probability), // Adjusted confidence of negative prediction on the y-axis
           borderColor: 'rgb(75, 192, 192)',
           tension: 0.1
         }]
@@ -154,7 +160,17 @@ const MyData = ({ params }) => {
 
   return (
     <div className="h-screen w-screen" data-theme="corperate">
-      <h1 className="text-3xl font-bold p-5">My Data for {params.disease}</h1>
+      <div className="flex flex-row justify-between items-center p-6">
+        <h1 className="text-3xl font-bold">My Data for {params.disease}</h1>
+        <div className="flex justify-center">
+          <button onClick={() => { generateMyDataPDF(data) }} className="flex flex-row justify-center items-center bg-green-500 hover:bg-green-700 text-white text-xl font-bold py-2 px-4 rounded">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Download PDF
+          </button>
+        </div>
+      </div>
       <div className="mx-5 card card-bordered rounded overflow-x-auto w-screen">
         <h2 className="text-xl font-bold m-4">Last Five Entries</h2>
         <table className="table table-zebra">
@@ -167,10 +183,12 @@ const MyData = ({ params }) => {
           </thead>
           <tbody>
             {data.map((item, index) => (
-              <tr key={index}>
-                <td>{item.prediction.prediction}</td>
-                <td>{item.prediction.prediction === 1 ? 100 - item.prediction.probability : item.prediction.probability}</td>
-                <td>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
+              <tr key={index} onClick={() => {
+                router.push('/mydata/diagnosis/' + item.id)
+              }}>
+                <td>{item.data.prediction.prediction}</td>
+                <td>{item.data.prediction.prediction === 1 ? 100 - item.data.prediction.probability : item.data.prediction.probability}</td>
+                <td>{new Date(item.data.timestamp.seconds * 1000).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
