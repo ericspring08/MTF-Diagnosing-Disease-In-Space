@@ -24,5 +24,5 @@ export const generateMyDataPDF = (data) => {
     theme: 'grid'
   });
 
-  doc.save('my_data.pdf');
+  doc.save(`my_data_${Date()}.pdf`);
 };
