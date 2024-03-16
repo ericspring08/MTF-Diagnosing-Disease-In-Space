@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, orderBy, where, limit, startAfter, endBefore } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, where, limit, startAfter, endBefore, getCountFromServer } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { auth, firestore } from '../../../../utils/firebase';
@@ -10,90 +10,96 @@ import { generateMyDataPDF } from '../../../../utils/pdfgen';
 const MyData = ({ params }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [hasNextPage, setHasNextPage] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [firstVisible, setFirstVisible] = useState(null);
+  const [lastVisible, setLastVisible] = useState(null);
+  const [firstVisibleIndex, setFirstVisibleIndex] = useState(0);
+  const [lastVisibleIndex, setLastVisibleIndex] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [disableNext, setDisableNext] = useState(false);
+  const [disablePrevious, setDisablePrevious] = useState(true);
+  const [totalEntries, setTotalEntries] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
-    fetchDataNext();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+        initialFetch(user);
+      } else
+        router.push('/auth/signin');
+    })
   }, []);
 
-  const fetchDataNext = async () => {
-    const user = await new Promise((resolve, reject) => {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        unsubscribe();
-        resolve(user);
-      }, reject);
+  const initialFetch = async (user) => {
+    // count total number of entries
+    const totalEntries = await getCountFromServer(collection(firestore, 'users', user.uid, 'results'));
+
+    if (totalEntries.data().count === 0) {
+      setLoading(false);
+      return;
+    }
+
+    setTotalEntries(totalEntries.data().count);
+
+    const q = query(collection(firestore, 'users', user.uid, 'results'), where('disease', '==', params.disease), orderBy('timestamp', 'desc'), limit(5));
+    const querySnapshot = await getDocs(q);
+    const newData = [];
+    querySnapshot.forEach((doc) => {
+      newData.push({ id: doc.id, data: doc.data() });
     });
 
-    if (user) {
-      try {
-        const collectionRef = collection(firestore, "users", user.uid, "results");
-        let q = query(collectionRef, where("disease", "==", params.disease), orderBy("timestamp", "desc"), limit(5));
+    setData(newData);
 
-        if (data.length > 0) {
-          q = query(q, startAfter(data[data.length - 1].timestamp));
-        }
+    setFirstVisible(querySnapshot.docs[0]);
+    setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    setFirstVisibleIndex(1);
+    setLastVisibleIndex(querySnapshot.docs.length);
+    setLoading(false);
+  }
 
-        const querySnapshot = await getDocs(q);
-
-        const newData = querySnapshot.docs.map((doc) => {
-          return { id: doc.id, data: doc.data() };
-        });
-        console.log(newData)
-        setData(newData);
-        setHasNextPage(newData.length === 5);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error getting documents: ", error);
-      }
-    } else {
-      router.push('/auth/signin');
-    }
-  };
-
-  const fetchDataPrevious = async () => {
-    const user = await new Promise((resolve, reject) => {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        unsubscribe();
-        resolve(user);
-      }, reject);
+  const fetchNextData = async (user) => {
+    const q = query(collection(firestore, 'users', user.uid, 'results'), where('disease', '==', params.disease), orderBy('timestamp', 'desc'), limit(5), startAfter(lastVisible));
+    const querySnapshot = await getDocs(q);
+    const newData = [];
+    querySnapshot.forEach((doc) => {
+      newData.push({ id: doc.id, data: doc.data() });
     });
 
-    if (user) {
-      try {
-        const collectionRef = collection(firestore, "users", user.uid, "results");
-        let q = query(collectionRef, where("disease", "==", params.disease), orderBy("timestamp", "desc"), limit(5));
+    if (newData.length === 0) return;
 
-        if (data.length > 0) {
-          q = query(q, endBefore(data[0].timestamp));
-        }
+    setData(newData);
+    setFirstVisible(querySnapshot.docs[0]);
+    setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    setFirstVisibleIndex(firstVisibleIndex + 5);
+    setLastVisibleIndex(lastVisibleIndex + newData.length);
 
-        const querySnapshot = await getDocs(q);
-
-        const newData = querySnapshot.docs.map((doc) => {
-          return { id: doc.id, data: doc.data() };
-        });
-        setData(newData);
-        setHasNextPage(true);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error getting documents: ", error);
-      }
-    } else {
-      router.push('/auth/signin');
+    if (lastVisibleIndex + newData.length === totalEntries - 1) {
+      setDisableNext(true);
     }
-  };
+    setDisablePrevious(false);
+  }
 
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-    fetchDataNext();
-  };
+  const fetchPreviousData = async (user) => {
+    const q = query(collection(firestore, 'users', user.uid, 'results'), where('disease', '==', params.disease), orderBy('timestamp', 'desc'), limit(5), endBefore(firstVisible));
+    const querySnapshot = await getDocs(q);
+    const newData = [];
+    querySnapshot.forEach((doc) => {
+      newData.push({ id: doc.id, data: doc.data() });
+    });
 
-  const handlePreviousPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-    fetchDataPrevious();
-  };
+    if (newData.length === 0) return;
+
+    setData(newData);
+    setFirstVisible(querySnapshot.docs[0]);
+    setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    setFirstVisibleIndex(firstVisibleIndex - newData.length);
+    setLastVisibleIndex(lastVisibleIndex - 5);
+
+    if (firstVisibleIndex - newData.length === 1) {
+      setDisablePrevious(true);
+    }
+    setDisableNext(false);
+  }
 
   useEffect(() => {
     Chart.register(...registerables);
@@ -134,33 +140,33 @@ const MyData = ({ params }) => {
     };
   }, [data]);
 
-  if (loading) {
-    return (
-      <div className="h-screen w-screen" data-theme="corperate">
-        <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
-        <div className="flex justify-center items-center h-full">
-          <span className="loading loading-lg loading-dots" />
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="h-screen w-screen" data-theme="corperate">
+  //       <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
+  //       <div className="flex justify-center items-center h-full">
+  //         <span className="loading loading-lg loading-dots" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  if (data.length === 0) {
-    return (
-      <div className="h-screen w-screen" data-theme="corperate">
-        <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
-        <div className="flex justify-center items-center">
-          <div className="card shadow-xl w-1/2">
-            <div className="font-bold">No data found </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (data.length === 0) {
+  //   return (
+  //     <div className="h-screen w-screen" data-theme="corperate">
+  //       <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
+  //       <div className="flex justify-center items-center">
+  //         <div className="card shadow-xl w-1/2">
+  //           <div className="font-bold">No data found </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
-    <div className="h-screen w-screen" data-theme="corperate">
-      <div className="flex flex-row justify-between items-center p-6">
+    <div className="h-screen w-screen flex flex-col flex-wrap" data-theme="corperate">
+      <div className="flex flex-row justify-between items-center p-6 w-full">
         <h1 className="text-3xl font-bold">My Data for {params.disease}</h1>
         <div className="flex justify-center">
           <button onClick={() => { generateMyDataPDF(data) }} className="flex flex-row justify-center items-center bg-green-500 hover:bg-green-700 text-white text-xl font-bold py-2 px-4 rounded">
@@ -171,7 +177,7 @@ const MyData = ({ params }) => {
           </button>
         </div>
       </div>
-      <div className="mx-5 card card-bordered rounded overflow-x-auto w-screen">
+      <div className="card card-bordered rounded mx-5">
         <h2 className="text-xl font-bold m-4">Last Five Entries</h2>
         <table className="table table-zebra">
           <thead>
@@ -193,22 +199,18 @@ const MyData = ({ params }) => {
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="flex justify-center mt-4">
-        {currentPage > 1 && (
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={handlePreviousPage}>
-            Back
-          </button>
-        )}
-        {hasNextPage && (
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleNextPage}>
-            Next
-          </button>
-        )}
+        <div className="join grid grid-cols-2 m-4">
+          <button className="join-item btn btn-outline" disabled={disablePrevious} onClick={() => {
+            fetchPreviousData(currentUser);
+          }}>Previous page</button>
+          <button className="join-item btn btn-outline" disabled={disableNext} onClick={() => {
+            fetchNextData(currentUser);
+          }}>Next</button>
+        </div>
       </div>
       <div className="card card-bordered rounded m-5">
         <h2 className="text-xl font-bold m-4">Chart: Confidence of Negative Prediction vs. Successful Entries</h2>
-        <canvas id="myChart" width="800" height="400"></canvas>
+        <canvas id="myChart" width="800" height="auto"></canvas>
       </div>
     </div>
   );
