@@ -24,7 +24,7 @@ const MyData = ({ params }) => {
         resolve(user);
       }, reject);
     });
-  
+
     if (user) {
       try {
         const collectionRef = collection(firestore, "users", user.uid, "results");
@@ -35,7 +35,7 @@ const MyData = ({ params }) => {
         }
 
         const querySnapshot = await getDocs(q);
-  
+
         const newData = querySnapshot.docs.map((doc) => doc.data());
         setData(newData);
         setHasNextPage(newData.length === 5);
@@ -55,7 +55,7 @@ const MyData = ({ params }) => {
         resolve(user);
       }, reject);
     });
-  
+
     if (user) {
       try {
         const collectionRef = collection(firestore, "users", user.uid, "results");
@@ -66,7 +66,7 @@ const MyData = ({ params }) => {
         }
 
         const querySnapshot = await getDocs(q);
-  
+
         const newData = querySnapshot.docs.map((doc) => doc.data());
         setData(newData);
         setHasNextPage(true);
@@ -93,7 +93,7 @@ const MyData = ({ params }) => {
     Chart.register(...registerables);
 
     const ctx = document.getElementById('myChart');
-    
+
     const myChart = new Chart(ctx, {
       type: 'line',
       data: {
@@ -136,64 +136,65 @@ const MyData = ({ params }) => {
           <span className="loading loading-lg loading-dots" />
         </div>
       </div>
-          );
-        }
-      
-        if (data.length === 0) {
-          return (
-            <div className="h-screen w-screen" data-theme="corperate">
-              <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
-              <div className="flex justify-center items-center">
-                <div className="card shadow-xl w-1/2">
-                  <div className="font-bold">No data found </div>
-                </div>
-              </div>
-            </div>
-          );
-        }
-      
-        return (
-          <div className="h-screen w-screen" data-theme="corperate">
-            <h1 className="text-3xl font-bold p-6">My Data for {params.disease}</h1>
-            <div className="overflow-x-auto w-screen">
-              <table className="table table-zebra">
-                <thead>
-                  <tr>
-                    <th>Prediction</th>
-                    <th>Probability</th>
-                    <th>Timestamp</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((item, index) => (
-                    <tr key={index}>
-                      <td>{item.prediction.prediction}</td>
-                      <td>{item.prediction.prediction === 1 ? 100 - item.prediction.probability : item.prediction.probability}</td>
-                      <td>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex justify-center mt-4">
-              {currentPage > 1 && (
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={handlePreviousPage}>
-                  Back
-                </button>
-              )}
-              {hasNextPage && (
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleNextPage}>
-                  Next
-                </button>
-              )}
-            </div>
-            <div className="mt-8 p-6">
-              <h2 className="text-xl font-bold">Chart: Confidence of Negative Prediction vs. Successful Entries</h2>
-              <canvas id="myChart" width="800" height="400"></canvas>
-            </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="h-screen w-screen" data-theme="corperate">
+        <h1 className="text-3xl font-bold mb-4">My Data for {params.disease}</h1>
+        <div className="flex justify-center items-center">
+          <div className="card shadow-xl w-1/2">
+            <div className="font-bold">No data found </div>
           </div>
-        );
-      };
-      
-      export default MyData;
-      
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen w-screen" data-theme="corperate">
+      <h1 className="text-3xl font-bold p-5">My Data for {params.disease}</h1>
+      <div className="mx-5 card card-bordered rounded overflow-x-auto w-screen">
+        <h2 className="text-xl font-bold m-4">Last Five Entries</h2>
+        <table className="table table-zebra">
+          <thead>
+            <tr>
+              <th>Prediction</th>
+              <th>Probability</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
+              <tr key={index}>
+                <td>{item.prediction.prediction}</td>
+                <td>{item.prediction.prediction === 1 ? 100 - item.prediction.probability : item.prediction.probability}</td>
+                <td>{new Date(item.timestamp.seconds * 1000).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex justify-center mt-4">
+        {currentPage > 1 && (
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" onClick={handlePreviousPage}>
+            Back
+          </button>
+        )}
+        {hasNextPage && (
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleNextPage}>
+            Next
+          </button>
+        )}
+      </div>
+      <div className="card card-bordered rounded m-5">
+        <h2 className="text-xl font-bold m-4">Chart: Confidence of Negative Prediction vs. Successful Entries</h2>
+        <canvas id="myChart" width="800" height="400"></canvas>
+      </div>
+    </div>
+  );
+};
+
+export default MyData;
+

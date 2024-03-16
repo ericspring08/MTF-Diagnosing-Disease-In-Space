@@ -27,7 +27,7 @@ const HomePage = () => {
               href={`/form/${disease.value}`}
               key={disease.value}
             >
-              <div className="card card-bordered w-80 bg-base-100 shadow-xl hover:shadow-2xl hover:opacity-60">
+              <div className="card card-bordered w-80 bg-base-100 hover:shadow-2xl hover:opacity-60">
                 <figure className="px-10 pt-10">
                   <Image
                     src={`/img/${disease.value}.png`}

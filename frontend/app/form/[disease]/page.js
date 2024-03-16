@@ -181,7 +181,7 @@ const Page = ({ params }) => {
       ) : formHeaders.length === 0 ? (
         <span className="loading loading-dots loading-lg"></span>
       ) : (
-        <div className="p-5 m-5 card card-bordered shadow-2xl mt-10">
+        <div className="p-5 m-5 card card-bordered rounded mt-10">
           <div className="mb-4">
             <p>
               Page {formIndex + 1} of {formHeaders.length}
