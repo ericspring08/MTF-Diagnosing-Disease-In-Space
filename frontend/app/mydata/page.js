@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { auth, firestore } from '../../utils/firebase';
 import axios from 'axios';
+import Image from 'next/image';
 
 import { generateMyDataPDF } from '../../utils/pdfgen';
 
@@ -56,18 +57,36 @@ const MyData = () => {
   const DiseaseCards = () => {
     if (diseases) {
       return (
-        <div className="flex justify-center items-center flex-wrap">
-          {diseases.map((category, index) => (
-            <Link href={`/mydata/specdata/${category.value}`} key={index}>
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-4 m-1 text-xl rounded">
-                See All Predictions for {diseases[index].label}
-              </button>
-            </Link>
+        <div className="flex flex-wrap justify-center items-stretch">
+          {diseases.map((disease, index) => (
+            <div key={index} className="m-3">
+              <div className="card card-bordered w-80 bg-base-100 hover:shadow-2xl hover:opacity-60">
+                <figure className="px-10 pt-10">
+                  <Image
+                    src={`/img/${disease.value}.png`}
+                    alt={disease.label}
+                    width={500}
+                    height={500}
+                  />
+                </figure>
+                <div className="card-body items-center text-center">
+                  <h2 className="card-title">{disease.label}</h2>
+                  <p className="text-sm">{disease.description}</p>
+                  <Link href={`/mydata/specdata/${disease.value}`} legacyBehavior>
+                    <a className="btn btn-primary mt-4">
+                      See All Predictions
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       );
     }
   };
+  
+  
 
   return (
     <div className="flex flex-wrap justify-center h-screen w-screen" data-theme="corporate">
@@ -150,3 +169,4 @@ const MyData = () => {
 };
 
 export default MyData;
+
