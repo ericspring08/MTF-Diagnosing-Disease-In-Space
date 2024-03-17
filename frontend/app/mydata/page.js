@@ -58,7 +58,7 @@ const MyData = () => {
     const handleCardClick = (diseaseValue) => {
       router.push(`/mydata/specdata/${diseaseValue}`);
     };
-  
+
     if (diseases) {
       return (
         <div className="flex flex-wrap justify-center items-stretch">
@@ -89,12 +89,12 @@ const MyData = () => {
       );
     }
   };
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
 
   return (
     <div className="flex flex-wrap justify-center h-screen w-screen" data-theme="corporate">
@@ -147,7 +147,7 @@ const MyData = () => {
         <div className="card card-bordered my-5 rounded outline-black">
           <div className="overflow-x-auto w-full ">
             <h2 className="text-xl font-bold m-4">Last Five Entries</h2>
-            <table className="table table-zebra">
+            <table className="table">
               <thead>
                 <tr>
                   <th>Disease</th>
@@ -158,7 +158,7 @@ const MyData = () => {
               </thead>
               <tbody>
                 {data.map((item, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"} onClick={() => { router.push('/mydata/diagnosis/' + item.id) }}>
+                  <tr key={index} className="hover:bg-gray-200" onClick={() => { router.push('/mydata/diagnosis/' + item.id) }}>
                     <th className="font-bold border px-4 py-2">{item.data.disease}</th>
                     <td className="border px-4 py-2">{item.data.prediction.prediction}</td>
                     <td className="border px-4 py-2">{item.data.prediction.probability}</td>
@@ -176,7 +176,7 @@ const MyData = () => {
       </div>
     </div>
   );
-  
+
 };
 
 export default MyData;
