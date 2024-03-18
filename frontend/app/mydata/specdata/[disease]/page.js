@@ -193,7 +193,7 @@ const MyData = ({ params }) => {
                     router.push('/mydata/diagnosis/' + item.id)
                   }}>
                     <td>{item.data.prediction.prediction}</td>
-                    <td>{item.data.prediction.prediction === 1 ? 100 - item.data.prediction.probability : item.data.prediction.probability}</td>
+                    <td>{((item.data.prediction.probability) * 100).toFixed(4)}%</td>
                     <td>{new Date(item.data.timestamp.seconds * 1000).toLocaleString()}</td>
                   </tr>
                 ))}

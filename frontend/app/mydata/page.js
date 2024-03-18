@@ -203,7 +203,7 @@ const MyData = () => {
                   <tr key={index} className="hover:bg-gray-200" onClick={() => { router.push('/mydata/diagnosis/' + item.id) }}>
                     <th className="font-bold border px-4 py-2">{item.data.disease}</th>
                     <td className="border px-4 py-2">{item.data.prediction.prediction}</td>
-                    <td className="border px-4 py-2">{item.data.prediction.probability}</td>
+                    <td className="border px-4 py-2">{(item.data.prediction.probability * 100).toFixed(4)}%</td>
                     <td className="border px-4 py-2">{new Date(item.data.timestamp.seconds * 1000).toLocaleString()}</td>
                   </tr>
                 ))}
