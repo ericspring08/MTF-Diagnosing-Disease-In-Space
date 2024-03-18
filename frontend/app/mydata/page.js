@@ -1,52 +1,35 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getDocs, collection, orderBy, query, limit } from "firebase/firestore";
+import { getDocs, collection, orderBy, query, limit, getCountFromServer, where, Timestamp } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { auth, firestore } from '../../utils/firebase';
 import axios from 'axios';
 import Image from 'next/image';
+import { DISEASES } from '../../utils/constants'
 
 import { generateMyDataPDF } from '../../utils/pdfgen';
 
 const MyData = () => {
   const router = useRouter();
   const [data, setData] = useState([]);
-  const [diseases, setDiseases] = useState(null);
-  const [entriesByDay, setEntriesByDay] = useState([]);
+  const [diseases, setDiseases] = useState(DISEASES);
+  const [entriesByDisease, setEntriesByDisease] = useState(null);
+  const [entriesByTimeFrame, setEntriesByTimeFrame] = useState({
+    day: 0,
+    week: 0,
+    month: 0,
+    year: 0,
+    all: 0
+  });
 
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        let promise = axios.get('/api/diseases');
-        promise.then((response) => {
-          setDiseases(response.data.diseases);
-        });
-        const collectionRef = collection(firestore, "users", user.uid, "results");
-        const q = query(collectionRef, orderBy("timestamp", "desc"), limit(5));
-
-        await getDocs(q).then((querySnapshot) => {
-          const newData = [];
-          const entriesMap = {};
-          if (querySnapshot.empty) {
-            console.log('No matching documents.');
-          } else {
-            querySnapshot.forEach((doc) => {
-              const item = doc.data();
-              newData.push({ id: doc.id, data: item });
-              const date = new Date(item.timestamp.seconds * 1000).toLocaleDateString();
-              if (!entriesMap[date]) {
-                entriesMap[date] = 0;
-              }
-              entriesMap[date]++;
-            });
-            setData(newData);
-            setEntriesByDay(entriesMap);
-          }
-        }).catch((error) => {
-          console.error("Error getting documents: ", error);
-        });
+        getEntriesByDisease(user);
+        getEntriesByTimeFrame(user);
+        fetchMyData(user);
       } else {
         // User is signed out
         router.push('/auth/signin');
@@ -54,11 +37,74 @@ const MyData = () => {
     });
   }, []);
 
+  const fetchMyData = async (user) => {
+    const collectionRef = collection(firestore, "users", user.uid, "results");
+    const q = query(collectionRef, orderBy("timestamp", "desc"), limit(5));
+    const querySnapshot = await getDocs(q);
+    const newData = [];
+    querySnapshot.forEach((doc) => {
+      newData.push({ id: doc.id, data: doc.data() });
+    });
+    setData(newData);
+  }
+
+  const getEntriesByDisease = async (user) => {
+    const collectionRef = collection(firestore, "users", user.uid, "results");
+
+    // count entries by day
+    for (let i = 0; i < diseases.length; i++) {
+      const q = query(collectionRef, where("disease", "==", diseases[i]));
+      const querySnapshot = await getCountFromServer(q);
+      setEntriesByDisease((prev) => ({
+        ...prev,
+        [diseases[i]]: querySnapshot.data().count
+      }));
+    }
+  }
+
+  const getEntriesByTimeFrame = async (user) => {
+    const collectionRef = collection(firestore, "users", user.uid, "results");
+    const qtoday = query(collectionRef, where("timestamp", ">=", Timestamp.fromDate(new Date(new Date().setHours(0, 0, 0, 0)))));
+    const querySnapshotToday = await getCountFromServer(qtoday);
+    setEntriesByTimeFrame((prev) => ({
+      ...prev,
+      day: querySnapshotToday.data().count
+    }));
+
+    const qweek = query(collectionRef, where("timestamp", ">=", Timestamp.fromDate(new Date(new Date().setDate(new Date().getDate() - 7)))));
+    const querySnapshotWeek = await getCountFromServer(qweek);
+    setEntriesByTimeFrame((prev) => ({
+      ...prev,
+      week: querySnapshotWeek.data().count
+    }));
+
+    const qmonth = query(collectionRef, where("timestamp", ">=", Timestamp.fromDate(new Date(new Date().setMonth(new Date().getMonth() - 1)))));
+    const querySnapshotMonth = await getCountFromServer(qmonth);
+    setEntriesByTimeFrame((prev) => ({
+      ...prev,
+      month: querySnapshotMonth.data().count
+    }));
+
+    const qyear = query(collectionRef, where("timestamp", ">=", Timestamp.fromDate(new Date(new Date().setFullYear(new Date().getFullYear() - 1)))));
+    const querySnapshotYear = await getCountFromServer(qyear);
+    setEntriesByTimeFrame((prev) => ({
+      ...prev,
+      year: querySnapshotYear.data().count
+    }));
+
+    const qall = query(collectionRef);
+    const querySnapshotAll = await getCountFromServer(qall);
+    setEntriesByTimeFrame((prev) => ({
+      ...prev,
+      all: querySnapshotAll.data().count
+    }));
+  }
+
   const DiseaseCards = () => {
     const handleCardClick = (diseaseValue) => {
       router.push(`/mydata/specdata/${diseaseValue}`);
     };
-  
+
     if (diseases) {
       return (
         <div className="flex flex-wrap justify-center items-stretch">
@@ -66,20 +112,20 @@ const MyData = () => {
             <div
               key={index}
               className="m-3 cursor-pointer"
-              onClick={() => handleCardClick(disease.value)}
+              onClick={() => handleCardClick(disease)}
             >
               <div className="card card-bordered w-80 bg-base-100 hover:shadow-2xl hover:opacity-60">
                 <figure className="px-10 pt-10">
                   <Image
-                    src={`/img/${disease.value}.png`}
-                    alt={disease.label}
+                    src={`/img/${disease}.png`}
+                    alt={disease}
                     width={500}
                     height={500}
                   />
                 </figure>
                 <div className="card-body items-center text-center">
                   <p className="text-lg font-bold">
-                    Click here for more information about {disease.label}
+                    Click here for more information about {disease}
                   </p>
                 </div>
               </div>
@@ -89,12 +135,6 @@ const MyData = () => {
       );
     }
   };
-  
-  
-  
-  
-  
-  
 
   return (
     <div className="flex flex-wrap justify-center h-screen w-screen" data-theme="corporate">
@@ -113,11 +153,11 @@ const MyData = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <div className="bg-white p-4 rounded card card-bordered outline-black">
-              <h2 className="text-xl font-bold mb-4">Entries by Category</h2>
-              {diseases && diseases.map((category) => (
-                <div key={category.value} className="flex justify-between items-center mb-2 border-b py-2">
-                  <span>{category.label}</span>
-                  <span>{data.filter(item => item.data.disease === category.value).length}</span>
+              <h2 className="text-xl font-bold mb-4">Entries by Disease</h2>
+              {entriesByDisease && diseases.map((disease, index) => (
+                <div key={index} className="flex justify-between items-center mb-2 border-b py-2">
+                  <span>{disease}</span>
+                  <span>{entriesByDisease[disease]}</span>
                 </div>
               ))}
             </div>
@@ -133,12 +173,14 @@ const MyData = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(entriesByDay).map(([date, count], index) => (
-                    <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                      <td className="border px-4 py-2">{date}</td>
-                      <td className="border px-4 py-2">{count}</td>
-                    </tr>
-                  ))}
+                  {
+                    Object.keys(entriesByTimeFrame).map((key, index) => (
+                      <tr key={index} className="">
+                        <th className="border px-4 py-2">{key}</th>
+                        <td className="border px-4 py-2">{entriesByTimeFrame[key]}</td>
+                      </tr>
+                    ))
+                  }
                 </tbody>
               </table>
             </div>
@@ -147,7 +189,7 @@ const MyData = () => {
         <div className="card card-bordered my-5 rounded outline-black">
           <div className="overflow-x-auto w-full ">
             <h2 className="text-xl font-bold m-4">Last Five Entries</h2>
-            <table className="table table-zebra">
+            <table className="table">
               <thead>
                 <tr>
                   <th>Disease</th>
@@ -158,7 +200,7 @@ const MyData = () => {
               </thead>
               <tbody>
                 {data.map((item, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"} onClick={() => { router.push('/mydata/diagnosis/' + item.id) }}>
+                  <tr key={index} className="hover:bg-gray-200" onClick={() => { router.push('/mydata/diagnosis/' + item.id) }}>
                     <th className="font-bold border px-4 py-2">{item.data.disease}</th>
                     <td className="border px-4 py-2">{item.data.prediction.prediction}</td>
                     <td className="border px-4 py-2">{item.data.prediction.probability}</td>
@@ -176,7 +218,7 @@ const MyData = () => {
       </div>
     </div>
   );
-  
+
 };
 
 export default MyData;
