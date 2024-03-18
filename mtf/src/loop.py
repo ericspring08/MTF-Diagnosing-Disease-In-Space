@@ -39,6 +39,7 @@ class MTF(object):
         self.sample_size = 1000
         self.optimization_metric = None
         self.scaler = None
+        self.null_char = None
 
     def read_config(self):
         try:
@@ -57,6 +58,7 @@ class MTF(object):
             self.sample_size = config["experiment"]["sample_size"]
             self.optimization_metric = config["experiment"]["optimization_metric"]
             self.scaler = config["experiment"]["scaler"]
+            self.null_char = config["experiment"]["null_char"]
 
             self.config = config
 
@@ -111,15 +113,20 @@ class MTF(object):
 
         dataset = self.dataset.drop(self.outputs_selection, axis=1)
 
-        # Loop through categorical features and fill null values with most frequent
+        # Replace null_char with null
+        if self.null_char:
+            dataset = dataset.replace(to_replace=self.null_char, value=np.nan)
 
+        print(dataset)
+
+        # Loop through categorical features and fill null values with most frequent
         for feature in self.categorical_features:
-            dataset[feature] = dataset[feature].fillna(
-                dataset[feature].value_counts().index[0])
+            dataset[feature].fillna(
+                method='ffill', inplace=True)
 
         # Loop through numerical features and fill null values with mean
         for feature in self.numerical_features:
-            dataset[feature] = dataset[feature].fillna(dataset[feature].mean())
+            dataset[feature].fillna(method='ffill', inplace=True)
 
         print("Preprocessing Data")
 

@@ -164,53 +164,55 @@ const MyData = ({ params }) => {
   }
   return (
     <div className="min-h-screen w-screen flex flex-col flex-wrap" data-theme="corperate">
-      <div className="flex flex-row justify-between items-center p-6 w-full">
-        <h1 className="text-3xl font-bold">My Data for {params.disease}</h1>
-        <div className="flex justify-center">
-          <button onClick={() => { generateMyDataPDF(data) }} className="flex flex-row justify-center items-center bg-green-500 hover:bg-green-700 text-white text-xl font-bold py-2 px-4 rounded">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-            </svg>
-            Download PDF
-          </button>
+      <div className="w-full p-6">
+        <div className="flex flex-row justify-between items-center pb-6 pt-2 w-full">
+          <h1 className="text-3xl font-bold">My Data for {params.disease}</h1>
+          <div className="flex justify-center">
+            <button onClick={() => { generateMyDataPDF(data) }} className="flex flex-row justify-center items-center bg-green-500 hover:bg-green-700 text-white text-xl font-bold py-2 px-4 rounded">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              Download PDF
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="card card-bordered rounded mx-5 w-full h-full">
-        <h2 className="text-xl font-bold m-4">Last Five Entries</h2>
-        <table className="table table-zebra">
-          <thead>
-            <tr>
-              <th>Prediction</th>
-              <th>Probability</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index} onClick={() => {
-                router.push('/mydata/diagnosis/' + item.id)
-              }}>
-                <td>{item.data.prediction.prediction}</td>
-                <td>{item.data.prediction.prediction === 1 ? 100 - item.data.prediction.probability : item.data.prediction.probability}</td>
-                <td>{new Date(item.data.timestamp.seconds * 1000).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="join grid grid-cols-2 m-4">
-          <button className="join-item btn btn-outline" disabled={disablePrevious} onClick={() => {
-            fetchPreviousData(currentUser);
-          }}>Previous page</button>
-          <button className="join-item btn btn-outline" disabled={disableNext} onClick={() => {
-            fetchNextData(currentUser);
-          }}>Next</button>
+        <div className="card card-bordered rounded overflow-x-scroll mb-4">
+          <div className="w-full">
+            <h2 className="text-xl font-bold m-4">Last Five Entries</h2>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Prediction</th>
+                  <th>Probability</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((item, index) => (
+                  <tr key={index} className="hover:bg-gray-200" onClick={() => {
+                    router.push('/mydata/diagnosis/' + item.id)
+                  }}>
+                    <td>{item.data.prediction.prediction}</td>
+                    <td>{item.data.prediction.prediction === 1 ? 100 - item.data.prediction.probability : item.data.prediction.probability}</td>
+                    <td>{new Date(item.data.timestamp.seconds * 1000).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="join grid grid-cols-2">
+              <button className="join-item btn btn-outline" disabled={disablePrevious} onClick={() => {
+                fetchPreviousData(currentUser);
+              }}>Previous page</button>
+              <button className="join-item btn btn-outline" disabled={disableNext} onClick={() => {
+                fetchNextData(currentUser);
+              }}>Next</button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div>
-      </div>
-      <div className="card card-bordered rounded m-5 h-max">
-        <h2 className="text-xl font-bold m-4">Chart: Confidence of Positive Prediction vs. Successful Entries</h2>
-        <canvas id="myChart"></canvas>
+        <div className="card card-bordered rounded h-min">
+          <h2 className="text-xl font-bold m-4">Chart: Confidence of Positive Prediction vs. Successful Entries</h2>
+          <canvas id="myChart"></canvas>
+        </div>
       </div>
     </div>
   );

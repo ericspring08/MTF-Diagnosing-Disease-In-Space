@@ -43,7 +43,7 @@ const DiagnosisPage = ({ params }) => {
 
   return (
     <div className="h-screen w-screen" data-theme="corporate">
-      <div className="flex flex-row justify-between items-center px-6 pt-6">
+      <div className="flex flex-row justify-between items-center px-6 pt-6 flex-wrap">
         <h1 className="text-3xl font-bold">{data.diseaseName} Diagnosis {id}</h1>
         <div className="flex justify-center">
           <button onClick={() => { generateDiagnosisPDF(data.diseaseName, data.formData, data.prediction.prediction, data.prediction.probability) }} className="flex flex-row justify-center items-center bg-green-500 hover:bg-green-700 text-white text-xl font-bold py-2 px-4 rounded">
