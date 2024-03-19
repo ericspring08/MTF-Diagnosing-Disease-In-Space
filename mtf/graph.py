@@ -4,6 +4,8 @@ from statistics import mean, stdev
 import os
 import argparse
 from src.utils import print_header
+import numpy as np
+from scipy.optimize import curve_fit
 
 print_header()
 
@@ -107,17 +109,55 @@ def generate_learning_curve(results_folder, output_location):
                         file_title, df, os.path.join(output_location, 'cv_results', trial_number, file_title.split('_')[1]))
 
 
+def logistic_objective(x, a, b, c):
+    return c / (1 + a * np.exp(-b * x))
+
+
 def graph_learning_curve(file_title, data, output_location):
+
     plt.figure(figsize=(20, 10))
     plt.rcParams.update({'axes.titlesize': 22})
 
+    x_axis = np.arange(len(data['mean_test_score']))
     y_axis = data['mean_test_score']
 
-    plt.plot(y_axis)
+    # graph the learning Curve logistic regression
+    popt, pcov = curve_fit(logistic_objective, np.arange(len(y_axis)), y_axis)
+
+    x_line = np.linspace(0, len(y_axis), 1000)
+    y_line = logistic_objective(x_line, *popt)
+
+    # get upper asymptote
+    upper_asymptote = popt[2]
+
+    # get lower asymptote
+    lower_asymptote = popt[2] - popt[0]
+
+    plt.plot(x_line, y_line, '--', label='fit')
+    plt.fill_between(x_line, y_line, 0, alpha=0.1)
+    # text for the best fit line equation
+    plt.text(0, upper_asymptote - 0.1,
+             f'Best Fit Line: {round(popt[2], 5)} / (1 + {round(popt[0], 5)} * exp(-{round(popt[1], 5)} * x))', fontsize=14)
+
+    # plot the upper upper_asymptote
+    plt.axhline(y=upper_asymptote, color='r',
+                linestyle='--', label='upper asymptote')
+    plt.axhline(y=lower_asymptote, color='g',
+                linestyle='--', label='lower asymptote')
+
+    # text labels for the upper and lower asymptote equation
+    plt.text(0, upper_asymptote,
+             f'Upper Asymptote: {round(upper_asymptote, 5)}', fontsize=14)
+    plt.text(0, lower_asymptote,
+             f'Lower Asymptote: {round(lower_asymptote, 5)}', fontsize=14)
+    # plot the lower upper_asymptote
+
+    plt.scatter(x_axis, y_axis)
     plt.title(
         f'Learning Curve {file_title.split("_")[0]} - {file_title.split("_")[1]}')
     plt.xlabel('Number of Trials')
     plt.ylabel('Mean Test Score')
+    plt.legend()
     plt.grid()
     print(f'{output_location}/{file_title}.png')
     # create the folder if it doesn't exists
@@ -148,6 +188,7 @@ def graph_model_metric(models, means, stdevs, metric, output, output_location):
         # check if positive or negative
         # increase the text size
         plt.text(value, index + 0.2, str(round(value, 5)), fontsize=14)
+
     plt.grid()
     plt.savefig(os.path.join(
         output_location, 'rankings', output, f'{output}_{metric}.png'))
