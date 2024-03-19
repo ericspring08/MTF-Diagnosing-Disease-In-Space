@@ -84,47 +84,11 @@ def generate_rank_graphs(data, output_location):
                                metric, output, output_location)
 
 
-def generate_rank_curve(results_folder, output_location):
+def generate_rank_curve(output_location):
     # loop through trials in output folder
-    subfolders = [f.path for f in os.scandir(
-        results_folder) if f.is_dir()]
-
-    for subfolder in subfolders:
-        if 'aggregate' in subfolder:
-            continue
-
-        print(f'Ranking Curve - {subfolder}')
-
-        # go through all the files in the subfolder cv_results
-        for root, dirs, files in os.walk(os.path.join(subfolder, 'cv_results')):
-            for file in files:
-                if file.endswith('.csv'):
-                    df = pd.read_csv(os.path.join(root, file))
-                    file_title = file.split('.')[0]
-                    trial_number = root.split('/')[-3]
-                    # insert cv_results into the path of the output output_location
-                    graph_learning_curve(
-                        file_title, df, os.path.join(output_location, 'cv_results', trial_number, file_title.split('_')[1]))
-
-
-def graph_learning_curve(file_title, data, output_location):
-    plt.figure(figsize=(20, 10))
-    plt.rcParams.update({'axes.titlesize': 22})
-
-    y_axis = data['mean_test_score']
-
-    plt.plot(y_axis)
-    plt.title(
-        f'Learning Curve {file_title.split("_")[0]} - {file_title.split("_")[1]}')
-    plt.xlabel('Number of Trials')
-    plt.ylabel('Mean Test Score')
-    plt.grid()
-    print(f'{output_location}/{file_title}.png')
-    # create the folder if it doesn't exists
-    if not os.path.exists(output_location):
-        os.makedirs(output_location)
-    plt.savefig(os.path.join(output_location,
-                f'{file_title}.png'))
+    for root, dirs, files in os.walk(output_location):
+        for file in files:
+            if file.endswith('.csv'):
 
 
 def graph_model_metric(models, means, stdevs, metric, output, output_location):
@@ -157,6 +121,3 @@ def graph_model_metric(models, means, stdevs, metric, output, output_location):
 if args.rankings:
     df = pd.read_csv(os.path.join(args.folder, 'aggregate', 'results_raw.csv'))
     generate_rank_graphs(df, output_location)
-
-if args.cvcurve:
-    generate_rank_curve(args.folder, output_location)
