@@ -84,7 +84,7 @@ def generate_rank_graphs(data, output_location):
                                metric, output, output_location)
 
 
-def generate_rank_curve(results_folder, output_location):
+def generate_learning_curve(results_folder, output_location):
     # loop through trials in output folder
     subfolders = [f.path for f in os.scandir(
         results_folder) if f.is_dir()]
@@ -159,4 +159,4 @@ if args.rankings:
     generate_rank_graphs(df, output_location)
 
 if args.cvcurve:
-    generate_rank_curve(args.folder, output_location)
+    generate_learning_curve(args.folder, output_location)

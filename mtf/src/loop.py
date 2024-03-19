@@ -217,11 +217,12 @@ class MTF(object):
 
                     # Train Model
                     # Tune Hyperparameters with Bayesian Optimization
+                    self.set_optimization_metric(self.optimization_metric)
                     np.int = int
                     opt = BayesSearchCV(
                         model,
                         model_params[model_name],
-                        scoring=shscorewrapper,
+                        scoring=self.optimization_metric,
                         # train test split iterator
                         cv=3,
                         n_iter=self.tuning_iterations,
