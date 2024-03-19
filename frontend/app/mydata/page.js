@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getDocs, collection, orderBy, query, limit } from "firebase/firestore";
@@ -10,8 +10,8 @@ import Image from 'next/image';
 
 import { generateMyDataPDF } from '../../utils/pdfgen';
 
-const MyData = () => {
-  const router = useRouter();
+const MyData = () => { 
+  const router = useRouter(); 
   const [data, setData] = useState([]);
   const [diseases, setDiseases] = useState(null);
   const [entriesByDay, setEntriesByDay] = useState([]);
@@ -43,6 +43,10 @@ const MyData = () => {
             });
             setData(newData);
             setEntriesByDay(entriesMap);
+
+            // Write data to localStorage
+            localStorage.setItem('data', JSON.stringify(newData));
+            console.log('Data written to localStorage');
           }
         }).catch((error) => {
           console.error("Error getting documents: ", error);
@@ -89,12 +93,6 @@ const MyData = () => {
       );
     }
   };
-
-
-
-
-
-
 
   return (
     <div className="flex flex-wrap justify-center h-screen w-screen" data-theme="corporate">
