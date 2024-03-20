@@ -150,9 +150,9 @@ def graph_learning_curve(file_title, data, output_location):
              f'Upper Asymptote: {round(upper_asymptote, 5)}', fontsize=14)
     plt.text(0, lower_asymptote,
              f'Lower Asymptote: {round(lower_asymptote, 5)}', fontsize=14)
-    # plot the lower upper_asymptote
 
-    plt.scatter(x_axis, y_axis)
+    plt.scatter(x_axis, y_axis, c=data['mean_fit_time'], cmap='viridis')
+    plt.colorbar(label='Mean Fit Time')
     plt.title(
         f'Learning Curve {file_title.split("_")[0]} - {file_title.split("_")[1]}')
     plt.xlabel('Number of Trials')
