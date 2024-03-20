@@ -86,6 +86,37 @@ def generate_rank_graphs(data, output_location):
                                metric, output, output_location)
 
 
+def graph_model_metric(models, means, stdevs, metric, output, output_location):
+    plt.figure(figsize=(20, 10))
+    plt.rcParams.update({'axes.titlesize': 22})
+    # bold the title
+    # bold the x and y labels
+    plt.rcParams.update({'axes.labelweight': 'bold'})
+    plt.rcParams.update({'axes.titleweight': 'bold'})
+    # increase size of title
+    plt.title(f'{output} - {metric}')
+    # make sure y label is not cut off
+    plt.barh(models, means, xerr=stdevs)
+    # increase size of xerr bar
+    plt.errorbar(means, models, xerr=stdevs, fmt='o',
+                 ecolor='black', elinewidth=2, capsize=4)
+    plt.xlabel(metric)
+    plt.ylabel('Model')
+    # text labels
+    for index, value in enumerate(means):
+        # check if positive or negative
+        # increase the text size
+        plt.text(value, index + 0.2, str(round(value, 5)), fontsize=14)
+
+    plt.grid()
+    # create the folder if it doesn't exists
+    if not os.path.exists(os.path.join(output_location, 'rankings', output)):
+        os.makedirs(os.path.join(output_location, 'rankings', output))
+    plt.savefig(os.path.join(
+        output_location, 'rankings', output, f'{output}_{metric}.png'))
+    plt.clf()
+
+
 def generate_learning_curve(results_folder, output_location):
     # loop through trials in output folder
     subfolders = [f.path for f in os.scandir(
@@ -119,44 +150,52 @@ def graph_learning_curve(file_title, data, output_location):
     plt.rcParams.update({'axes.titlesize': 22})
 
     x_axis = np.arange(len(data['mean_test_score']))
-    y_axis = data['mean_test_score']
+    y_axis_test = data['mean_test_score']
+    y_axis_train = data['mean_train_score']
 
     # graph the learning Curve logistic regression
-    popt, pcov = curve_fit(logistic_objective, np.arange(len(y_axis)), y_axis)
+    popt_test, pcov_test = curve_fit(
+        logistic_objective, np.arange(len(y_axis_test)), y_axis_test)
 
-    x_line = np.linspace(0, len(y_axis), 1000)
-    y_line = logistic_objective(x_line, *popt)
+    # popt_train, pcov_train = curve_fit(
+    #     logistic_objective, np.arange(len(y_axis_train)), y_axis_train)
+    #
+    x_line_test = np.linspace(0, len(y_axis_test), 1000)
+    y_line_test = logistic_objective(x_line_test, *popt_test)
+
+    x_line_train = np.linspace(0, len(y_axis_train), 1000)
+    # y_line_train = logistic_objective(x_line_train, *popt_train)
 
     # get upper asymptote
-    upper_asymptote = popt[2]
+    upper_asymptote_test = popt_test[2]
+    # upper_asymptote_train = popt_train[2]
 
-    # get lower asymptote
-    lower_asymptote = popt[2] - popt[0]
-
-    plt.plot(x_line, y_line, '--', label='fit')
-    plt.fill_between(x_line, y_line, 0, alpha=0.1)
+    plt.plot(x_line_test, y_line_test, '--', label='test best fit')
+    plt.fill_between(x_line_test, y_line_test, 0, alpha=0.1)
     # text for the best fit line equation
-    plt.text(0, upper_asymptote - 0.1,
-             f'Best Fit Line: {round(popt[2], 5)} / (1 + {round(popt[0], 5)} * exp(-{round(popt[1], 5)} * x))', fontsize=14)
+    plt.text(0, upper_asymptote_test - 0.1,
+             f'Best Fit Line Test: {round(popt_test[2], 5)} / (1 + {round(popt_test[0], 5)} * exp(-{round(popt_test[1], 5)} * x))', fontsize=14)
 
+    # plt.plot(x_line_train, y_line_train, '--', label='train best fit')
+    # plt.fill_between(x_line_train, y_line_train, 0, alpha=0.1)
+    # # text for the best fit line equation
+    # plt.text(0, upper_asymptote_train - 0.1,
+    #          f'Best Fit Line Train: {round(popt_train[2], 5)} / (1 + {round(popt_train[0], 5)} * exp(-{round(popt_train[1], 5)} * x))', fontsize=14)
+    #
     # plot the upper upper_asymptote
-    plt.axhline(y=upper_asymptote, color='r',
-                linestyle='--', label='upper asymptote')
-    plt.axhline(y=lower_asymptote, color='g',
-                linestyle='--', label='lower asymptote')
-
+    plt.axhline(y=upper_asymptote_test, color='r',
+                linestyle='--', label='upper asymptote test')
+    # plt.axhline(y=upper_asymptote_train, color='r',
+    #             linestyle='--', label='upper asymptote train')
     # text labels for the upper and lower asymptote equation
-    plt.text(0, upper_asymptote,
-             f'Upper Asymptote: {round(upper_asymptote, 5)}', fontsize=14)
-    plt.text(0, lower_asymptote,
-             f'Lower Asymptote: {round(lower_asymptote, 5)}', fontsize=14)
-
-    plt.scatter(x_axis, y_axis, c=data['mean_fit_time'], cmap='viridis')
-    plt.colorbar(label='Mean Fit Time')
+    plt.text(0, upper_asymptote_test,
+             f'Upper Asymptote Test: {round(upper_asymptote_test, 5)}', fontsize=14)
+    plt.scatter(x_axis, y_axis_test, label='test', color='r', )
+    plt.scatter(x_axis, y_axis_train, label='train', color='b')
     plt.title(
         f'Learning Curve {file_title.split("_")[0]} - {file_title.split("_")[1]}')
     plt.xlabel('Number of Trials')
-    plt.ylabel('Mean Test Score')
+    plt.ylabel('Mean Score')
     plt.legend()
     plt.grid()
     print(f'{output_location}/{file_title}.png')
@@ -165,34 +204,6 @@ def graph_learning_curve(file_title, data, output_location):
         os.makedirs(output_location)
     plt.savefig(os.path.join(output_location,
                 f'{file_title}.png'))
-
-
-def graph_model_metric(models, means, stdevs, metric, output, output_location):
-    plt.figure(figsize=(20, 10))
-    plt.rcParams.update({'axes.titlesize': 22})
-    # bold the title
-    # bold the x and y labels
-    plt.rcParams.update({'axes.labelweight': 'bold'})
-    plt.rcParams.update({'axes.titleweight': 'bold'})
-    # increase size of title
-    plt.title(f'{output} - {metric}')
-    # make sure y label is not cut off
-    plt.barh(models, means, xerr=stdevs)
-    # increase size of xerr bar
-    plt.errorbar(means, models, xerr=stdevs, fmt='o',
-                 ecolor='black', elinewidth=2, capsize=4)
-    plt.xlabel(metric)
-    plt.ylabel('Model')
-    # text labels
-    for index, value in enumerate(means):
-        # check if positive or negative
-        # increase the text size
-        plt.text(value, index + 0.2, str(round(value, 5)), fontsize=14)
-
-    plt.grid()
-    plt.savefig(os.path.join(
-        output_location, 'rankings', output, f'{output}_{metric}.png'))
-    plt.clf()
 
 
 if args.rankings:
