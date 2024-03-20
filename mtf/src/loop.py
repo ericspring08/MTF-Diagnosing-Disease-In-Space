@@ -226,6 +226,9 @@ class MTF(object):
                         # train test split iterator
                         cv=3,
                         n_iter=self.tuning_iterations,
+                        n_jobs=-1,
+                        n_points=1,
+                        pre_dispatch='2*n_jobs',
                         return_train_score=True,
                         error_score=0,
                     )
