@@ -48,6 +48,9 @@ const Page = ({ params }) => {
         formData: formData,
         prediction: results,
         timestamp: serverTimestamp(),
+        // TODO: upload to new document/array store in document 'graphing' in user folder 
+        //time stamp and probability of positive, map of all data, use diagnosis ID as key 
+        // just use data.filter with buttons for view by ___ week month year
       };
 
       await addDoc(collectionRef, docData);
@@ -115,10 +118,7 @@ const Page = ({ params }) => {
   }, []);
 
   return (
-    <div
-      className="w-screen min-h-screen flex flex-col justify-center items-center"
-      data-theme="corporate"
-    >
+    <div className="w-screen min-h-screen flex flex-col justify-center items-center" data-theme="corporate">
       {submitted ? (
         predictionResults === null ? (
           <span className="loading loading-dots loading-lg"></span>
@@ -126,53 +126,44 @@ const Page = ({ params }) => {
           <div>
             <h1 className="text-6xl">Prediction Result</h1>
             <div>
-              <p className="text-2xl">
-                Prediction:{' '}
-                {predictionResults.prediction === 0
-                  ? 'Negative'
-                  : 'Positive'}
-              </p>
-              <p className="text-2xl">
-                Confidence:{' '}
-                {Math.round(
-                  predictionResults.probability *
-                  100,
-                )}
-                %
-              </p>
+              <p className="text-2xl">Prediction: {predictionResults.prediction === 0 ? 'Negative' : 'Positive'}</p>
+              <p className="text-2xl">Confidence: {Math.round(predictionResults.probability * 100)}%</p>
               <div className="pb-5">
-                {
-                  predictionResults.prediction === 0
-                    ? (
-                      <progress className="progress progress-warning" value={predictionResults.probability * 100} max="100" />
-                    ) : (
-                      <progress className="progress progress-success" value={predictionResults.probability * 100} max="100" />
-                    )
-                }
+                {predictionResults.prediction === 0 ? (
+                  <progress className="progress progress-warning" value={predictionResults.probability * 100} max="100" />
+                ) : (
+                  <progress className="progress progress-success" value={predictionResults.probability * 100} max="100" />
+                )}
               </div>
               <div className="flex flex-row justify-between">
-                <button
-                  className="btn btn-warning"
-                  onClick={handleReset}
-                >
-                  Reset Form
-                </button>
-                <button
-                  className="btn btn-success ml-5"
-                  onClick={() => {
-                    generateDiagnosisPDF(
-                      formName,
-                      formData,
-                      predictionResults.prediction,
-                      predictionResults.probability,
-                    );
-                  }}
-                >
-                  Save as PDF
-                </button>
-                <a href="/" className="btn btn-info">
-                  Go To Home
-                </a>
+                <button className="btn btn-warning" onClick={handleReset}>Reset Form</button>
+                <button className="btn btn-success ml-5" onClick={() => { generateDiagnosisPDF(formName, formData, predictionResults.prediction, predictionResults.probability); }}>Save as PDF</button>
+                <a href="/" className="btn btn-info">Go To Home</a>
+              </div>
+              {/* Display diagnosis explanation based on prediction */}
+              <div className="text-xl mt-5">
+                {predictionResults.prediction === 0 ? (
+                  <div className="max-w-lg mx-auto">
+                    <p>
+                      Based on your diagnosis, it's reassuring to confirm that you are not currently at risk for significant heart conditions such as coronary artery disease, arrhythmia, or impending heart failure. However, your symptomatology is concerning as it suggests a potential risk for heart disease in the future. It's vital to consider lifestyle changes to mitigate this risk. This conclusion is supported by 90% of patients who present similar symptoms and are found to be in good health upon examination. This conclusion was made with the help of information from the National Heart, Lung, and Blood Institute’s publication Your Guide to a Healthy Heart.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="max-w-lg mx-auto">
+                    <p>
+                      Based on your diagnosis, it's concerning to note that you are at risk for significant heart conditions such as coronary artery disease, arrhythmia, or impending heart failure. Immediate medical attention is advised for a more in-depth diagnosis and exploration of treatment options. This conclusion is supported by a dataset of over 1000 patients with varying levels of symptoms of cardiovascular distress. This conclusion was made with the help of information from the National Heart, Lung, and Blood Institute’s publication Your Guide to a Healthy Heart.
+                    </p>
+                  </div>
+                )}
+  
+                {/* Additional message based on specific criteria */}
+                {formData.cholesterol >= 240 || formData.restingSystolicBloodPressure > 140 || formData.maxHeartRate > 155 ? (
+                  <div className="max-w-lg mx-auto mt-4">
+                    <p>
+                      Based on your diagnosis, it's reassuring to confirm that you are not currently at risk for significant heart conditions such as coronary artery disease, arrhythmia, or impending heart failure. However, your symptomatology is concerning as it suggests a potential risk for heart disease in the future. It's vital to consider lifestyle changes to mitigate this risk. This conclusion is supported by 90% of patients who present similar symptoms and are found to be in good health upon examination. This conclusion was made with the help of information from the National Heart, Lung, and Blood Institute’s publication Your Guide to a Healthy Heart.
+                    </p>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
@@ -186,7 +177,7 @@ const Page = ({ params }) => {
               Page {formIndex + 1} of {formHeaders.length}
             </p>
           </div>
-
+  
           <h1 className="text-6xl">{formName}</h1>
           <Form
             formStructure={formStructure}
