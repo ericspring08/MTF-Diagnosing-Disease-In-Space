@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 const HomePage = () => {
   const [diseases, setDiseases] = useState(null);
   const [ekgData, setEKGData] = useState(null);
+  const [error, setError] = useState(null);
 
   const connectToEKG = async () => {
     try {
@@ -15,6 +16,11 @@ const HomePage = () => {
       const ekgDevice = await godirect.selectDevice(); // Use godirect to select device
 
       console.log('Selected EKG device:', ekgDevice);
+
+      if (!ekgDevice || !ekgDevice.connect) {
+        setError('Failed to connect to the EKG device.');
+        return;
+      }
 
       console.log('Connecting to EKG device...');
       await ekgDevice.connect();
@@ -29,6 +35,7 @@ const HomePage = () => {
       });
     } catch (error) {
       console.error('Error:', error);
+      setError('An error occurred while connecting to the EKG device.');
     }
   };
 
@@ -43,6 +50,7 @@ const HomePage = () => {
       })
       .catch(error => {
         console.error('Error fetching disease data:', error);
+        setError('An error occurred while fetching disease data.');
       });
   }, []);
 
@@ -92,9 +100,15 @@ const HomePage = () => {
         Select a disease to diagnose
       </h2>
       <button onClick={handleButtonClick} className="btn btn-primary">Get Data From Vernier EKG</button>
-      {ekgData && (
+      {error && (
         <div className="mt-5">
-          <h3 className="text-xl font-bold">EKG Data:</h3>
+          <h3 className="text-xl font-bold">Error:</h3>
+          <p>{error}</p>
+        </div>
+      )}
+      {ekgData && !error && (
+        <div className="mt-5">
+          <h3 className="text-xl font-bold">Received EKG Data:</h3>
           <p>{JSON.stringify(ekgData)}</p>
         </div>
       )}
