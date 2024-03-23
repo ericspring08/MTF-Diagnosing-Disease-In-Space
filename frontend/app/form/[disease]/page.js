@@ -1,5 +1,5 @@
 'use client';
-
+import godirect from './node_modules/@vernier/godirect/dist/godirect.min.esm.js';
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { generateDiagnosisPDF } from '../../../utils/pdfgen';

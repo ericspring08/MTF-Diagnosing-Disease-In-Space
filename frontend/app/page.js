@@ -1,18 +1,49 @@
 'use client';
-
-import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import axios from 'axios';
+import axios from 'axios'; // Reintroduced axios library
+import godirect from '@vernier/godirect';
+import React, { useState, useEffect } from 'react';
 
 const HomePage = () => {
-  const [diseases, setDiseases] = React.useState(null);
+  const [diseases, setDiseases] = useState(null);
+  const [ekgData, setEKGData] = useState(null);
+
+  const connectToEKG = async () => {
+    try {
+      console.log('Opening device list chooser...');
+      const ekgDevice = await godirect.selectDevice(); // Use godirect to select device
+
+      console.log('Selected EKG device:', ekgDevice);
+
+      console.log('Connecting to EKG device...');
+      await ekgDevice.connect();
+      console.log('Connected to EKG sensor:', ekgDevice);
+
+      console.log('Starting EKG measurements...');
+      const measurement = await ekgDevice.startMeasurements();
+
+      measurement.subscribe(data => {
+        console.log('EKG measurement:', data);
+        setEKGData(data); // Update state with EKG data
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleButtonClick = () => {
+    connectToEKG();
+  };
 
   useEffect(() => {
-    let promise = axios.get('/api/diseases');
-    promise.then((response) => {
-      setDiseases(response.data.diseases);
-    });
+    axios.get('/api/diseases') // Fetch disease data from API endpoint
+      .then(response => {
+        setDiseases(response.data.diseases);
+      })
+      .catch(error => {
+        console.error('Error fetching disease data:', error);
+      });
   }, []);
 
   const DiseaseCards = () => {
@@ -53,25 +84,21 @@ const HomePage = () => {
   };
 
   return (
-    <div>
-      <div
-        className="h-screen w-screen flex flex-col items-center"
-        data-theme="corporate"
-      >
-        <h1
-          className="text-5xl text-center font-bold mt-10 mb-5"
-          data-theme="corporate"
-        >
-          Welcome to the Disease Diagnosis System
-        </h1>
-        <h2
-          className="text-3xl text-center mt-5 mb-10"
-          data-theme="corporate"
-        >
-          Select a disease to diagnose
-        </h2>
-        <DiseaseCards />
-      </div>
+    <div className="h-screen w-screen flex flex-col items-center" data-theme="corporate">
+      <h1 className="text-5xl text-center font-bold mt-10 mb-5" data-theme="corporate">
+        Welcome to the Disease Diagnosis System
+      </h1>
+      <h2 className="text-3xl text-center mt-5 mb-10" data-theme="corporate">
+        Select a disease to diagnose
+      </h2>
+      <button onClick={handleButtonClick} className="btn btn-primary">Get Data From Vernier EKG</button>
+      {ekgData && (
+        <div className="mt-5">
+          <h3 className="text-xl font-bold">EKG Data:</h3>
+          <p>{JSON.stringify(ekgData)}</p>
+        </div>
+      )}
+      <DiseaseCards />
     </div>
   );
 };
