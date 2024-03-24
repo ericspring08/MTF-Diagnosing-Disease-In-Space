@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import Chart from 'chart.js/auto'; // Import Chart.js library
 import Link from 'next/link';
 import Image from 'next/image';
 import axios from 'axios';
@@ -7,11 +8,13 @@ import godirect from '@vernier/godirect';
 
 const HomePage = () => {
   const [diseases, setDiseases] = useState(null);
-  const [ekgData, setEKGData] = useState(null);
   const [error, setError] = useState(null);
-  const [ekgMeasurement, setEKGMeasurement] = useState(null);
   const [numSensors, setNumSensors] = useState(null);
+  const [ekgMeasurement, setEKGMeasurement] = useState(null);
   const [logCounter, setLogCounter] = useState(0); // Counter for logging sensor data
+
+  // Initialize variables for EKG chart
+  let ekgChart;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,35 +52,53 @@ const HomePage = () => {
       console.log('Available sensors:', ekgDevice.availableSensors);
       setNumSensors(ekgDevice.availableSensors.length);
   
-      // Check if the device supports connection
-      if (!ekgDevice.connect) {
-        setError('EKG device does not support connection.');
-        return;
-      } 
+      // Get a filtered array of only the enabled sensor(s).
+      const enabledSensors = ekgDevice.sensors.filter(s => s.enabled);
   
-      console.log('Connecting to EKG device...');
-      await ekgDevice.connect();
-  
-      console.log('Connected to EKG sensor:', ekgDevice);
-  
-      console.log('Starting EKG measurements...');
-      const measurement = await ekgDevice.startMeasurements();
-  
-      // Set up subscription to EKG data
-      const subscription = measurement.subscribe((data) => {
-        if (logCounter < 100) {
-          console.log('EKG measurement:', data);
-          setEKGData(data);
+      // Increment log counter once per data update, not per sensor
+      const handleValueChanged = (sensor) => {
+        if (logCounter < 5) {
+          // Log the sensor name, new value, and units.
+          console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
           setLogCounter(logCounter + 1); // Increment log counter
+  
+          // Update the EKG chart with the new data point
+          ekgChart.data.labels.push('');
+          ekgChart.data.datasets[0].data.push(sensor.value);
+          ekgChart.update(); // Update the chart
         } else {
-          // Stop logging after 100 console log statements
-          console.log('Stopped logging after 100 console log statements.');
-          subscription.unsubscribe(); // Unsubscribe from further sensor data
+          // Stop logging after 5 console log statements
+          console.log('Stopped logging after 5 console log statements.');
+          enabledSensors.forEach(sensor => sensor.removeAllListeners()); // Remove all listeners
+        }
+      };
+  
+      // Loop through the array of `enabledSensors` and set up value change listeners.
+      enabledSensors.forEach(sensor => sensor.on('value-changed', handleValueChanged));
+  
+      // Set up the EKG chart
+      const ctx = document.getElementById('ekgChart');
+      ekgChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'EKG Data',
+            borderColor: 'rgb(75, 192, 192)',
+            borderWidth: 1,
+            data: [],
+            fill: false
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              display: false // Hide x-axis labels
+            }
+          }
         }
       });
   
-      // Store the subscription so we can unsubscribe later
-      setEKGMeasurement(subscription);  
     } catch (error) {
       console.error('Error:', error);
       if (error.code === 'device_selection_failed') {
@@ -88,10 +109,12 @@ const HomePage = () => {
         setError('Failed to start EKG measurements.');
       } else {
         setError('An error occurred while connecting to the EKG device.');
-      } 
+      }
     }
   };
   
+  
+
   const handleButtonClick = () => {
     connectToEKG();
   };
@@ -154,12 +177,8 @@ const HomePage = () => {
           <p>{error}</p>
         </div>
       )}
-      {ekgData && !error && (
-        <div className="mt-5">
-          <h3 className="text-xl font-bold">Received EKG Data:</h3>
-          <p>{JSON.stringify(ekgData)}</p>
-        </div>
-      )}
+      {/* Add the canvas element for the EKG chart */}
+      <canvas id="ekgChart" width="400" height="200"></canvas>
       <DiseaseCards />
     </div>
   );
