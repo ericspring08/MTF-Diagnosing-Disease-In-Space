@@ -27,38 +27,6 @@ const MyData = () => {
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        let promise = axios.get('/api/diseases');
-        promise.then((response) => {
-          setDiseases(response.data.diseases);
-        });
-        const collectionRef = collection(firestore, "users", user.uid, "results");
-        const q = query(collectionRef, orderBy("timestamp", "desc"), limit(5));
-
-        await getDocs(q).then((querySnapshot) => {
-          const newData = [];
-          const entriesMap = {};
-          if (querySnapshot.empty) {
-            console.log('No matching documents.');
-          } else {
-            querySnapshot.forEach((doc) => {
-              const item = doc.data();
-              newData.push({ id: doc.id, data: item });
-              const date = new Date(item.timestamp.seconds * 1000).toLocaleDateString();
-              if (!entriesMap[date]) {
-                entriesMap[date] = 0;
-              }
-              entriesMap[date]++;
-            });
-            setData(newData);
-            setEntriesByDay(entriesMap);
-
-            // Write data to localStorage
-            localStorage.setItem('data', JSON.stringify(newData));
-            console.log('Data written to localStorage');
-          }
-        }).catch((error) => {
-          console.error("Error getting documents: ", error);
-        });
         getEntriesByDisease(user);
         getEntriesByTimeFrame(user);
         fetchMyData(user);
@@ -83,7 +51,6 @@ const MyData = () => {
   const getEntriesByDisease = async (user) => {
     const collectionRef = collection(firestore, "users", user.uid, "results");
 
-    // count entries by day
     for (let i = 0; i < diseases.length; i++) {
       const q = query(collectionRef, where("disease", "==", diseases[i]));
       const querySnapshot = await getCountFromServer(q);
@@ -186,10 +153,10 @@ const MyData = () => {
           <div>
             <div className="bg-white p-4 rounded card card-bordered outline-black">
               <h2 className="text-xl font-bold mb-4">Entries by Disease</h2>
-              {entriesByDisease && diseases.map((disease, index) => (
+              {entriesByDisease && diseases.map((key, index) => (
                 <div key={index} className="flex justify-between items-center mb-2 border-b py-2">
-                  <span>{disease}</span>
-                  <span>{entriesByDisease[disease]}</span>
+                  <span>{key}</span>
+                  <span>{entriesByDisease[key]}</span>
                 </div>
               ))}
             </div>
