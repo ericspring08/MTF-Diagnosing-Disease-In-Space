@@ -1,0 +1,54 @@
+{
+  "location": {
+    "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/data/hdd.csv",
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/hdd_results_cvcurve/"
+  },
+  "experiment": {
+    "metrics": [
+      "accuracy",
+      "precision",
+      "recall",
+      "f1",
+      "train_time",
+      "predict_time",
+      "logloss",
+      "shscore",
+      "roc_auc",
+      "balanced_accuracy",
+      "jaccard"
+    ],
+    "outputs": [
+      "target"
+    ],
+    "numerical": [
+      "age",
+      "trestbps",
+      "thalach",
+      "oldpeak"
+    ],
+    "categorical": [
+      "sex",
+      "cp",
+      "fbs",
+      "restecg",
+      "exang",
+      "slope",
+      "ca",
+      "thal"
+    ],
+    "models": [
+      "DecisionTree",
+      "MLP",
+      "LGBM_GBDT",
+      "LGBM_DART",
+      "QDA"
+    ],
+    "trials": 1,
+    "tuning_iterations": 24,
+    "sample_size": 1000,
+    "optimization_metric": "neg_log_loss",
+    "scaler": "RobustScaler",
+    "null_char": "N/A"
+  },
+  "outputs": {}
+}

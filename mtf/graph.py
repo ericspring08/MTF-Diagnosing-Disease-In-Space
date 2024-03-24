@@ -4,6 +4,8 @@ from statistics import mean, stdev
 import os
 import argparse
 from src.utils import print_header
+import numpy as np
+from scipy.optimize import curve_fit
 
 print_header()
 
@@ -105,12 +107,108 @@ def graph_model_metric(models, means, stdevs, metric, output, output_location):
         # check if positive or negative
         # increase the text size
         plt.text(value, index + 0.2, str(round(value, 5)), fontsize=14)
+
     plt.grid()
+    # create the folder if it doesn't exists
+    if not os.path.exists(os.path.join(output_location, 'rankings', output)):
+        os.makedirs(os.path.join(output_location, 'rankings', output))
     plt.savefig(os.path.join(
         output_location, 'rankings', output, f'{output}_{metric}.png'))
     plt.clf()
 
 
+def generate_learning_curve(results_folder, output_location):
+    # loop through trials in output folder
+    subfolders = [f.path for f in os.scandir(
+        results_folder) if f.is_dir()]
+
+    for subfolder in subfolders:
+        if 'aggregate' in subfolder:
+            continue
+
+        print(f'Ranking Curve - {subfolder}')
+
+        # go through all the files in the subfolder cv_results
+        for root, dirs, files in os.walk(os.path.join(subfolder, 'cv_results')):
+            for file in files:
+                if file.endswith('.csv'):
+                    df = pd.read_csv(os.path.join(root, file))
+                    file_title = file.split('.')[0]
+                    trial_number = root.split('/')[-3]
+                    # insert cv_results into the path of the output output_location
+                    graph_learning_curve(
+                        file_title, df, os.path.join(output_location, 'cv_results', trial_number, file_title.split('_')[1]))
+
+
+def logistic_objective(x, a, b, c):
+    return c / (1 + a * np.exp(-b * x))
+
+
+def graph_learning_curve(file_title, data, output_location):
+
+    plt.figure(figsize=(20, 10))
+    plt.rcParams.update({'axes.titlesize': 22})
+
+    x_axis = np.arange(len(data['mean_test_score']))
+    y_axis_test = data['mean_test_score']
+    y_axis_train = data['mean_train_score']
+
+    # graph the learning Curve logistic regression
+    popt_test, pcov_test = curve_fit(
+        logistic_objective, np.arange(len(y_axis_test)), y_axis_test)
+
+    # popt_train, pcov_train = curve_fit(
+    #     logistic_objective, np.arange(len(y_axis_train)), y_axis_train)
+    #
+    x_line_test = np.linspace(0, len(y_axis_test), 1000)
+    y_line_test = logistic_objective(x_line_test, *popt_test)
+
+    x_line_train = np.linspace(0, len(y_axis_train), 1000)
+    # y_line_train = logistic_objective(x_line_train, *popt_train)
+
+    # get upper asymptote
+    upper_asymptote_test = popt_test[2]
+    # upper_asymptote_train = popt_train[2]
+
+    plt.plot(x_line_test, y_line_test, '--', label='test best fit')
+    plt.fill_between(x_line_test, y_line_test, 0, alpha=0.1)
+    # text for the best fit line equation
+    plt.text(0, upper_asymptote_test - 0.1,
+             f'Best Fit Line Test: {round(popt_test[2], 5)} / (1 + {round(popt_test[0], 5)} * exp(-{round(popt_test[1], 5)} * x))', fontsize=14)
+
+    # plt.plot(x_line_train, y_line_train, '--', label='train best fit')
+    # plt.fill_between(x_line_train, y_line_train, 0, alpha=0.1)
+    # # text for the best fit line equation
+    # plt.text(0, upper_asymptote_train - 0.1,
+    #          f'Best Fit Line Train: {round(popt_train[2], 5)} / (1 + {round(popt_train[0], 5)} * exp(-{round(popt_train[1], 5)} * x))', fontsize=14)
+    #
+    # plot the upper upper_asymptote
+    plt.axhline(y=upper_asymptote_test, color='r',
+                linestyle='--', label='upper asymptote test')
+    # plt.axhline(y=upper_asymptote_train, color='r',
+    #             linestyle='--', label='upper asymptote train')
+    # text labels for the upper and lower asymptote equation
+    plt.text(0, upper_asymptote_test,
+             f'Upper Asymptote Test: {round(upper_asymptote_test, 5)}', fontsize=14)
+    plt.scatter(x_axis, y_axis_test, label='test', color='r', )
+    plt.scatter(x_axis, y_axis_train, label='train', color='b')
+    plt.title(
+        f'Learning Curve {file_title.split("_")[0]} - {file_title.split("_")[1]}')
+    plt.xlabel('Number of Trials')
+    plt.ylabel('Mean Score')
+    plt.legend()
+    plt.grid()
+    print(f'{output_location}/{file_title}.png')
+    # create the folder if it doesn't exists
+    if not os.path.exists(output_location):
+        os.makedirs(output_location)
+    plt.savefig(os.path.join(output_location,
+                f'{file_title}.png'))
+
+
 if args.rankings:
     df = pd.read_csv(os.path.join(args.folder, 'aggregate', 'results_raw.csv'))
     generate_rank_graphs(df, output_location)
+
+if args.cvcurve:
+    generate_learning_curve(args.folder, output_location)
