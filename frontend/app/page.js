@@ -1,58 +1,100 @@
 'use client';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import axios from 'axios'; // Reintroduced axios library
+import axios from 'axios';
 import godirect from '@vernier/godirect';
-import React, { useState, useEffect } from 'react';
 
 const HomePage = () => {
   const [diseases, setDiseases] = useState(null);
   const [ekgData, setEKGData] = useState(null);
   const [error, setError] = useState(null);
+  const [ekgMeasurement, setEKGMeasurement] = useState(null);
+  const [numSensors, setNumSensors] = useState(null);
+  const [logCounter, setLogCounter] = useState(0); // Counter for logging sensor data
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('/api/diseases');
+        setDiseases(response.data.diseases);
+      } catch (error) {
+        console.error('Error fetching disease data:', error);
+        setError('An error occurred while fetching disease data.');
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      if (ekgMeasurement) {
+        ekgMeasurement.unsubscribe();
+      }
+    };
+  }, []);
 
   const connectToEKG = async () => {
     try {
       console.log('Opening device list chooser...');
-      const ekgDevice = await godirect.selectDevice(); // Use godirect to select device
-
+      const ekgDevice = await godirect.selectDevice();
+  
       console.log('Selected EKG device:', ekgDevice);
-
-      if (!ekgDevice || !ekgDevice.connect) {
-        setError('Failed to connect to the EKG device.');
+  
+      if (!ekgDevice) {
+        setError('Failed to select the EKG device.');
         return;
       }
-
+  
+      // Access device properties to display sensor availability
+      console.log('Available sensors:', ekgDevice.availableSensors);
+      setNumSensors(ekgDevice.availableSensors.length);
+  
+      // Check if the device supports connection
+      if (!ekgDevice.connect) {
+        setError('EKG device does not support connection.');
+        return;
+      } 
+  
       console.log('Connecting to EKG device...');
       await ekgDevice.connect();
+  
       console.log('Connected to EKG sensor:', ekgDevice);
-
+  
       console.log('Starting EKG measurements...');
       const measurement = await ekgDevice.startMeasurements();
-
-      measurement.subscribe(data => {
-        console.log('EKG measurement:', data);
-        setEKGData(data); // Update state with EKG data
+  
+      // Set up subscription to EKG data
+      const subscription = measurement.subscribe((data) => {
+        if (logCounter < 100) {
+          console.log('EKG measurement:', data);
+          setEKGData(data);
+          setLogCounter(logCounter + 1); // Increment log counter
+        } else {
+          // Stop logging after 100 console log statements
+          console.log('Stopped logging after 100 console log statements.');
+          subscription.unsubscribe(); // Unsubscribe from further sensor data
+        }
       });
+  
+      // Store the subscription so we can unsubscribe later
+      setEKGMeasurement(subscription);  
     } catch (error) {
       console.error('Error:', error);
-      setError('An error occurred while connecting to the EKG device.');
+      if (error.code === 'device_selection_failed') {
+        setError('Failed to select the EKG device.');
+      } else if (error.code === 'connection_failed') {
+        setError('Failed to connect to the EKG device.');
+      } else if (error.code === 'start_measurements_failed') {
+        setError('Failed to start EKG measurements.');
+      } else {
+        setError('An error occurred while connecting to the EKG device.');
+      } 
     }
   };
-
+  
   const handleButtonClick = () => {
     connectToEKG();
   };
-
-  useEffect(() => {
-    axios.get('/api/diseases') // Fetch disease data from API endpoint
-      .then(response => {
-        setDiseases(response.data.diseases);
-      })
-      .catch(error => {
-        console.error('Error fetching disease data:', error);
-        setError('An error occurred while fetching disease data.');
-      });
-  }, []);
 
   const DiseaseCards = () => {
     if (diseases === null)
@@ -100,6 +142,12 @@ const HomePage = () => {
         Select a disease to diagnose
       </h2>
       <button onClick={handleButtonClick} className="btn btn-primary">Get Data From Vernier EKG</button>
+      {numSensors && (
+        <div className="mt-5">
+          <h3 className="text-xl font-bold">Number of Available Sensors:</h3>
+          <p>{numSensors}</p>
+        </div>
+      )}
       {error && (
         <div className="mt-5">
           <h3 className="text-xl font-bold">Error:</h3>
