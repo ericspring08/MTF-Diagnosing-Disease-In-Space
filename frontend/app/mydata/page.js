@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getDocs, collection, orderBy, query, limit, getCountFromServer, where, Timestamp } from "firebase/firestore";
@@ -51,7 +51,6 @@ const MyData = () => {
   const getEntriesByDisease = async (user) => {
     const collectionRef = collection(firestore, "users", user.uid, "results");
 
-    // count entries by day
     for (let i = 0; i < diseases.length; i++) {
       const q = query(collectionRef, where("disease", "==", diseases[i]));
       const querySnapshot = await getCountFromServer(q);
@@ -154,10 +153,10 @@ const MyData = () => {
           <div>
             <div className="bg-white p-4 rounded card card-bordered outline-black">
               <h2 className="text-xl font-bold mb-4">Entries by Disease</h2>
-              {entriesByDisease && diseases.map((disease, index) => (
+              {entriesByDisease && diseases.map((key, index) => (
                 <div key={index} className="flex justify-between items-center mb-2 border-b py-2">
-                  <span>{disease}</span>
-                  <span>{entriesByDisease[disease]}</span>
+                  <span>{key}</span>
+                  <span>{entriesByDisease[key]}</span>
                 </div>
               ))}
             </div>

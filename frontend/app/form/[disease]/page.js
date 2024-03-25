@@ -1,5 +1,4 @@
 'use client';
-import godirect from './node_modules/@vernier/godirect/dist/godirect.min.esm.js';
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { generateDiagnosisPDF } from '../../../utils/pdfgen';
@@ -155,7 +154,7 @@ const Page = ({ params }) => {
                     </p>
                   </div>
                 )}
-  
+
                 {/* Additional message based on specific criteria */}
                 {formData.cholesterol >= 240 || formData.restingSystolicBloodPressure > 140 || formData.maxHeartRate > 155 ? (
                   <div className="max-w-lg mx-auto mt-4">
@@ -177,7 +176,7 @@ const Page = ({ params }) => {
               Page {formIndex + 1} of {formHeaders.length}
             </p>
           </div>
-  
+
           <h1 className="text-6xl">{formName}</h1>
           <Form
             formStructure={formStructure}
