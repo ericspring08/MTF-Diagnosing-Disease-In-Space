@@ -56,23 +56,23 @@ const HomePage = () => {
       const enabledSensors = ekgDevice.sensors.filter(s => s.enabled);
   
       // Increment log counter once per data update, not per sensor
-      const handleValueChanged = (sensor) => {
-        if (logCounter < 5) {
-          // Log the sensor name, new value, and units.
-          console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
-          setLogCounter(logCounter + 1); // Increment log counter
+// Increment log counter once per data update, not per sensor
+const handleValueChanged = (sensor) => {
+  if (ekgChart.data.datasets[0].data.length < 100) { // Check if data points are less than 100
+    // Log the sensor name, new value, and units.
+    console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
   
-          // Update the EKG chart with the new data point
-          ekgChart.data.labels.push('');
-          ekgChart.data.datasets[0].data.push(sensor.value);
-          ekgChart.update(); // Update the chart
-        } else {
-          // Stop logging after 5 console log statements
-          console.log('Stopped logging after 5 console log statements.');
-          enabledSensors.forEach(sensor => sensor.removeAllListeners()); // Remove all listeners
-        }
-      };
-  
+    // Update the EKG chart with the new data point
+    ekgChart.data.labels.push('');
+    ekgChart.data.datasets[0].data.push(sensor.value);
+    ekgChart.update(); // Update the chart
+  } else {
+    // Stop logging after 100 data points
+    console.log('Stopped logging after 100 data points.');
+    enabledSensors.forEach(sensor => sensor.removeAllListeners()); // Remove all listeners
+  }
+};
+
       // Loop through the array of `enabledSensors` and set up value change listeners.
       enabledSensors.forEach(sensor => sensor.on('value-changed', handleValueChanged));
   
