@@ -32,6 +32,9 @@ const Navbar = () => {
             <Link href="/mydata" className="btn btn-ghost mr-1 text-white">
               My Data
             </Link>
+            <Link href="/ekg" className="btn btn-ghost text-white">
+              EKG
+            </Link> {/* EKG Button */}
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                 <svg className="w-10 h-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -54,7 +57,7 @@ const Navbar = () => {
     )
   } else {
     return (
-      <div data-theme="coperate">
+      <div data-theme="corporate">
         <div className="navbar bg-base-100">
           <div className="flex-1">
             <Link href="/" className="btn btn-ghost text-xl">Smart Diagnosis</Link>
