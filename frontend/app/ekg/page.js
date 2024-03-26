@@ -148,6 +148,11 @@ const HomePage = () => {
                 <h4>Conclusion</h4>
                 <p>EKG interpretation is a crucial skill for healthcare professionals, enabling them to diagnose and manage various cardiac conditions. While the EKG provides valuable information, it's essential to integrate findings with other clinical data for accurate diagnosis and treatment planning.</p>
               </div>
+              <hr className="my-4" />
+              {/* Image */}
+              <div className="p-6">
+                <img src="https://cardiocarellc.com/app/uploads/2020/06/EKG-vs.-ECG-the-difference.jpg" alt="EKG vs. ECG" className="mx-auto max-w-full" />
+              </div>
             </div>
           )}
         </div>
@@ -171,6 +176,7 @@ const HomePage = () => {
       <canvas id="ekgChart" width="800" height="400"></canvas>
     </div>
   );
+  
   
   
   }; 
