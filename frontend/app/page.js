@@ -1,20 +1,14 @@
+// Import necessary dependencies
 'use client';
 import React, { useState, useEffect } from 'react';
-import Chart from 'chart.js/auto'; // Import Chart.js library
 import Link from 'next/link';
 import Image from 'next/image';
 import axios from 'axios';
-import godirect from '@vernier/godirect';
 
 const HomePage = () => {
   const [diseases, setDiseases] = useState(null);
   const [error, setError] = useState(null);
   const [numSensors, setNumSensors] = useState(null);
-  const [ekgMeasurement, setEKGMeasurement] = useState(null);
-  const [logCounter, setLogCounter] = useState(0); // Counter for logging sensor data
-
-  // Initialize variables for EKG chart
-  let ekgChart;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,96 +22,7 @@ const HomePage = () => {
     };
 
     fetchData();
-
-    return () => {
-      if (ekgMeasurement) {
-        ekgMeasurement.unsubscribe();
-      }
-    };
   }, []);
-
-  const connectToEKG = async () => {
-    try {
-      console.log('Opening device list chooser...');
-      const ekgDevice = await godirect.selectDevice();
-  
-      console.log('Selected EKG device:', ekgDevice);
-  
-      if (!ekgDevice) {
-        setError('Failed to select the EKG device.');
-        return;
-      }
-  
-      // Access device properties to display sensor availability
-      console.log('Available sensors:', ekgDevice.availableSensors);
-      setNumSensors(ekgDevice.availableSensors.length);
-  
-      // Get a filtered array of only the enabled sensor(s).
-      const enabledSensors = ekgDevice.sensors.filter(s => s.enabled);
-  
-      // Increment log counter once per data update, not per sensor
-// Increment log counter once per data update, not per sensor
-const handleValueChanged = (sensor) => {
-  if (ekgChart.data.datasets[0].data.length < 100) { // Check if data points are less than 100
-    // Log the sensor name, new value, and units.
-    console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
-  
-    // Update the EKG chart with the new data point
-    ekgChart.data.labels.push('');
-    ekgChart.data.datasets[0].data.push(sensor.value);
-    ekgChart.update(); // Update the chart
-  } else {
-    // Stop logging after 100 data points
-    console.log('Stopped logging after 100 data points.');
-    enabledSensors.forEach(sensor => sensor.removeAllListeners()); // Remove all listeners
-  }
-};
-
-      // Loop through the array of `enabledSensors` and set up value change listeners.
-      enabledSensors.forEach(sensor => sensor.on('value-changed', handleValueChanged));
-  
-      // Set up the EKG chart
-      const ctx = document.getElementById('ekgChart');
-      ekgChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: [],
-          datasets: [{
-            label: 'EKG Data',
-            borderColor: 'rgb(75, 192, 192)',
-            borderWidth: 1,
-            data: [],
-            fill: false
-          }]
-        },
-        options: {
-          scales: {
-            x: {
-              display: false // Hide x-axis labels
-            }
-          }
-        }
-      });
-  
-    } catch (error) {
-      console.error('Error:', error);
-      if (error.code === 'device_selection_failed') {
-        setError('Failed to select the EKG device.');
-      } else if (error.code === 'connection_failed') {
-        setError('Failed to connect to the EKG device.');
-      } else if (error.code === 'start_measurements_failed') {
-        setError('Failed to start EKG measurements.');
-      } else {
-        setError('An error occurred while connecting to the EKG device.');
-      }
-    }
-  };
-  
-  
-
-  const handleButtonClick = () => {
-    connectToEKG();
-  };
 
   const DiseaseCards = () => {
     if (diseases === null)
@@ -164,21 +69,12 @@ const handleValueChanged = (sensor) => {
       <h2 className="text-3xl text-center mt-5 mb-10" data-theme="corporate">
         Select a disease to diagnose
       </h2>
-      <button onClick={handleButtonClick} className="btn btn-primary">Get Data From Vernier EKG</button>
-      {numSensors && (
-        <div className="mt-5">
-          <h3 className="text-xl font-bold">Number of Available Sensors:</h3>
-          <p>{numSensors}</p>
-        </div>
-      )}
       {error && (
         <div className="mt-5">
           <h3 className="text-xl font-bold">Error:</h3>
           <p>{error}</p>
         </div>
       )}
-      {/* Add the canvas element for the EKG chart */}
-      <canvas id="ekgChart" width="400" height="200"></canvas>
       <DiseaseCards />
     </div>
   );
