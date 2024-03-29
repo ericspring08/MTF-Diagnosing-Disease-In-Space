@@ -1,8 +1,9 @@
 model,output,metric,value
 DecisionTree,binaryClass,accuracy,0.985
-DecisionTree,binaryClass,precision,0.9840425531914894
-DecisionTree,binaryClass,recall,1.0
-DecisionTree,binaryClass,f1,0.9919571045576407
-DecisionTree,binaryClass,train_time,755967125.0
-DecisionTree,binaryClass,predict_time,449834.0
-DecisionTree,binaryClass,logloss,0.5406548008367575
+DecisionTree,binaryClass,precision,0.9945945945945946
+DecisionTree,binaryClass,recall,0.989247311827957
+DecisionTree,binaryClass,f1,0.9919137466307278
+DecisionTree,binaryClass,train_time,707779457.0
+DecisionTree,binaryClass,predict_time,10250333.0
+DecisionTree,binaryClass,logloss,0.0300010801806521
+DecisionTree,binaryClass,balanced_accuracy,0.9589093701996928

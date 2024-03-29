@@ -14,11 +14,11 @@ ldd_numerical_features = ["FVC", "FEC1", "AGE"]
 hdd_categorical_features = ["sex", "cp", "fbs",
                             "restecg", "exang", "slope", "ca", "thal"]
 hdd_numerical_features = ["age", "trestbps", "chol", "thalach", "oldpeak"]
-tdd_features = ["age", "sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery", "I131_treatment",
-                "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary", "TSH", "T3", "TT4", "T4U", "FTI"]
+tdd_features = ["age", "sex", "on thyroxine", "on antithyroid medication", "sick", "thyroid surgery", "I131 treatment",
+                "query hypothyroid", "query hyperthyroid", "goitre", "tumor", "hypopituitary", "TSH", "T3", "TT4", "T4U", "FTI"]
 tdd_numerical_features = ["age", "TSH", "T3", "TT4", "T4U", "FTI"]
-tdd_categorical_features = ["sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery",
-                            "I131_treatment", "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary"]
+tdd_categorical_features = ["sex", "on thyroxine", "on antithyroid medication", "sick", "thyroid surgery",
+                            "I131 treatment", "query hypothyroid", "query hyperthyroid", "goitre", "tumor", "hypopituitary"]
 hdd_types = {
     "age": int,
     "sex": int,
@@ -77,16 +77,16 @@ ldd_types = {
 tdd_types = {
     "age": int,
     "sex": str,
-    "on_thyroxine": bool,
-    "on antithyroid meds": bool,
-    "sick": bool,
-    "thyroid_surgery": bool,
-    "I131_treatment": bool,
-    "query_hypothyroid": bool,
-    "query_hyperthyroid": bool,
-    "goitre": bool,
-    "tumor": bool,
-    "hypopituitary": bool,
+    "on thyroxine": str,
+    "on antithyroid medication": str,
+    "sick": str,
+    "thyroid surgery": str,
+    "I131 treatment": str,
+    "query hypothyroid": str,
+    "query hyperthyroid": str,
+    "goitre": str,
+    "tumor": str,
+    "hypopituitary": str,
     "TSH": float,
     "T3": float,
     "TT4": float,
@@ -107,16 +107,16 @@ form_tdd = {
                 'Female': 'F'
             }
         },
-        'on_thyroxine': {
-            'title': 'On thyroxine?',
+        'on thyroxine': {
+            'title': 'On Thyroxine?',
             'type': 'categorical',
             'options': {
                 'Yes': 't',
                 'No': 'f'
             }
         },
-        'on antithyroid meds': {
-            'title': 'On Antithyroid meds?',
+        'on antithyroid medication': {
+            'title': 'On Antithyroid medication?',
             'type': 'categorical',
             'options': {
                 'Yes': 't',
@@ -131,7 +131,7 @@ form_tdd = {
                 'No': 'f'
             }
         },
-        'thyroid_surgery': {
+        'thyroid surgery': {
             'title': 'Have had Thyroid Surgery?',
             'type': 'categorical',
             'options': {
@@ -139,7 +139,7 @@ form_tdd = {
                 'No': 'f'
             }
         },
-        'I131_treatment': {
+        'I131 treatment': {
             'title': 'Have had I131 treatment?',
             'type': 'categorical',
             'options': {
@@ -147,7 +147,7 @@ form_tdd = {
                 'No': 'f'
             }
         },
-        'query_hypothyroid': {
+        'query hypothyroid': {
             'title': 'Do you think you have Hypothyroidism?',
             'type': 'categorical',
             'options': {
@@ -155,7 +155,7 @@ form_tdd = {
                 'No': 'f'
             }
         },
-        'query_hyperthyroid': {
+        'query hyperthyroid': {
             'title': 'Do you think you have Hyperthyroidism?',
             'type': 'categorical',
             'options': {
