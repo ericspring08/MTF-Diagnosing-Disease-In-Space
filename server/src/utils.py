@@ -15,8 +15,8 @@ hdd_categorical_features = ["sex", "cp", "fbs",
                             "restecg", "exang", "slope", "ca", "thal"]
 hdd_numerical_features = ["age", "trestbps", "chol", "thalach", "oldpeak"]
 tdd_features = ["age", "sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery", "I131_treatment",
-                "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary", "TSH", "T3", "TT4", "T4U", "FTI", "TBG"]
-tdd_numerical_features = ["age", "TSH", "T3", "TT4", "T4U", "FTI", "TBG"]
+                "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary", "TSH", "T3", "TT4", "T4U", "FTI"]
+tdd_numerical_features = ["age", "TSH", "T3", "TT4", "T4U", "FTI"]
 tdd_categorical_features = ["sex", "on_thyroxine", "on antithyroid meds", "sick", "thyroid_surgery",
                             "I131_treatment", "query_hypothyroid", "query_hyperthyroid", "goitre", "tumor", "hypopituitary"]
 hdd_types = {
@@ -92,7 +92,6 @@ tdd_types = {
     "TT4": float,
     "T4U": float,
     "FTI": float,
-    "TBG": float
 }
 form_tdd = {
     'Basics': {
@@ -208,10 +207,6 @@ form_tdd = {
         },
         'FTI': {
             'title': 'FTI in Blood (μg/dL)',
-            'type': 'numerical'
-        },
-        'TBG': {
-            'title': 'TBG in Blood (mcg/dL)',
             'type': 'numerical'
         },
     }
