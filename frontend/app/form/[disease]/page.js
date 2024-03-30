@@ -144,7 +144,7 @@ const Page = ({ params }) => {
                 <div className="text-xl mt-5">
                   {predictionResults.prediction === 0 ? (
                     <div className="max-w-lg mx-auto">
-                                            <p>
+                      <p>
                         Based on your diagnosis, it's reassuring to confirm that you are not currently at risk for significant heart conditions such as coronary artery disease, arrhythmia, or impending heart failure. However, your symptomatology is concerning as it suggests a potential risk for heart disease in the future. It's vital to consider lifestyle changes to mitigate this risk. This conclusion is supported by 90% of patients who present similar symptoms and are found to be in good health upon examination. This conclusion was made with the help of information from the National Heart, Lung, and Blood Institute’s publication Your Guide to a Healthy Heart.
                       </p>
                     </div>
@@ -155,7 +155,7 @@ const Page = ({ params }) => {
                       </p>
                     </div>
                   )}
-
+  
                   {/* Additional message based on specific criteria */}
                   {formData.cholesterol >= 240 || formData.restingSystolicBloodPressure > 140 || formData.maxHeartRate > 155 ? (
                     <div className="max-w-lg mx-auto mt-4">
@@ -164,6 +164,25 @@ const Page = ({ params }) => {
                       </p>
                     </div>
                   ) : null}
+                </div>
+              )}
+  
+              {/* Display diagnosis explanation for thyroid */}
+              {params.disease === 'tdd' && (
+                <div className="text-xl mt-5">
+                  {predictionResults.prediction === 0 ? (
+                    <div className="max-w-lg mx-auto">
+                      <p>
+                        Your recent diagnosis suggests that your thyroid function is moderate to above average, with no signs of hypothyroidism. This indicates a healthy thyroid status for now. However, it's still important to stay vigilant and schedule periodic check-ups to ensure ongoing thyroid health.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="max-w-lg mx-auto">
+                      <p>
+                        Your diagnosis indicates hypothyroidism, requiring prompt medical attention. It's crucial to consult with a healthcare professional for further evaluation and management. Early intervention and treatment can help address symptoms and prevent potential complications associated with hypothyroidism.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -178,7 +197,7 @@ const Page = ({ params }) => {
               Page {formIndex + 1} of {formHeaders.length}
             </p>
           </div>
-
+  
           <h1 className="text-6xl">{formName}</h1>
           <Form
             formStructure={formStructure}
@@ -261,7 +280,7 @@ const Page = ({ params }) => {
         </div>
       )}
     </div>
-  );
+  );  
 };
 
 export default Page;
