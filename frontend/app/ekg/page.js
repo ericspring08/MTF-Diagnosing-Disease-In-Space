@@ -4,7 +4,7 @@ import Chart from 'chart.js/auto';
 import Image from 'next/image';
 import axios from 'axios';
 import godirect from '@vernier/godirect';
-import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentLength } from '../../utils/ekgfunctions'; // Import functions from ekgfunctions.js
+import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentSlope } from '../../utils/ekgfunctions'; // Import functions from ekgfunctions.js
 import Link from 'next/link'; // Import Link component
 
 // Define the HomePage component
@@ -32,7 +32,7 @@ const HomePage = () => {
       const enabledSensors = ekgDevice.sensors.filter(s => s.enabled);
 
       const handleValueChanged = (sensor) => {
-        if (ekgChart.data.datasets[0].data.length < 100) {
+        if (ekgChart.data.datasets[0].data.length < 300) {
           console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
 
           ekgChart.data.labels.push('');
@@ -41,15 +41,15 @@ const HomePage = () => {
 
           // Calculate EKG data values using imported functions
           // Define the threshold for peak detection
-          const threshold = 0.5; // You can adjust this value as needed
+          const threshold = 0.275; // You can adjust this value as needed
           const samplingRate = 1;
           const start = 0;
           const end = 1000;
-          const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold); // You need to define the 'threshold' variable
+          const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
           const rrIntervals = calculateRRIntervals(peaks, samplingRate); // You need to define the 'samplingRate' variable
           const maxima = findMaxima(ekgChart.data.datasets[0].data);
           const minima = findMinima(ekgChart.data.datasets[0].data);
-          const segmentLength = measureSegmentLength(ekgChart.data.datasets[0].data, start, end, samplingRate); // You need to define the 'start', 'end', and 'samplingRate' variables
+          const segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks); // You need to define the 'start', 'end', and 'samplingRate' variables
 
           // Update state with calculated EKG data values
           setEkgDataValues({
@@ -202,17 +202,17 @@ const HomePage = () => {
                 <th>RR Interval</th>
                 <th>Maxima</th>
                 <th>Minima</th>
-                <th>Segment Length</th>
+                <th>ST Segment Slope</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>{ekgDataValues.peaks.slice(0, 5).join(', ')}</td>
-                <td>{calculateAverage(ekgDataValues.rrIntervals).toFixed(2)}</td>
-                <td>{ekgDataValues.maxima.length > 0 ? Math.max(...ekgDataValues.maxima) : '-'}</td>
-                <td>{ekgDataValues.minima.length > 0 ? Math.min(...ekgDataValues.minima) : '-'}</td>
-                <td>{calculateAverage(ekgDataValues.segmentLength).toFixed(2)}</td>
-              </tr>
+            <tr>
+              <td>{ekgDataValues.peaks.slice(0, 5).join(', ')}</td>
+              <td>{calculateAverage(ekgDataValues.rrIntervals).toFixed(2)}</td>
+              <td>{ekgDataValues.maxima !== undefined ? ekgDataValues.maxima : '-'}</td>
+              <td>{ekgDataValues.minima !== undefined ? ekgDataValues.minima : '-'}</td>
+              <td>{(calculateAverage(ekgDataValues.segmentLength) * 100).toFixed(4)}</td>
+          </tr>
             </tbody>
           </table>
         </div>
