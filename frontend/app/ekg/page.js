@@ -1,10 +1,10 @@
-// Import necessary dependencies
 'use client';
 import React, { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 import Image from 'next/image';
 import axios from 'axios';
 import godirect from '@vernier/godirect';
+import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentLength } from '../../utils/ekgfunctions'; // Import functions from ekgfunctions.js
 import Link from 'next/link'; // Import Link component
 
 // Define the HomePage component
@@ -14,6 +14,7 @@ const HomePage = () => {
   const [numSensors, setNumSensors] = useState(null);
   let ekgChart; // Initialize EKG chart
   const [showEkgDescription, setShowEkgDescription] = useState(false);
+  const [ekgDataValues, setEkgDataValues] = useState(null); // State variable to store calculated EKG data values
 
   // Function to connect to EKG device
   const connectToEKG = async () => {
@@ -37,6 +38,27 @@ const HomePage = () => {
           ekgChart.data.labels.push('');
           ekgChart.data.datasets[0].data.push(sensor.value);
           ekgChart.update();
+
+          // Calculate EKG data values using imported functions
+          // Define the threshold for peak detection
+          const threshold = 0.5; // You can adjust this value as needed
+          const samplingRate = 1;
+          const start = 0;
+          const end = 1000;
+          const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold); // You need to define the 'threshold' variable
+          const rrIntervals = calculateRRIntervals(peaks, samplingRate); // You need to define the 'samplingRate' variable
+          const maxima = findMaxima(ekgChart.data.datasets[0].data);
+          const minima = findMinima(ekgChart.data.datasets[0].data);
+          const segmentLength = measureSegmentLength(ekgChart.data.datasets[0].data, start, end, samplingRate); // You need to define the 'start', 'end', and 'samplingRate' variables
+
+          // Update state with calculated EKG data values
+          setEkgDataValues({
+            peaks,
+            rrIntervals,
+            maxima,
+            minima,
+            segmentLength
+          });
         } else {
           console.log('Stopped logging after 100 data points.');
           enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
@@ -44,6 +66,7 @@ const HomePage = () => {
       };
 
       enabledSensors.forEach(sensor => sensor.on('value-changed', handleValueChanged));
+      
 
       const ctx = document.getElementById('ekgChart');
       ekgChart = new Chart(ctx, {
@@ -83,6 +106,18 @@ const HomePage = () => {
     }
   };
 
+  const calculateAverage = (values) => {
+    // Check if values is an array and not empty
+    if (!Array.isArray(values) || values.length === 0) return 0;
+  
+    // Check if all values are numbers
+    if (!values.every(value => typeof value === 'number')) return 0;
+  
+    // Perform the average calculation
+    const sum = values.reduce((acc, curr) => acc + curr, 0);
+    return sum / values.length;
+  }
+  
   // Render the HomePage component
   return (
     <div className="h-screen w-screen flex flex-col items-center" data-theme="corporate">
@@ -142,11 +177,6 @@ const HomePage = () => {
               <h4>Conclusion</h4>
               <p>EKG interpretation is a crucial skill for healthcare professionals, enabling them to diagnose and manage various cardiac conditions. While the EKG provides valuable information, it's essential to integrate findings with other clinical data for accurate diagnosis and treatment planning.</p>
             </div>
-            <hr className="my-4" />
-            {/* Image */}
-            <div className="p-6">
-              <img src="https://cardiocarellc.com/app/uploads/2020/06/EKG-vs.-ECG-the-difference.jpg" alt="EKG vs. ECG" className="mx-auto max-w-full" />
-            </div>
           </div>
         )}
       </div>
@@ -160,13 +190,37 @@ const HomePage = () => {
         </div>
       )}
       <canvas id="ekgChart" width="800" height="400"></canvas>
+  
+      {/* Table to display calculated EKG data values */}
+      {ekgDataValues ? (
+        <div className="mt-5">
+          <h2 className="text-2xl font-bold mb-3">Calculated EKG Data Values</h2>
+          <table className="table w-full">
+            <thead>
+              <tr>
+                <th>Peak</th>
+                <th>RR Interval</th>
+                <th>Maxima</th>
+                <th>Minima</th>
+                <th>Segment Length</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{ekgDataValues.peaks.slice(0, 5).join(', ')}</td>
+                <td>{calculateAverage(ekgDataValues.rrIntervals).toFixed(2)}</td>
+                <td>{ekgDataValues.maxima.length > 0 ? Math.max(...ekgDataValues.maxima) : '-'}</td>
+                <td>{ekgDataValues.minima.length > 0 ? Math.min(...ekgDataValues.minima) : '-'}</td>
+                <td>{calculateAverage(ekgDataValues.segmentLength).toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="mt-5">Loading...</div>
+      )}
     </div>
-  );
-
-
-
+  );  
 };
 
-
 export default HomePage;
-
