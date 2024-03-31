@@ -38,9 +38,7 @@
       "tumor",
       "hypopituitary"
     ],
-    "models": [
-      "DecisionTree"
-    ],
+    "models": "all",
     "trials": 1,
     "tuning_iterations": 10,
     "scaler": "RobustScaler",

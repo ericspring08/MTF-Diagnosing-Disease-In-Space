@@ -29,6 +29,10 @@ def get_metric(y_pred, y_prob, y_test, metrics, train_time, predict_time):
         elif metric == "shscore":
             # SHScore Metric
             all_metrics[metric] = shscore(y_pred, y_prob, y_test.values)
+        elif metric == "neg_log_loss":
+            # Negative Log Loss Metric
+            all_metrics[metric] = -log_loss(
+                y_test, y_prob, labels=y_test.unique())
         # Standard Metrics
         else:
             # import from sklearn
