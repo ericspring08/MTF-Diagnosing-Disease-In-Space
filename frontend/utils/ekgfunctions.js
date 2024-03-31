@@ -1,20 +1,33 @@
 // Function to detect peaks in EKG data
 export function detectPeaks(data, threshold) {
     const peaks = [];
+    
+    // Find peaks
     for (let i = 1; i < data.length - 1; i++) {
         if (data[i] > threshold && data[i] > data[i - 1] && data[i] > data[i + 1]) {
-            peaks.push(i);
+            peaks.push({ index: i, value: data[i] });
         }
     }
-    return peaks;
+    
+    // Sort peaks by value in descending order
+    peaks.sort((a, b) => b.value - a.value);
+    
+    // Keep only the top three highest peaks
+    if (peaks.length > 4) {
+        peaks.splice(4);
+    }
+    
+    // Extract indices of the top three peaks
+    return peaks.map(peak => peak.index);
 }
+
 
 
 // Function to calculate RR intervals from peaks
 export function calculateRRIntervals(peaks, samplingRate) {
     const rrIntervals = [];
     for (let i = 1; i < peaks.length; i++) {
-        const rrInterval = (peaks[i] - peaks[i - 1]) / samplingRate; // Convert indices to time
+        const rrInterval = Math.abs((peaks[i] - peaks[i - 1]) / samplingRate); // Convert indices to time and calculate absolute value
         rrIntervals.push(rrInterval);
     }
     return rrIntervals;
@@ -74,4 +87,29 @@ export function measureSegmentSlope(ekgData, peaks) {
     return slopes;
 }
 
+export function detectEKGNormalcy(data, peaks, rrIntervals, maxima) {
+    const rrIntervalThresholdMin = 50;
+    const rrIntervalThresholdMax = 120;
+    const peakCountThreshold = 3;
+    const maximaThreshold = 0.9;
 
+    // Check RR interval criteria
+    const abnormalRRIntervals = rrIntervals.some(interval => interval < rrIntervalThresholdMin || interval > rrIntervalThresholdMax);
+    
+    // Check peak count
+    const abnormalPeakCount = peaks.length > peakCountThreshold;
+
+    // Check for left ventricular hypertrophy
+    const leftVentricularHypertrophy = maxima > maximaThreshold;
+
+    // Determine normalcy based on criteria
+    if (abnormalRRIntervals) {
+        return 'Abnormal';
+    } else if (abnormalPeakCount) {
+        return 'Abnormal';
+    } else if (leftVentricularHypertrophy) {
+        return 'Left Ventricular Hypertrophy';
+    } else {
+        return 'Normal';
+    }
+}

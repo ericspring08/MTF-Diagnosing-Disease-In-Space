@@ -2,10 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 import Image from 'next/image';
-import axios from 'axios';
 import godirect from '@vernier/godirect';
-import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentSlope } from '../../utils/ekgfunctions'; // Import functions from ekgfunctions.js
-import Link from 'next/link'; // Import Link component
+import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentSlope, detectEKGNormalcy} from '../../utils/ekgfunctions'; // Import functions from ekgfunctions.js
 
 // Define the HomePage component
 const HomePage = () => {
@@ -43,21 +41,20 @@ const HomePage = () => {
           // Define the threshold for peak detection
           const threshold = 0.275; // You can adjust this value as needed
           const samplingRate = 1;
-          const start = 0;
-          const end = 1000;
           const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
           const rrIntervals = calculateRRIntervals(peaks, samplingRate); // You need to define the 'samplingRate' variable
           const maxima = findMaxima(ekgChart.data.datasets[0].data);
           const minima = findMinima(ekgChart.data.datasets[0].data);
           const segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks); // You need to define the 'start', 'end', and 'samplingRate' variables
-
+          const normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
           // Update state with calculated EKG data values
           setEkgDataValues({
             peaks,
             rrIntervals,
             maxima,
             minima,
-            segmentLength
+            segmentLength,
+            normalcy,
           });
         } else {
           console.log('Stopped logging after 100 data points.');
@@ -179,48 +176,83 @@ const HomePage = () => {
             </div>
           </div>
         )}
-      </div>
-      {error && (
-        <div role="alert" className="alert alert-error rounded">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          <div>
-            <h3 className="font-bold">Error connecting to Vernier EKG</h3>
-            <div className="text-xs">{error}</div>
+        {error && (
+          <div role="alert" className="alert alert-error rounded">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div>
+              <h3 className="font-bold">Error connecting to Vernier EKG</h3>
+              <div className="text-xs">{error}</div>
+            </div>
           </div>
-        </div>
-      )}
-      <canvas id="ekgChart" width="800" height="400"></canvas>
+        )}
+        <canvas id="ekgChart" width="800" height="400"></canvas>
   
-      {/* Table to display calculated EKG data values */}
-      {ekgDataValues ? (
         <div className="mt-5">
-          <h2 className="text-2xl font-bold mb-3">Calculated EKG Data Values</h2>
-          <table className="table w-full">
-            <thead>
-              <tr>
-                <th>Peak</th>
-                <th>RR Interval</th>
-                <th>Maxima</th>
-                <th>Minima</th>
-                <th>ST Segment Slope</th>
-              </tr>
-            </thead>
-            <tbody>
-            <tr>
-              <td>{ekgDataValues.peaks.slice(0, 5).join(', ')}</td>
-              <td>{calculateAverage(ekgDataValues.rrIntervals).toFixed(2)}</td>
-              <td>{ekgDataValues.maxima !== undefined ? ekgDataValues.maxima : '-'}</td>
-              <td>{ekgDataValues.minima !== undefined ? ekgDataValues.minima : '-'}</td>
-              <td>{(calculateAverage(ekgDataValues.segmentLength) * 100).toFixed(4)}</td>
-          </tr>
-            </tbody>
-          </table>
+          {/* Table displaying calculated EKG data values */}
+          {ekgDataValues ? (
+            <div>
+              <h2 className="text-2xl font-bold mb-3">Calculated EKG Data Values</h2>
+              <table className="table w-full">
+                <thead>
+                  <tr>
+                    <th>Peak</th>
+                    <th>RR Interval</th>
+                    <th>Maxima</th>
+                    <th>Minima</th>
+                    <th>ST Segment Slope</th>
+                    <th>EKG Normalcy</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{ekgDataValues.peaks.slice(0, 5).join(', ')}</td>
+                    <td>{calculateAverage(ekgDataValues.rrIntervals).toFixed(2)}</td>
+                    <td>{ekgDataValues.maxima !== undefined ? ekgDataValues.maxima : '-'}</td>
+                    <td>{ekgDataValues.minima !== undefined ? ekgDataValues.minima : '-'}</td>
+                    <td>{(calculateAverage(ekgDataValues.segmentLength) * 100).toFixed(4)}</td>
+                    <td>{ekgDataValues.normalcy}</td>
+                  </tr>
+                </tbody>
+              </table>
+              {/* Boxes with text */}
+              <div className="flex mt-5">
+                {/* Box 1: ST Slope */}
+                <div className="box mr-5 p-4">
+                  <h3 className="font-bold">ST Slope</h3>
+                  <p>
+                    ST slope can provide a variety of information points, including the presence of ischemia or past/present myocardial infarctions.
+                    It's important to compare ST slope changes between resting states and states of elevated heart rate to look for exercise-induced changes as well.
+                  </p>
+                </div>
+  
+                {/* Box 2: Normality */}
+                <div className="box mr-5 p-4">
+                  <h3 className="font-bold">EKG Normality</h3>
+                  <p>
+                    EKG normality is assessed based on difference of extrema as well as time duration between waves.
+                    Normality should only be considered in the realm of a resting patient diagnosis and can be altered in the instance of an elevated heart rate or various medications.
+                  </p>
+                </div>
+  
+                {/* Box 3: Left Ventricular Hypertrophy */}
+                <div className="box p-4">
+                  <h3 className="font-bold">Left Ventricular Hypertrophy</h3>
+                  <p>
+                    Left Ventricular Hypertrophy is one of the most common indicators of underlying heart disease.
+                    It can be diagnosed by a particularly sharp R wave compared to the rest of the wave on an EKG.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-5">Loading...</div>
+          )}
         </div>
-      ) : (
-        <div className="mt-5">Loading...</div>
-      )}
+      </div>
     </div>
-  );  
-};
+  );
+  
+          }  
+
 
 export default HomePage;
