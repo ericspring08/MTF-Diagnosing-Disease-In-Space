@@ -1,7 +1,7 @@
 {
   "location": {
     "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/data/LDD.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/ldd_cvcurve/"
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/ldd_results/"
   },
   "experiment": {
     "metrics": [
@@ -36,19 +36,12 @@
       "Asthama",
       "Other diseaes"
     ],
-    "models": [
-      "DecisionTree",
-      "MLP",
-      "LGBM_GBDT",
-      "LGBM_DART",
-      "QDA"
-    ],
-    "trials": 1,
+    "models": "all",
+    "trials": 5,
     "tuning_iterations": 150,
     "sample_size": 1000,
     "scaler": "RobustScaler",
-    "optimization_metric": "neg_log_loss",
-    "null_char": "N/A"
+    "optimization_metric": "neg_modified_log_loss"
   },
   "outputs": {
     "Risk": {

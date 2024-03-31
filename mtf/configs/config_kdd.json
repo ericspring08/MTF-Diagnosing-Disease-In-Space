@@ -1,7 +1,7 @@
 {
   "location": {
     "dataset": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/data/KDD.csv",
-    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/kdd_1000_cvcurve/"
+    "results": "/Users/ericzhang/Desktop/Code/NasaHunch23/mtf/results/kdd_results/"
   },
   "experiment": {
     "metrics": [
@@ -48,19 +48,12 @@
       "pe",
       "ane"
     ],
-    "models": [
-      "DecisionTree",
-      "MLP",
-      "LGBM_GBDT",
-      "LGBM_DART",
-      "QDA"
-    ],
-    "trials": 1,
-    "tuning_iterations": 150,
+    "models": "all",
+    "trials": 5,
+    "tuning_iterations": 24,
     "sample_size": 1000,
-    "optimization_metric": "neg_log_loss",
-    "scaler": "RobustScaler",
-    "null_char": "N/A"
+    "optimization_metric": "neg_modified_log_loss",
+    "scaler": "RobustScaler"
   },
   "outputs": {
     "classification": {

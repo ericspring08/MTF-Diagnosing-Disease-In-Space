@@ -7,7 +7,7 @@ import pandas as pd
 
 from models import model_options, model_params
 from save import ModelResults
-from utils import get_metric, print_tags, shscorewrapper
+from utils import get_metric, print_tags, shscorewrapper, neg_modified_log_loss_wrapper, fprime_wrapper
 
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
@@ -15,8 +15,6 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler, MinMaxScaler, R
 
 from skopt import BayesSearchCV
 import pickle
-
-from sklearn.metrics import log_loss
 
 
 class MTF(object):
@@ -96,12 +94,6 @@ class MTF(object):
 
     def load_data(self):
         self.dataset = pd.read_csv(self.dataset_path)
-
-    def set_optimization_metric(self, metric):
-        if metric == "shscore":
-            self.optimization_metric = shscorewrapper
-        else:
-            self.optimization_metric = metric
 
     def preprocess(self):
         print("Extract Outputs")
@@ -270,12 +262,20 @@ class MTF(object):
 
                     # Train Model
                     # Tune Hyperparameters with Bayesian Optimization
-                    self.set_optimization_metric(self.optimization_metric)
+                    _optimization_metric = self.optimization_metric
+
+                    if self.optimization_metric == "shscore":
+                        _optimization_metric = shscorewrapper
+                    elif self.optimization_metric == "neg_modified_log_loss":
+                        _optimization_metric = neg_modified_log_loss_wrapper
+                    elif self.optimization_metric == "fprime":
+                        _optimization_metric = fprime_wrapper
+
                     np.int = int
                     opt = BayesSearchCV(
                         model,
                         model_params[model_name],
-                        scoring=self.optimization_metric,
+                        scoring=_optimization_metric,
                         # train test split iterator
                         cv=3,
                         n_iter=self.tuning_iterations,
