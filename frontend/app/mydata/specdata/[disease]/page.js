@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { auth, firestore } from '../../../../utils/firebase';
 import { Chart, registerables } from 'chart.js';
 import { generateMyDataPDF } from '../../../../utils/pdfgen';
+import { DISEASES, DISEASE_NAMES } from '../../../../utils/constants';
 
 const MyData = ({ params }) => {
   const [data, setData] = useState([]);
@@ -166,7 +167,7 @@ const MyData = ({ params }) => {
     <div className="min-h-screen w-screen flex flex-col flex-wrap" data-theme="corperate">
       <div className="w-full p-6">
         <div className="flex flex-row justify-between items-center pb-6 pt-2 w-full">
-          <h1 className="text-3xl font-bold">My Data for {params.disease}</h1>
+          <h1 className="text-3xl font-bold">My Data for {DISEASE_NAMES[params.disease]}</h1>
           <div className="flex justify-center">
             <button onClick={() => { generateMyDataPDF(data) }} className="flex flex-row justify-center items-center bg-green-500 hover:bg-green-700 text-white text-xl font-bold py-2 px-4 rounded">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-2">
