@@ -173,7 +173,7 @@ const MyData = () => {
                   {
                     Object.keys(entriesByTimeFrame).map((key, index) => (
                       <tr key={index} className="">
-                        <th className="border px-4 py-2">{DISEASE_NAMES[key]}</th>
+                        <th className="border px-4 py-2">{key}</th>
                         <td className="border px-4 py-2">{entriesByTimeFrame[key]}</td>
                       </tr>
                     ))
