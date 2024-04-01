@@ -49,10 +49,10 @@
       "ane"
     ],
     "models": "all",
-    "trials": 5,
-    "tuning_iterations": 24,
+    "trials": 1,
+    "tuning_iterations": 15,
     "sample_size": 1000,
-    "optimization_metric": "neg_modified_log_loss",
+    "optimization_metric": "neg_log_loss",
     "scaler": "RobustScaler"
   },
   "outputs": {
