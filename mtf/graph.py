@@ -34,11 +34,13 @@ if not os.path.exists(output_location):
 
 def generate_rank_graphs(data, output_location):
     combine_trials = dict()
+    not_qualified_models = []
 
     # loop through all rows
     for index, row in data.iterrows():
         # pass if value is nan
         if pd.isna(row['value']):
+            not_qualified_models.append(row['model'])
             continue
 
         # Get the key for the dictionary
@@ -83,10 +85,10 @@ def generate_rank_graphs(data, output_location):
 
             models, means, stdevs = zip(*processed_trials[output][metric])
             graph_model_metric(models, means, stdevs,
-                               metric, output, output_location)
+                               metric, output, output_location, not_qualified_models)
 
 
-def graph_model_metric(models, means, stdevs, metric, output, output_location):
+def graph_model_metric(models, means, stdevs, metric, output, output_location, not_qualified_models):
     plt.figure(figsize=(20, 10))
     plt.rcParams.update({'axes.titlesize': 22})
     # bold the title
@@ -98,6 +100,10 @@ def graph_model_metric(models, means, stdevs, metric, output, output_location):
     # make sure y label is not cut off
     plt.barh(models, means, xerr=stdevs)
     # increase size of xerr bar
+    # list out the models as bars with error message that didn't qualify
+    for model in not_qualified_models:
+        plt.barh(model, 0, xerr=0.001, color='red')
+        plt.text(0, model, 'Model did not qualify', fontsize=14)
     plt.errorbar(means, models, xerr=stdevs, fmt='o',
                  ecolor='black', elinewidth=2, capsize=4)
     plt.xlabel(metric)
