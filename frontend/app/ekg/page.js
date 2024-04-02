@@ -71,23 +71,21 @@ const HomePage = () => {
               segmentLength,
               normalcy,
             });
-
-            // Upload the calculated EKG data values to Firestore
-            uploadEKGDataToFirebase({
-              peaks,
-              rrIntervals,
-              maxima,
-              minima,
-              segmentLength,
-              normalcy,
-            });
-
             // Reset the data point count
             dataPointCount = 0;
           }
         } else {
           console.log('Stopped logging after 100 data points.');
           enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
+          // Upload the calculated EKG data values to Firestore
+          uploadEKGDataToFirebase({
+            peaks,
+            rrIntervals,
+            maxima,
+            minima,
+            segmentLength,
+            normalcy,
+          });
         }
       };
 

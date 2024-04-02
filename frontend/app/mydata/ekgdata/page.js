@@ -15,7 +15,7 @@ const EKGDataPage = () => {
         console.log('User is not signed in');
       }
       console.log('User is signed in');
-      const ekgDataCollection = collection(firestore, user.uid, 'ekgData');
+      const ekgDataCollection = collection(firestore, 'users', user.uid, 'ekgData');
       const q = query(ekgDataCollection, orderBy('timestamp', 'desc'), limit(5));
       const snapshot = await getDocs(q);
       const data = snapshot.docs.map(doc => doc.data());
