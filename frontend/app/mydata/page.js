@@ -2,9 +2,9 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getDocs, collection, orderBy, query, limit, getCountFromServer, where, Timestamp } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 import { auth, firestore } from '../../utils/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import axios from 'axios';
 import Image from 'next/image';
 import { DISEASES } from '../../utils/constants'
@@ -23,6 +23,7 @@ const MyData = () => {
     year: 0,
     all: 0
   });
+
 
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
@@ -47,6 +48,24 @@ const MyData = () => {
     });
     setData(newData);
   }
+
+  const EKGDataCard = () => {
+    const handleCardClick = () => {
+      router.push('/mydata/ekgdata');
+    };
+  
+    return (
+      <div className="m-3 cursor-pointer" onClick={handleCardClick}>
+        <div className="card card-bordered w-80 bg-base-100 hover:shadow-2xl hover:opacity-60">
+          <div className="card-body items-center text-center">
+            <p className="text-lg font-bold">
+              Click here for EKG Data
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const getEntriesByDisease = async (user) => {
     const collectionRef = collection(firestore, "users", user.uid, "results");
@@ -213,6 +232,7 @@ const MyData = () => {
         <div className="bg-white rounded-lg p-4">
           <h2 className="text-2xl font-bold mb-4">Explore by Disease</h2>
           <DiseaseCards />
+          <EKGDataCard />
         </div>
       </div>
     </div>

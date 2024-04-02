@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 import Image from 'next/image';
+import { auth, firestore } from '../../utils/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import godirect from '@vernier/godirect';
 import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentSlope, detectEKGNormalcy} from '../../utils/ekgfunctions'; // Import functions from ekgfunctions.js
 
@@ -29,6 +31,8 @@ const HomePage = () => {
 
       const enabledSensors = ekgDevice.sensors.filter(s => s.enabled);
 
+      let dataPointCount = 0;
+
       const handleValueChanged = (sensor) => {
         if (ekgChart.data.datasets[0].data.length < 300) {
           console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
@@ -47,20 +51,45 @@ const HomePage = () => {
           const minima = findMinima(ekgChart.data.datasets[0].data);
           const segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks); // You need to define the 'start', 'end', and 'samplingRate' variables
           const normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
-          // Update state with calculated EKG data values
-          setEkgDataValues({
-            peaks,
-            rrIntervals,
-            maxima,
-            minima,
-            segmentLength,
-            normalcy,
-          });
-        } else {
-          console.log('Stopped logging after 100 data points.');
-          enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
-        }
-      };
+          dataPointCount++;
+
+    if (dataPointCount === 300) {
+      // Calculate EKG data values
+      const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
+      const rrIntervals = calculateRRIntervals(peaks, samplingRate);
+      const maxima = findMaxima(ekgChart.data.datasets[0].data);
+      const minima = findMinima(ekgChart.data.datasets[0].data);
+      const segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks);
+      const normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
+
+      // Update state with calculated EKG data values
+      setEkgDataValues({
+        peaks,
+        rrIntervals,
+        maxima,
+        minima,
+        segmentLength,
+        normalcy,
+      });
+
+      // Upload the calculated EKG data values to Firestore
+      uploadEKGDataToFirebase({
+        peaks,
+        rrIntervals,
+        maxima,
+        minima,
+        segmentLength,
+        normalcy,
+      });
+
+      // Reset the data point count
+      dataPointCount = 0;
+    }
+  } else {
+    console.log('Stopped logging after 100 data points.');
+    enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
+  }
+};
 
       enabledSensors.forEach(sensor => sensor.on('value-changed', handleValueChanged));
       
@@ -102,6 +131,76 @@ const HomePage = () => {
       }
     }
   };
+
+  // Move the uploadEKGDataToFirebase function outside of the connectToEKG function
+const uploadEKGDataToFirebase = async (ekgDataValues) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error('User not logged in.');
+      return;
+    }
+
+    // Define the collection reference
+    const collectionRef = collection(firestore, "users", user.uid, "ekgData");
+
+    // Create a document with the calculated EKG data values
+    const docData = {
+      peaks: ekgDataValues.peaks,
+      rrIntervals: ekgDataValues.rrIntervals,
+      maxima: ekgDataValues.maxima,
+      minima: ekgDataValues.minima,
+      segmentLength: ekgDataValues.segmentLength,
+      normalcy: ekgDataValues.normalcy,
+      timestamp: serverTimestamp(),
+    };
+
+    // Add the document to the collection
+    await addDoc(collectionRef, docData);
+
+    console.log('EKG data uploaded to Firebase successfully.');
+  } catch (error) {
+    console.error('Error uploading EKG data to Firebase:', error);
+  }
+};
+
+// Inside handleValueChanged function
+const handleValueChanged = (sensor) => {
+  if (ekgChart.data.datasets[0].data.length < 300) {
+    // Your existing code to handle sensor value changes...
+
+    // Calculate EKG data values
+    const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
+    const rrIntervals = calculateRRIntervals(peaks, samplingRate);
+    const maxima = findMaxima(ekgChart.data.datasets[0].data);
+    const minima = findMinima(ekgChart.data.datasets[0].data);
+    const segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks);
+    const normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
+
+    // Update state with calculated EKG data values
+    setEkgDataValues({
+      peaks,
+      rrIntervals,
+      maxima,
+      minima,
+      segmentLength,
+      normalcy,
+    });
+
+    // Upload the calculated EKG data values to Firebase
+    uploadEKGDataToFirebase({
+      peaks,
+      rrIntervals,
+      maxima,
+      minima,
+      segmentLength,
+      normalcy,
+    });
+  } else {
+    console.log('Stopped logging after 100 data points.');
+    enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
+  }
+};
 
   const calculateAverage = (values) => {
     // Check if values is an array and not empty
