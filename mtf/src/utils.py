@@ -29,6 +29,19 @@ def get_metric(y_pred, y_prob, y_test, metrics, train_time, predict_time):
         elif metric == "shscore":
             # SHScore Metric
             all_metrics[metric] = shscore(y_pred, y_prob, y_test.values)
+        elif metric == "neg_log_loss":
+            # Negative Log Loss Metric
+            all_metrics[metric] = -log_loss(
+                y_test, y_prob, labels=y_test.unique())
+        elif metric == "fprime":
+            # Fprime Metric
+            all_metrics[metric] = fprime(y_test, y_pred)
+        elif metric == "modified_log_loss":
+            # Modified Log Loss Metric
+            all_metrics[metric] = modified_log_loss(y_pred, y_prob, y_test)
+        elif metric == "neg_modified_log_loss":
+            # Negative Modified Log Loss Metric
+            all_metrics[metric] = neg_modified_log_loss(y_pred, y_prob, y_test)
         # Standard Metrics
         else:
             # import from sklearn
@@ -104,7 +117,7 @@ def fprime(y_test, y_pred):
     return score
 
 
-def aoc(y_pred, y_prob, y_test):
+def modified_log_loss(y_pred, y_prob, y_test):
     wfn = 1
     wfp = 1
 
@@ -136,8 +149,12 @@ def aoc(y_pred, y_prob, y_test):
     return logloss
 
 
+def neg_modified_log_loss(y_pred, y_prob, y_test):
+    return -1 * modified_log_loss(y_pred, y_prob, y_test)
+
+
 def shscore(y_pred, y_prob, y_test):
-    return fprime(y_test, y_pred) - aoc(y_pred, y_prob, y_test)
+    return fprime(y_test, y_pred) - modified_log_loss(y_pred, y_prob, y_test)
 
 
 def shscorewrapper(estimator, X, Y):
@@ -145,5 +162,31 @@ def shscorewrapper(estimator, X, Y):
     y_prob = estimator.predict_proba(X)
 
     score = shscore(y_pred, y_prob, Y.values)
+
+    return score
+
+
+def modified_log_loss_wrapper(estimator, X, Y):
+    y_pred = estimator.predict(X)
+    y_prob = estimator.predict_proba(X)
+
+    score = modified_log_loss(y_pred, y_prob, Y.values)
+
+    return score
+
+
+def neg_modified_log_loss_wrapper(estimator, X, Y):
+    y_pred = estimator.predict(X)
+    y_prob = estimator.predict_proba(X)
+
+    score = neg_modified_log_loss(y_pred, y_prob, Y.values)
+
+    return score
+
+
+def fprime_wrapper(estimator, X, Y):
+    y_pred = estimator.predict(X)
+
+    score = fprime(Y.values, y_pred)
 
     return score

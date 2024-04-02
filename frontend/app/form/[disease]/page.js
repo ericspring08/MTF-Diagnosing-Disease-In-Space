@@ -5,7 +5,7 @@ import { generateDiagnosisPDF } from '../../../utils/pdfgen';
 import Form from './form';
 import { auth, firestore } from '../../../utils/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore';
 
 const Page = ({ params }) => {
   const [formIndex, setFormIndex] = React.useState(0);
@@ -52,7 +52,15 @@ const Page = ({ params }) => {
         // just use data.filter with buttons for view by ___ week month year
       };
 
-      await addDoc(collectionRef, docData);
+      let docId = '';
+      await addDoc(collectionRef, docData).then((response) => {
+        // get the new doc id
+        console.log('Document written with ID: ', response.id);
+        docId = response.id;
+      })
+      if (results.prediction == 0) {
+        results.probability = 1 - results.probability;
+      }
     } catch (error) {
       console.error('Error uploading results:', error);
     }

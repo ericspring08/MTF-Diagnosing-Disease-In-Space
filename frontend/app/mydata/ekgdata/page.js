@@ -2,26 +2,26 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { firestore } from '../../../utils/firebase'; 
+import { onAuthStateChanged } from 'firebase/auth';
+import { firestore } from '../../../utils/firebase';
 
 const EKGDataPage = () => {
   const [ekgData, setEKGData] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Query the Firestore collection for the latest five documents based on the timestamp field
-        const ekgDataCollection = collection(firestore, 'ekgData');
-        const q = query(ekgDataCollection, orderBy('timestamp', 'desc'), limit(5));
-        const snapshot = await getDocs(q);
-        const data = snapshot.docs.map(doc => doc.data());
-        setEKGData(data);
-      } catch (error) {
-        console.error('Error fetching EKG data:', error);
+    // Query the Firestore collection for the latest five documents based on the timestamp field
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        console.log('User is not signed in');
       }
-    };
-
-    fetchData();
+      console.log('User is signed in');
+      const ekgDataCollection = collection(firestore, user.uid, 'ekgData');
+      const q = query(ekgDataCollection, orderBy('timestamp', 'desc'), limit(5));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map(doc => doc.data());
+      setEKGData(data);
+      console.log('EKG data:', data)
+    })
   }, []);
 
   return (

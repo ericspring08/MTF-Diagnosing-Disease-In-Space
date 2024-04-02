@@ -34,11 +34,13 @@ if not os.path.exists(output_location):
 
 def generate_rank_graphs(data, output_location):
     combine_trials = dict()
+    not_qualified_models = []
 
     # loop through all rows
     for index, row in data.iterrows():
         # pass if value is nan
         if pd.isna(row['value']):
+            not_qualified_models.append(row['model'])
             continue
 
         # Get the key for the dictionary
@@ -83,10 +85,10 @@ def generate_rank_graphs(data, output_location):
 
             models, means, stdevs = zip(*processed_trials[output][metric])
             graph_model_metric(models, means, stdevs,
-                               metric, output, output_location)
+                               metric, output, output_location, not_qualified_models)
 
 
-def graph_model_metric(models, means, stdevs, metric, output, output_location):
+def graph_model_metric(models, means, stdevs, metric, output, output_location, not_qualified_models):
     plt.figure(figsize=(20, 10))
     plt.rcParams.update({'axes.titlesize': 22})
     # bold the title
@@ -98,6 +100,10 @@ def graph_model_metric(models, means, stdevs, metric, output, output_location):
     # make sure y label is not cut off
     plt.barh(models, means, xerr=stdevs)
     # increase size of xerr bar
+    # list out the models as bars with error message that didn't qualify
+    for model in not_qualified_models:
+        plt.barh(model, 0, xerr=0.001, color='red')
+        plt.text(0, model, 'Model did not qualify', fontsize=14)
     plt.errorbar(means, models, xerr=stdevs, fmt='o',
                  ecolor='black', elinewidth=2, capsize=4)
     plt.xlabel(metric)
@@ -137,7 +143,7 @@ def generate_learning_curve(results_folder, output_location):
                     trial_number = root.split('/')[-3]
                     # insert cv_results into the path of the output output_location
                     graph_learning_curve(
-                        file_title, df, os.path.join(output_location, 'cv_results', trial_number, file_title.split('_')[1]))
+                        file_title, df, os.path.join(output_location, 'cv_results', trial_number))
 
 
 def logistic_objective(x, a, b, c):
@@ -153,47 +159,51 @@ def graph_learning_curve(file_title, data, output_location):
     y_axis_test = data['mean_test_score']
     y_axis_train = data['mean_train_score']
 
-    # graph the learning Curve logistic regression
-    popt_test, pcov_test = curve_fit(
-        logistic_objective, np.arange(len(y_axis_test)), y_axis_test)
+    try:
+        # graph the learning Curve logistic regression
+        popt_test, pcov_test = curve_fit(
+            logistic_objective, np.arange(len(y_axis_test)), y_axis_test)
 
-    # popt_train, pcov_train = curve_fit(
-    #     logistic_objective, np.arange(len(y_axis_train)), y_axis_train)
-    #
-    x_line_test = np.linspace(0, len(y_axis_test), 1000)
-    y_line_test = logistic_objective(x_line_test, *popt_test)
+        # popt_train, pcov_train = curve_fit(
+        #     logistic_objective, np.arange(len(y_axis_train)), y_axis_train)
+        #
+        x_line_test = np.linspace(0, len(y_axis_test), 1000)
+        y_line_test = logistic_objective(x_line_test, *popt_test)
 
-    x_line_train = np.linspace(0, len(y_axis_train), 1000)
-    # y_line_train = logistic_objective(x_line_train, *popt_train)
+        x_line_train = np.linspace(0, len(y_axis_train), 1000)
+        # y_line_train = logistic_objective(x_line_train, *popt_train)
 
-    # get upper asymptote
-    upper_asymptote_test = popt_test[2]
-    # upper_asymptote_train = popt_train[2]
+        # get upper asymptote
+        upper_asymptote_test = popt_test[2]
+        # upper_asymptote_train = popt_train[2]
 
-    plt.plot(x_line_test, y_line_test, '--', label='test best fit')
-    plt.fill_between(x_line_test, y_line_test, 0, alpha=0.1)
-    # text for the best fit line equation
-    plt.text(0, upper_asymptote_test - 0.1,
-             f'Best Fit Line Test: {round(popt_test[2], 5)} / (1 + {round(popt_test[0], 5)} * exp(-{round(popt_test[1], 5)} * x))', fontsize=14)
+        plt.plot(x_line_test, y_line_test, '--', label='test best fit')
+        plt.fill_between(x_line_test, y_line_test, 0, alpha=0.1)
+        # text for the best fit line equation
+        plt.text(0, upper_asymptote_test - 0.1,
+                 f'Best Fit Line Test: {round(popt_test[2], 5)} / (1 + {round(popt_test[0], 5)} * exp(-{round(popt_test[1], 5)} * x))', fontsize=14)
 
-    # plt.plot(x_line_train, y_line_train, '--', label='train best fit')
-    # plt.fill_between(x_line_train, y_line_train, 0, alpha=0.1)
-    # # text for the best fit line equation
-    # plt.text(0, upper_asymptote_train - 0.1,
-    #          f'Best Fit Line Train: {round(popt_train[2], 5)} / (1 + {round(popt_train[0], 5)} * exp(-{round(popt_train[1], 5)} * x))', fontsize=14)
-    #
-    # plot the upper upper_asymptote
-    plt.axhline(y=upper_asymptote_test, color='r',
-                linestyle='--', label='upper asymptote test')
-    # plt.axhline(y=upper_asymptote_train, color='r',
-    #             linestyle='--', label='upper asymptote train')
-    # text labels for the upper and lower asymptote equation
-    plt.text(0, upper_asymptote_test,
-             f'Upper Asymptote Test: {round(upper_asymptote_test, 5)}', fontsize=14)
+        # plt.plot(x_line_train, y_line_train, '--', label='train best fit')
+        # plt.fill_between(x_line_train, y_line_train, 0, alpha=0.1)
+        # # text for the best fit line equation
+        # plt.text(0, upper_asymptote_train - 0.1,
+        #          f'Best Fit Line Train: {round(popt_train[2], 5)} / (1 + {round(popt_train[0], 5)} * exp(-{round(popt_train[1], 5)} * x))', fontsize=14)
+        #
+        # plot the upper upper_asymptote
+        plt.axhline(y=upper_asymptote_test, color='r',
+                    linestyle='--', label='upper asymptote test')
+        # plt.axhline(y=upper_asymptote_train, color='r',
+        #             linestyle='--', label='upper asymptote train')
+        # text labels for the upper and lower asymptote equation
+        plt.text(0, upper_asymptote_test,
+                 f'Upper Asymptote Test: {round(upper_asymptote_test, 5)}', fontsize=14)
+    except:
+        pass
+
     plt.scatter(x_axis, y_axis_test, label='test', color='r', )
     plt.scatter(x_axis, y_axis_train, label='train', color='b')
     plt.title(
-        f'Learning Curve {file_title.split("_")[0]} - {file_title.split("_")[1]}')
+        f'Learning Curve {file_title}')
     plt.xlabel('Number of Trials')
     plt.ylabel('Mean Score')
     plt.legend()

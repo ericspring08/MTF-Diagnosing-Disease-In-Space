@@ -7,7 +7,7 @@ import pandas as pd
 
 from models import model_options, model_params
 from save import ModelResults
-from utils import get_metric, print_tags, shscorewrapper
+from utils import get_metric, print_tags, shscorewrapper, neg_modified_log_loss_wrapper, fprime_wrapper
 
 from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
@@ -39,7 +39,6 @@ class MTF(object):
         self.sample_size = 1000
         self.optimization_metric = None
         self.scaler = None
-        self.null_char = None
 
     def read_config(self):
         try:
@@ -58,7 +57,6 @@ class MTF(object):
             self.sample_size = config["experiment"]["sample_size"]
             self.optimization_metric = config["experiment"]["optimization_metric"]
             self.scaler = config["experiment"]["scaler"]
-            self.null_char = config["experiment"]["null_char"]
 
             self.config = config
 
@@ -97,12 +95,6 @@ class MTF(object):
     def load_data(self):
         self.dataset = pd.read_csv(self.dataset_path)
 
-    def set_optimization_metric(self, metric):
-        if metric == "shscore":
-            self.optimization_metric = shscorewrapper
-        else:
-            self.optimization_metric = metric
-
     def preprocess(self):
         print("Extract Outputs")
 
@@ -113,20 +105,7 @@ class MTF(object):
 
         dataset = self.dataset.drop(self.outputs_selection, axis=1)
 
-        # Replace null_char with null
-        if self.null_char:
-            dataset = dataset.replace(to_replace=self.null_char, value=np.nan)
-
         print(dataset)
-
-        # Loop through categorical features and fill null values with most frequent
-        for feature in self.categorical_features:
-            dataset[feature].fillna(
-                method='ffill', inplace=True)
-
-        # Loop through numerical features and fill null values with mean
-        for feature in self.numerical_features:
-            dataset[feature].fillna(method='ffill', inplace=True)
 
         print("Preprocessing Data")
 
@@ -189,7 +168,60 @@ class MTF(object):
         self.x_test = x_test
         self.y_test = y_test
 
+        self.inital_benchmark_results = {}
+        self.inital_benchmark()
         self.run_trial()
+
+    def inital_benchmark(self):
+        # select random 5 models
+        models_names = np.random.choice(list(model_options.keys()), 5)
+        print("Models Selected for Inital Benchmark: ", models_names)
+
+        # select random 5 outputs
+
+        for model_name in models_names:
+            for output in self.outputs_selection:
+                model = model_options[model_name]
+                # Special cases for some models that require multiclass specification
+                if "LGBM" in model_name and self.outputs[output].nunique() > 2:
+                    model.set_params(objective="multiclass")
+                elif "LGBM" in model_name and self.outputs[output].nunique() == 2:
+                    model.set_params(objective="binary")
+
+                if "XGB" in model_name and self.outputs[output].nunique() > 2:
+                    model.set_params(objective="multi:softmax",
+                                     num_class=self.outputs[output].nunique())
+                elif "XGB" in model_name and self.outputs[output].nunique() == 2:
+                    model.set_params(
+                        objective="binary:logistic", num_class=1)
+
+                # Set model probability to true if it exists
+                if dir(model).__contains__('probability'):
+                    model.set_params(probability=True)
+
+                # Train Model
+                model.fit(self.x_train, self.y_train[output])
+                y_prob = model.predict_proba(self.x_test)
+
+                # evalue on the optimization_metric
+                metrics = get_metric(self.y_train, y_prob, self.y_test[output], [
+                    self.optimization_metric], 0, 0)
+
+                # check if model_name, output exists in inital_benchmark_results
+                if output not in self.inital_benchmark_results:
+                    self.inital_benchmark_results[output] = 0
+
+                self.inital_benchmark_results[output] = self.inital_benchmark_results[output] + \
+                    metrics[self.optimization_metric]
+
+                print(
+                    f"Initial Benchmark Model {model_name} {output}: {metrics[self.optimization_metric]}")
+
+        # divide by 5 to get the average
+        for output in self.outputs_selection:
+            self.inital_benchmark_results[output] = self.inital_benchmark_results[output] / 5
+            print("Inital Benchmark Results Average: ",
+                  self.inital_benchmark_results[output])
 
     def run_trial(self):
         # Iterate through models
@@ -215,14 +247,41 @@ class MTF(object):
                     if dir(model).__contains__('probability'):
                         model.set_params(probability=True)
 
+                    print(f"Running {model_name} {output}")
+                    print("Running Inital Benchmark")
+                    # run inital to see if above average
+                    temp_model = model
+                    temp_model.fit(self.x_train, self.y_train[output])
+
+                    temp_y_prob = temp_model.predict_proba(self.x_test)
+
+                    # evalue on the optimization_metric
+                    temp_metrics = get_metric(
+                        self.y_train, temp_y_prob, self.y_test[output], [self.optimization_metric], 0, 0)
+
+                    if temp_metrics[self.optimization_metric] < self.inital_benchmark_results[output]:
+                        print(
+                            f"Model {model_name} {output}: {temp_metrics[self.optimization_metric]} < {self.inital_benchmark_results[output]}")
+                        print_tags(
+                            (f"{model_name}", f"{output}"), f"Model not better than benchmark, skipping")
+                        continue
+
                     # Train Model
                     # Tune Hyperparameters with Bayesian Optimization
-                    self.set_optimization_metric(self.optimization_metric)
+                    _optimization_metric = self.optimization_metric
+
+                    if self.optimization_metric == "shscore":
+                        _optimization_metric = shscorewrapper
+                    elif self.optimization_metric == "neg_modified_log_loss":
+                        _optimization_metric = neg_modified_log_loss_wrapper
+                    elif self.optimization_metric == "fprime":
+                        _optimization_metric = fprime_wrapper
+
                     np.int = int
                     opt = BayesSearchCV(
                         model,
                         model_params[model_name],
-                        scoring=self.optimization_metric,
+                        scoring=_optimization_metric,
                         # train test split iterator
                         cv=3,
                         n_iter=self.tuning_iterations,

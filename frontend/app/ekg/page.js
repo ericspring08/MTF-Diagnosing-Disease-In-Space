@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { auth, firestore } from '../../utils/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import godirect from '@vernier/godirect';
-import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentSlope, detectEKGNormalcy} from '../../utils/ekgfunctions'; // Import functions from ekgfunctions.js
+import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentSlope, detectEKGNormalcy } from '../../utils/ekgfunctions'; // Import functions from ekgfunctions.js
 
 // Define the HomePage component
 const HomePage = () => {
@@ -53,46 +53,46 @@ const HomePage = () => {
           const normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
           dataPointCount++;
 
-    if (dataPointCount === 300) {
-      // Calculate EKG data values
-      const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
-      const rrIntervals = calculateRRIntervals(peaks, samplingRate);
-      const maxima = findMaxima(ekgChart.data.datasets[0].data);
-      const minima = findMinima(ekgChart.data.datasets[0].data);
-      const segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks);
-      const normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
+          if (dataPointCount === 300) {
+            // Calculate EKG data values
+            const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
+            const rrIntervals = calculateRRIntervals(peaks, samplingRate);
+            const maxima = findMaxima(ekgChart.data.datasets[0].data);
+            const minima = findMinima(ekgChart.data.datasets[0].data);
+            const segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks);
+            const normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
 
-      // Update state with calculated EKG data values
-      setEkgDataValues({
-        peaks,
-        rrIntervals,
-        maxima,
-        minima,
-        segmentLength,
-        normalcy,
-      });
+            // Update state with calculated EKG data values
+            setEkgDataValues({
+              peaks,
+              rrIntervals,
+              maxima,
+              minima,
+              segmentLength,
+              normalcy,
+            });
 
-      // Upload the calculated EKG data values to Firestore
-      uploadEKGDataToFirebase({
-        peaks,
-        rrIntervals,
-        maxima,
-        minima,
-        segmentLength,
-        normalcy,
-      });
+            // Upload the calculated EKG data values to Firestore
+            uploadEKGDataToFirebase({
+              peaks,
+              rrIntervals,
+              maxima,
+              minima,
+              segmentLength,
+              normalcy,
+            });
 
-      // Reset the data point count
-      dataPointCount = 0;
-    }
-  } else {
-    console.log('Stopped logging after 100 data points.');
-    enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
-  }
-};
+            // Reset the data point count
+            dataPointCount = 0;
+          }
+        } else {
+          console.log('Stopped logging after 100 data points.');
+          enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
+        }
+      };
 
       enabledSensors.forEach(sensor => sensor.on('value-changed', handleValueChanged));
-      
+
 
       const ctx = document.getElementById('ekgChart');
       ekgChart = new Chart(ctx, {
@@ -133,87 +133,87 @@ const HomePage = () => {
   };
 
   // Move the uploadEKGDataToFirebase function outside of the connectToEKG function
-const uploadEKGDataToFirebase = async (ekgDataValues) => {
-  try {
-    const user = auth.currentUser;
-    if (!user) {
-      console.error('User not logged in.');
-      return;
+  const uploadEKGDataToFirebase = async (ekgDataValues) => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        console.error('User not logged in.');
+        return;
+      }
+
+      // Define the collection reference
+      const collectionRef = collection(firestore, "users", user.uid, "ekgData");
+
+      // Create a document with the calculated EKG data values
+      const docData = {
+        peaks: ekgDataValues.peaks,
+        rrIntervals: ekgDataValues.rrIntervals,
+        maxima: ekgDataValues.maxima,
+        minima: ekgDataValues.minima,
+        segmentLength: ekgDataValues.segmentLength,
+        normalcy: ekgDataValues.normalcy,
+        graph: ekgChart,
+        timestamp: serverTimestamp(),
+      };
+
+      // Add the document to the collection
+      await addDoc(collectionRef, docData);
+
+      console.log('EKG data uploaded to Firebase successfully.');
+    } catch (error) {
+      console.error('Error uploading EKG data to Firebase:', error);
     }
+  };
 
-    // Define the collection reference
-    const collectionRef = collection(firestore, "users", user.uid, "ekgData");
+  // Inside handleValueChanged function
+  const handleValueChanged = (sensor) => {
+    if (ekgChart.data.datasets[0].data.length < 300) {
+      // Your existing code to handle sensor value changes...
 
-    // Create a document with the calculated EKG data values
-    const docData = {
-      peaks: ekgDataValues.peaks,
-      rrIntervals: ekgDataValues.rrIntervals,
-      maxima: ekgDataValues.maxima,
-      minima: ekgDataValues.minima,
-      segmentLength: ekgDataValues.segmentLength,
-      normalcy: ekgDataValues.normalcy,
-      timestamp: serverTimestamp(),
-    };
+      // Calculate EKG data values
+      const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
+      const rrIntervals = calculateRRIntervals(peaks, samplingRate);
+      const maxima = findMaxima(ekgChart.data.datasets[0].data);
+      const minima = findMinima(ekgChart.data.datasets[0].data);
+      const segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks);
+      const normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
 
-    // Add the document to the collection
-    await addDoc(collectionRef, docData);
-
-    console.log('EKG data uploaded to Firebase successfully.');
-  } catch (error) {
-    console.error('Error uploading EKG data to Firebase:', error);
-  }
-};
-
-// Inside handleValueChanged function
-const handleValueChanged = (sensor) => {
-  if (ekgChart.data.datasets[0].data.length < 300) {
-    // Your existing code to handle sensor value changes...
-
-    // Calculate EKG data values
-    const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
-    const rrIntervals = calculateRRIntervals(peaks, samplingRate);
-    const maxima = findMaxima(ekgChart.data.datasets[0].data);
-    const minima = findMinima(ekgChart.data.datasets[0].data);
-    const segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks);
-    const normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
-
-    // Update state with calculated EKG data values
-    setEkgDataValues({
-      peaks,
-      rrIntervals,
-      maxima,
-      minima,
-      segmentLength,
-      normalcy,
-    });
-
-    // Upload the calculated EKG data values to Firebase
-    uploadEKGDataToFirebase({
-      peaks,
-      rrIntervals,
-      maxima,
-      minima,
-      segmentLength,
-      normalcy,
-    });
-  } else {
-    console.log('Stopped logging after 100 data points.');
-    enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
-  }
-};
+      // Update state with calculated EKG data values
+      setEkgDataValues({
+        peaks,
+        rrIntervals,
+        maxima,
+        minima,
+        segmentLength,
+        normalcy,
+      });
+      // Upload the calculated EKG data values to Firebase
+    } else {
+      console.log('Stopped logging after 100 data points.');
+      enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
+      uploadEKGDataToFirebase({
+        peaks,
+        rrIntervals,
+        maxima,
+        minima,
+        segmentLength,
+        normalcy,
+      });
+    }
+  };
 
   const calculateAverage = (values) => {
     // Check if values is an array and not empty
     if (!Array.isArray(values) || values.length === 0) return 0;
-  
+
     // Check if all values are numbers
     if (!values.every(value => typeof value === 'number')) return 0;
-  
+
     // Perform the average calculation
     const sum = values.reduce((acc, curr) => acc + curr, 0);
     return sum / values.length;
   }
-  
+
   // Render the HomePage component
   return (
     <div className="h-screen w-screen flex flex-col items-center" data-theme="corporate">
@@ -285,7 +285,7 @@ const handleValueChanged = (sensor) => {
           </div>
         )}
         <canvas id="ekgChart" width="800" height="400"></canvas>
-  
+
         <div className="mt-5">
           {/* Table displaying calculated EKG data values */}
           {ekgDataValues ? (
@@ -323,7 +323,7 @@ const handleValueChanged = (sensor) => {
                     It's important to compare ST slope changes between resting states and states of elevated heart rate to look for exercise-induced changes as well.
                   </p>
                 </div>
-  
+
                 {/* Box 2: Normality */}
                 <div className="box mr-5 p-4">
                   <h3 className="font-bold">EKG Normality</h3>
@@ -332,7 +332,7 @@ const handleValueChanged = (sensor) => {
                     Normality should only be considered in the realm of a resting patient diagnosis and can be altered in the instance of an elevated heart rate or various medications.
                   </p>
                 </div>
-  
+
                 {/* Box 3: Left Ventricular Hypertrophy */}
                 <div className="box p-4">
                   <h3 className="font-bold">Left Ventricular Hypertrophy</h3>
@@ -350,8 +350,8 @@ const handleValueChanged = (sensor) => {
       </div>
     </div>
   );
-  
-          }  
+
+}
 
 
 export default HomePage;

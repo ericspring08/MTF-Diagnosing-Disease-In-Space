@@ -1,13 +1,11 @@
 'use client'
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getDocs, collection, orderBy, query, limit, getCountFromServer, where, Timestamp } from "firebase/firestore";
 import { useRouter } from 'next/navigation';
 import { auth, firestore } from '../../utils/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import axios from 'axios';
 import Image from 'next/image';
-import { DISEASES } from '../../utils/constants'
+import { DISEASES, DISEASE_NAMES } from '../../utils/constants'
 
 import { generateMyDataPDF } from '../../utils/pdfgen';
 
@@ -53,7 +51,7 @@ const MyData = () => {
     const handleCardClick = () => {
       router.push('/mydata/ekgdata');
     };
-  
+
     return (
       <div className="m-3 cursor-pointer" onClick={handleCardClick}>
         <div className="card card-bordered w-80 bg-base-100 hover:shadow-2xl hover:opacity-60">
@@ -143,7 +141,7 @@ const MyData = () => {
                 </figure>
                 <div className="card-body items-center text-center">
                   <p className="text-lg font-bold">
-                    Click here for more information about {disease}
+                    Click here for more information about {DISEASE_NAMES[disease]}
                   </p>
                 </div>
               </div>
@@ -174,7 +172,7 @@ const MyData = () => {
               <h2 className="text-xl font-bold mb-4">Entries by Disease</h2>
               {entriesByDisease && diseases.map((key, index) => (
                 <div key={index} className="flex justify-between items-center mb-2 border-b py-2">
-                  <span>{key}</span>
+                  <span>{DISEASE_NAMES[key]}</span>
                   <span>{entriesByDisease[key]}</span>
                 </div>
               ))}
@@ -219,7 +217,7 @@ const MyData = () => {
               <tbody>
                 {data.map((item, index) => (
                   <tr key={index} className="hover:bg-gray-200" onClick={() => { router.push('/mydata/diagnosis/' + item.id) }}>
-                    <th className="font-bold border px-4 py-2">{item.data.disease}</th>
+                    <th className="font-bold border px-4 py-2">{DISEASE_NAMES[item.data.disease]}</th>
                     <td className="border px-4 py-2">{item.data.prediction.prediction}</td>
                     <td className="border px-4 py-2">{(item.data.prediction.probability * 100).toFixed(4)}%</td>
                     <td className="border px-4 py-2">{new Date(item.data.timestamp.seconds * 1000).toLocaleString()}</td>
