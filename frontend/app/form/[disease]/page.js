@@ -98,6 +98,46 @@ const Page = ({ params }) => {
     setFormData(resetData);
   };
 
+  const uploadJsonHandler = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const data = JSON.parse(e.target.result);
+        // go through every key in the data and set the form data if it exists
+        for (const key in data) {
+          if (formData.hasOwnProperty(key)) {
+            setFormData((prev) => {
+              return {
+                ...prev,
+                [key]: data[key],
+              };
+            })
+          }
+        }
+      }
+      reader.readAsText(file);
+    }
+    fileInput.click();
+  }
+
+  const downloadJsonTemplate = () => {
+    const data = {};
+    for (const key in formData) {
+      data[key] = '';
+    }
+    const dataStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = params.disease + '_form.json';
+    a.click();
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -268,6 +308,14 @@ const Page = ({ params }) => {
           </div>
         </div>
       )}
+      {
+        !submitted && formHeaders.length > 0 && (
+          <div className="flex flex-row flex-wrap justify-center gap-2 m-5">
+            <button className="btn btn-lg btn-primary text-white" onClick={uploadJsonHandler}>Upload JSON</button>
+            <button className="btn btn-lg btn-secondary text-white" onClick={downloadJsonTemplate}>Download JSON Template</button>
+          </div>
+        )
+      }
     </div>
   );
 };
