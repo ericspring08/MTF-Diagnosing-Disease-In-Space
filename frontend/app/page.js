@@ -8,7 +8,6 @@ import { DISEASE_COLOR_MAP } from '@/utils/constants';
 
 const HomePage = () => {
   const [diseases, setDiseases] = useState(null);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,12 +72,6 @@ const HomePage = () => {
       <h2 className="text-3xl text-center mt-5 mb-10" data-theme="corporate">
         Select a disease to diagnose
       </h2>
-      {error && (
-        <div className="mt-5">
-          <h3 className="text-xl font-bold">Error:</h3>
-          <p>{error}</p>
-        </div>
-      )}
       <DiseaseCards />
     </div>
   );
