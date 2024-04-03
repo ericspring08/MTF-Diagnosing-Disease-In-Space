@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { collection, doc, getDoc, query, where, orderBy, limit, startAfter } from "firebase/firestore";
 import { auth, firestore } from '../../../../utils/firebase';
 import { generateDiagnosisPDF } from '../../../../utils/pdfgen';
+import { DISEASES, DISEASE_NAMES } from '../../../../utils/constants';
 
 const DiagnosisPage = ({ params }) => {
   const { id } = params;
@@ -44,9 +45,12 @@ const DiagnosisPage = ({ params }) => {
   return (
     <div className="h-screen w-screen" data-theme="corporate">
       <div className="flex flex-row justify-between items-center px-6 pt-6 flex-wrap">
-        <h1 className="text-3xl font-bold">{data.diseaseName} Diagnosis {id}</h1>
+        <div className="flex flex-col justify-center">
+          <h1 className="text-3xl font-bold text-wrap">{data.diseaseName} Diagnosis</h1>
+          <div className="text-sm text-gray-500">ID: {id}</div>
+        </div>
         <div className="flex justify-center">
-          <button onClick={() => { generateDiagnosisPDF(data.diseaseName, data.formData, data.prediction.prediction, data.prediction.probability) }} className="flex flex-row justify-center items-center bg-green-500 hover:bg-green-700 text-white text-xl font-bold py-2 px-4 rounded">
+          <button onClick={() => { generateDiagnosisPDF(DISEASE_NAMES[data.diseaseName], data.formData, data.prediction.prediction, data.prediction.probability) }} className="flex flex-row justify-center items-center bg-green-500 hover:bg-green-700 text-white text-xl font-bold py-2 px-4 rounded">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 mr-2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
             </svg>
