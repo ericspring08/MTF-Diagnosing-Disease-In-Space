@@ -3,15 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 import Image from 'next/image';
-import axios from 'axios';
 import godirect from '@vernier/godirect';
-import Link from 'next/link'; // Import Link component
 
 // Define the HomePage component
 const HomePage = () => {
   // State variables
   const [error, setError] = useState(null);
-  const [numSensors, setNumSensors] = useState(null);
   let ekgChart; // Initialize EKG chart
   const [showEkgDescription, setShowEkgDescription] = useState(false);
 
@@ -94,7 +91,7 @@ const HomePage = () => {
         <div className="card card-bordered w-80 bg-base-100 hover:shadow-2xl hover:opacity-60 m-3" onClick={connectToEKG}>
           <figure className="px-10 pt-10">
             <Image
-              src={`/img/ekg_button.png`}
+              src={`/img/ekg.png`}
               alt="EKG Button"
               width={500}
               height={500}
@@ -159,12 +156,18 @@ const HomePage = () => {
           </div>
         </div>
       )}
-      <canvas id="ekgChart" width="800" height="400"></canvas>
+      {
+
+      }
+      {
+        ekgChart && (
+          <div className="card card-bordered bg-base-100 hover:shadow-2xl hover:opacity-60 m-3">
+            <canvas id="ekgChart" width="800" height="400"></canvas>
+          </div>
+        )
+      }
     </div>
   );
-
-
-
 };
 
 
