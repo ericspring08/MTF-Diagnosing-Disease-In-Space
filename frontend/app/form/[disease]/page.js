@@ -124,6 +124,20 @@ const Page = ({ params }) => {
     fileInput.click();
   }
 
+  const downloadJsonTemplate = () => {
+    const data = {};
+    for (const key in formData) {
+      data[key] = '';
+    }
+    const dataStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = params.disease + '_form.json';
+    a.click();
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -296,7 +310,10 @@ const Page = ({ params }) => {
       )}
       {
         !submitted && formHeaders.length > 0 && (
-          <button className="btn btn-lg btn-primary text-white" onClick={uploadJsonHandler}>Upload JSON</button>
+          <div className="flex flex-row flex-wrap justify-center gap-2 m-5">
+            <button className="btn btn-lg btn-primary text-white" onClick={uploadJsonHandler}>Upload JSON</button>
+            <button className="btn btn-lg btn-secondary text-white" onClick={downloadJsonTemplate}>Download JSON Template</button>
+          </div>
         )
       }
     </div>
