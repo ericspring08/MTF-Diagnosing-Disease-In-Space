@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import axios from 'axios';
+import { DISEASE_COLOR_MAP } from '@/utils/constants';
 
 const HomePage = () => {
   const [diseases, setDiseases] = useState(null);
@@ -47,7 +48,7 @@ const HomePage = () => {
                 <div className="card-body items-center text-center">
                   <h2 className="card-title">
                     {disease.label}
-                    <span className="badge badge-secondary ml-2">
+                    <span className={`badge ml-2 bg-${DISEASE_COLOR_MAP[disease.type]}`}>
                       {disease.type}
                     </span>
                   </h2>
@@ -57,8 +58,9 @@ const HomePage = () => {
                 </div>
               </div>
             </Link>
-          ))}
-        </div>
+          ))
+          }
+        </div >
       );
     }
   };
