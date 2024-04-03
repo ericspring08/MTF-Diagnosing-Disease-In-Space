@@ -4,17 +4,17 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import axios from 'axios';
+import { DISEASE_COLOR_MAP } from '@/utils/constants';
 
 const HomePage = () => {
   const [diseases, setDiseases] = useState(null);
   const [error, setError] = useState(null);
-  const [numSensors, setNumSensors] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('/api/diseases');
-        setDiseases(response.data.diseases);
+        setDiseases(response.data);
       } catch (error) {
         console.error('Error fetching disease data:', error);
         setError('An error occurred while fetching disease data.');
@@ -33,7 +33,7 @@ const HomePage = () => {
           {diseases.map((disease) => (
             <Link
               className="flex flex-wrap justify-center items-stretch m-3"
-              href={`/form/${disease.value}`}
+              href={disease.path}
               key={disease.value}
             >
               <div className="card card-bordered w-80 bg-base-100 hover:shadow-2xl hover:opacity-60">
@@ -48,6 +48,9 @@ const HomePage = () => {
                 <div className="card-body items-center text-center">
                   <h2 className="card-title">
                     {disease.label}
+                    <span className={`badge ml-2 bg-${DISEASE_COLOR_MAP[disease.type]}`}>
+                      {disease.type}
+                    </span>
                   </h2>
                   <p className="text-sm">
                     {disease.description}
@@ -55,8 +58,9 @@ const HomePage = () => {
                 </div>
               </div>
             </Link>
-          ))}
-        </div>
+          ))
+          }
+        </div >
       );
     }
   };
