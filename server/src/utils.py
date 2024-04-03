@@ -49,27 +49,40 @@ format_dict = {
         'form': form_tdd,
     }
 }
-disease_options = {
-    'diseases': [
-        {
-            'value': 'hdd',
-            'label': 'Heart Disease',
-            'description': 'Heart disease describes a range of conditions that affect your heart. Diseases under the heart disease umbrella include blood vessel diseases, such as coronary artery disease; heart rhythm problems (arrhythmias); and heart defects you\'re born with (congenital heart defects), among others.',
-        },
-        {
-            'value': 'kdd',
-            'label': 'Kidney Disease',
-            'description': 'Kidney disease means your kidneys are damaged and can’t filter blood the way they should. You are at greater risk for kidney disease if you have diabetes or high blood pressure. If you experience kidney failure, treatments include kidney transplant or dialysis.',
-        },
-        {
-            'value': 'ldd',
-            'label': 'Lung Disease',
-            'description': 'Lung disease refers to various conditions affecting the lungs, impairing their function and often causing symptoms like coughing, shortness of breath, and decreased oxygen intake. These conditions range from infections like pneumonia to chronic diseases such as COPD and asthma, impacting breathing and overall respiratory health.'
-        },
-        {
-            'value': 'tdd',
-            'label': 'Thyroid Disease',
-            'description': 'Thyroid disease refers to conditions affecting the thyroid glands function, leading to hormonal imbalances that can impact metabolism, energy levels, and various bodily functions',
-        }
-    ]
-}
+diagnosis_options = [
+    {
+        'value': 'hdd',
+        'label': 'Heart Disease',
+        'description': 'Heart disease describes a range of conditions that affect your heart. Diseases under the heart disease umbrella include blood vessel diseases, such as coronary artery disease; heart rhythm problems (arrhythmias); and heart defects you\'re born with (congenital heart defects), among others.',
+        'type': 'disease',
+        'path': '/form/hdd'
+    },
+    {
+        'value': 'kdd',
+        'label': 'Kidney Disease',
+        'description': 'Kidney disease means your kidneys are damaged and can’t filter blood the way they should. You are at greater risk for kidney disease if you have diabetes or high blood pressure. If you experience kidney failure, treatments include kidney transplant or dialysis.',
+        'type': 'disease',
+        'path': '/form/kdd'
+    },
+    {
+        'value': 'ldd',
+        'label': 'Lung Disease',
+        'description': 'Lung disease refers to various conditions affecting the lungs, impairing their function and often causing symptoms like coughing, shortness of breath, and decreased oxygen intake. These conditions range from infections like pneumonia to chronic diseases such as COPD and asthma, impacting breathing and overall respiratory health.',
+        'type': 'disease',
+        'path': '/form/ldd'
+    },
+    {
+        'value': 'tdd',
+        'label': 'Thyroid Disease',
+        'description': 'Thyroid disease refers to conditions affecting the thyroid glands function, leading to hormonal imbalances that can impact metabolism, energy levels, and various bodily functions',
+        'type': 'disease',
+        'path': '/form/tdd'
+    },
+    {
+        'value': 'ekg',
+        'label': 'Vernier EKG',
+        'description': 'The Vernier EKG sensor measures electrical signals produced during heart activity. The sensor is placed on the skin and can be used to measure heart rate, heart rate variability, and more. The sensor can be used to monitor heart health and activity.',
+        'type': 'sensor',
+        'path': '/sensor/ekg'
+    }
+]
