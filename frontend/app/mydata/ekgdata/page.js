@@ -8,7 +8,7 @@ import { firestore } from '../../../utils/firebase';
 
 const EKGDataPage = () => {
   const [ekgData, setEKGData] = useState(null);
-  const router = useRouter()
+ // const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,9 +35,9 @@ const EKGDataPage = () => {
     fetchData();
   }, []);
 
-  const redirectToLogin = () => {
+  /*const redirectToLogin = () => {
     router.push('/login'); // Redirect to login page
-  };
+  }; */
 
   if (ekgData === null) {
     return (

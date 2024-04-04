@@ -14,17 +14,18 @@ const HomePage = () => {
   let ekgChart; // Initialize EKG chart
   const [showEkgDescription, setShowEkgDescription] = useState(false);
   const [ekgDataValues, setEkgDataValues] = useState(null); // State variable to store calculated EKG data values
+  const [numSensors, setNumSensors] = useState(null);
 
   // Function to connect to EKG device
   const connectToEKG = async () => {
     try {
       const ekgDevice = await godirect.selectDevice();
-
+  
       if (!ekgDevice) {
         setError('Failed to select the EKG device.');
         return;
       }
-
+  
       console.log('Available sensors:', ekgDevice.availableSensors);
       setNumSensors(ekgDevice.availableSensors.length);
 
