@@ -7,7 +7,6 @@ import { firestore } from '../../../utils/firebase';
 
 const EKGDataPage = () => {
   const [ekgData, setEKGData] = useState(null);
-  const router = useRouter()
 
   useEffect(() => {
     // Query the Firestore collection for the latest five documents based on the timestamp field
@@ -70,7 +69,7 @@ const EKGDataPage = () => {
       </table>
     </div>
   );
-  
+
 };
 
 export default EKGDataPage;
