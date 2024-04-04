@@ -8,7 +8,7 @@ import { firestore } from '../../../utils/firebase';
 
 const EKGDataPage = () => {
   const [ekgData, setEKGData] = useState(null);
-  const router = useRouter(); 
+  const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,6 +84,7 @@ const EKGDataPage = () => {
       </table>
     </div>
   );
+  
 };
 
 export default EKGDataPage;
