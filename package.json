@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@vernier/godirect": "^1.8.3",
-    "dspjs": "^1.0.0"
-  }
-}
