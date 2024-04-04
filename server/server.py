@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from src.Prediction import Prediction
-from src.utils import disease_options, format_dict
+from src.utils import diagnosis_options, format_dict
 import os
 
 app = Flask(__name__)
@@ -10,7 +10,7 @@ CORS(app)
 
 @app.route('/diseases')
 def diseases():
-    return jsonify(disease_options)
+    return jsonify(diagnosis_options)
 
 
 @app.route('/get_features', methods=['GET'])
