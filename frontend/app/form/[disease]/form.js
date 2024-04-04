@@ -1,3 +1,5 @@
+import React from 'react';
+
 const Form = ({
   formStructure,
   formHeaders,
@@ -7,14 +9,14 @@ const Form = ({
 }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(() => ({
-      ...formData,
+    setFormData(prevFormData => ({
+      ...prevFormData,
       [name]: value,
     }));
   };
 
   if (formHeaders.length === 0) {
-    <span className="loading loading-dots loading-xs"></span>;
+    return <span className="loading loading-dots loading-xs"></span>;
   } else {
     return (
       <div className="max-w-lg mx-auto m-5" key={formIndex}>

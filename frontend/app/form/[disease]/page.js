@@ -1,11 +1,12 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { generateDiagnosisPDF } from '../../../utils/pdfgen';
 import Form from './form';
 import { auth, firestore } from '../../../utils/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { query, orderBy, limit, getDocs } from 'firebase/firestore';
 
 const Page = ({ params }) => {
   const [formIndex, setFormIndex] = React.useState(0);
@@ -124,6 +125,23 @@ const Page = ({ params }) => {
     fetchData();
   }, []);
 
+  const autoFillForm = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      const ekgDataCollection = collection(firestore, 'users', user.uid, 'ekgData');
+      const q = query(ekgDataCollection, orderBy('timestamp', 'desc'), limit(1));
+      const snapshot = await getDocs(q);
+      if (!snapshot.empty) {
+        const latestData = snapshot.docs[0].data();
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          'Slope of the Peak Exercise ST Segment': latestData.segmentLength || '',
+          'Resting Electrocardiographic Results': latestData.normalcy || ''
+        }));
+      }
+    }
+  };
+
   return (
     <div className="w-screen min-h-screen flex flex-col justify-center items-center" data-theme="corporate">
       {submitted ? (
@@ -240,26 +258,34 @@ const Page = ({ params }) => {
               </svg>
             </button>
             {formIndex === formHeaders.length - 1 ? (
-              <button
-                onClick={handleSubmit}
-                className="btn btn-success mt-5 mb-5"
-                disabled={disableNext}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6"
+              <>
+                <button
+                  className="btn btn-primary ml-5"
+                  onClick={autoFillForm} // Add onClick handler for auto fill button
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-                  />
-                </svg>
-              </button>
+                  Auto Fill
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="btn btn-success mt-5 mb-5"
+                  disabled={disableNext}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                    />
+                  </svg>
+                </button>
+              </>
             ) : (
               <button
                 onClick={() => {

@@ -33,6 +33,13 @@ const HomePage = () => {
 
       let dataPointCount = 0;
 
+      let peaks;
+      let rrIntervals;
+      let maxima;
+      let minima;
+      let segmentLength;
+      let normalcy;
+
       const handleValueChanged = (sensor) => {
         if (ekgChart.data.datasets[0].data.length < 300) {
           console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
@@ -45,12 +52,12 @@ const HomePage = () => {
           // Define the threshold for peak detection
           const threshold = 0.275; // You can adjust this value as needed
           const samplingRate = 1;
-          const peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
-          const rrIntervals = calculateRRIntervals(peaks, samplingRate); // You need to define the 'samplingRate' variable
-          const maxima = findMaxima(ekgChart.data.datasets[0].data);
-          const minima = findMinima(ekgChart.data.datasets[0].data);
-          const segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks); // You need to define the 'start', 'end', and 'samplingRate' variables
-          const normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
+          peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
+          rrIntervals = calculateRRIntervals(peaks, samplingRate); // You need to define the 'samplingRate' variable
+          maxima = findMaxima(ekgChart.data.datasets[0].data);
+          minima = findMinima(ekgChart.data.datasets[0].data);
+          segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks); // You need to define the 'start', 'end', and 'samplingRate' variables
+          normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
           dataPointCount++;
 
           if (dataPointCount === 300) {
@@ -138,30 +145,22 @@ const HomePage = () => {
         console.error('User not logged in.');
         return;
       }
-
+  
       // Define the collection reference
       const collectionRef = collection(firestore, "users", user.uid, "ekgData");
-
-      // Create a document with the calculated EKG data values
-      const docData = {
-        peaks: ekgDataValues.peaks,
-        rrIntervals: ekgDataValues.rrIntervals,
-        maxima: ekgDataValues.maxima,
-        minima: ekgDataValues.minima,
-        segmentLength: ekgDataValues.segmentLength,
-        normalcy: ekgDataValues.normalcy,
-        graph: ekgChart,
-        timestamp: serverTimestamp(),
-      };
-
+  
+      // Exclude the 'graph' field from the document data
+      const { graph, ...docData } = ekgDataValues;
+  
       // Add the document to the collection
       await addDoc(collectionRef, docData);
-
+  
       console.log('EKG data uploaded to Firebase successfully.');
     } catch (error) {
       console.error('Error uploading EKG data to Firebase:', error);
     }
   };
+  
 
   // Inside handleValueChanged function
   const handleValueChanged = (sensor) => {
