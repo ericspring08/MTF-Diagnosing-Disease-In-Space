@@ -3,27 +3,41 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { useRouter } from 'next/router'; 
 import { firestore } from '../../../utils/firebase';
 
 const EKGDataPage = () => {
   const [ekgData, setEKGData] = useState(null);
-  const router = useRouter()
+  const router = useRouter(); 
 
   useEffect(() => {
-    // Query the Firestore collection for the latest five documents based on the timestamp field
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        console.log('User is not signed in');
+    const fetchData = async () => {
+      try {
+        const user = auth.currentUser;
+        if (!user) {
+          console.log('User is not signed in');
+          redirectToLogin();
+          return;
+        }
+        console.log('User is signed in');
+        
+        const ekgDataCollection = collection(firestore, 'users', user.uid, 'ekgData');
+        const q = query(ekgDataCollection, orderBy('timestamp', 'desc'), limit(5));
+        const snapshot = await getDocs(q);
+        const data = snapshot.docs.map(doc => doc.data());
+        setEKGData(data);
+        console.log('EKG data:', data)
+      } catch (error) {
+        console.error('Error fetching EKG data:', error);
       }
-      console.log('User is signed in');
-      const ekgDataCollection = collection(firestore, 'users', user.uid, 'ekgData');
-      const q = query(ekgDataCollection, orderBy('timestamp', 'desc'), limit(5));
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => doc.data());
-      setEKGData(data);
-      console.log('EKG data:', data)
-    })
+    };
+
+    fetchData();
   }, []);
+
+  const redirectToLogin = () => {
+    router.push('/login'); // Redirect to login page
+  };
 
   if (ekgData === null) {
     return (
@@ -70,7 +84,6 @@ const EKGDataPage = () => {
       </table>
     </div>
   );
-  
 };
 
 export default EKGDataPage;
