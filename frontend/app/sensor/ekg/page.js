@@ -4,28 +4,28 @@ import Chart from 'chart.js/auto';
 import Image from 'next/image';
 import { auth, firestore } from '@/utils/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentSlope, detectEKGNormalcy } from '@/utils/ekgfunctions'; // Import functions from ekgfunctions.js
 import godirect from '@vernier/godirect';
+import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentSlope, detectEKGNormalcy } from '@/utils/ekgfunctions'; // Import functions from ekgfunctions.js
 
 // Define the HomePage component
 const HomePage = () => {
   // State variables
   const [error, setError] = useState(null);
+  const [numSensors, setNumSensors] = useState(null);
   let ekgChart; // Initialize EKG chart
   const [showEkgDescription, setShowEkgDescription] = useState(false);
   const [ekgDataValues, setEkgDataValues] = useState(null); // State variable to store calculated EKG data values
-  const [numSensors, setNumSensors] = useState(null);
 
   // Function to connect to EKG device
   const connectToEKG = async () => {
     try {
       const ekgDevice = await godirect.selectDevice();
-  
+
       if (!ekgDevice) {
         setError('Failed to select the EKG device.');
         return;
       }
-  
+
       console.log('Available sensors:', ekgDevice.availableSensors);
       setNumSensors(ekgDevice.availableSensors.length);
 
@@ -145,22 +145,22 @@ const HomePage = () => {
         console.error('User not logged in.');
         return;
       }
-
+  
       // Define the collection reference
       const collectionRef = collection(firestore, "users", user.uid, "ekgData");
-
+  
       // Exclude the 'graph' field from the document data
       const { graph, ...docData } = ekgDataValues;
-
+  
       // Add the document to the collection
       await addDoc(collectionRef, docData);
-
+  
       console.log('EKG data uploaded to Firebase successfully.');
     } catch (error) {
       console.error('Error uploading EKG data to Firebase:', error);
     }
   };
-
+  
 
   // Inside handleValueChanged function
   const handleValueChanged = (sensor) => {
@@ -222,7 +222,7 @@ const HomePage = () => {
         <div className="card card-bordered w-80 bg-base-100 hover:shadow-2xl hover:opacity-60 m-3" onClick={connectToEKG}>
           <figure className="px-10 pt-10">
             <Image
-              src={`/img/ekg.png`}
+              src={`/img/ekg_button.png`}
               alt="EKG Button"
               width={500}
               height={500}
@@ -281,12 +281,7 @@ const HomePage = () => {
             </div>
           </div>
         )}
-        {/* EKG Chart */}
-        {
-          ekgChart ? (
-            <canvas id="ekgChart" width="800" height="400"></canvas>
-          ) : null
-        }
+        <canvas id="ekgChart" width="800" height="400"></canvas>
 
         <div className="mt-5">
           {/* Table displaying calculated EKG data values */}
@@ -349,10 +344,11 @@ const HomePage = () => {
             <div className="mt-5">Loading...</div>
           )}
         </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
-};
+
+}
 
 
 export default HomePage;
