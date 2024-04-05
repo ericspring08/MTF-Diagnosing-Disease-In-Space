@@ -15,6 +15,7 @@ const HomePage = () => {
   let ekgChart; // Initialize EKG chart
   const [showEkgDescription, setShowEkgDescription] = useState(false);
   const [ekgDataValues, setEkgDataValues] = useState(null); // State variable to store calculated EKG data values
+  const [sensorDataPoints, setSensorDataPoints] = useState([]); // Array to store all sensor data points
 
   // Function to connect to EKG device
   const connectToEKG = async () => {
@@ -45,6 +46,7 @@ const HomePage = () => {
           console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
 
           ekgChart.data.labels.push('');
+          sensorDataPoints.push(sensor.value);
           ekgChart.data.datasets[0].data.push(sensor.value);
           ekgChart.update();
 
@@ -82,7 +84,7 @@ const HomePage = () => {
             dataPointCount = 0;
           }
         } else {
-          console.log('Stopped logging after 100 data points.');
+          console.log('Stopped logging after 300 data points.');
           enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
           // Upload the calculated EKG data values to Firestore
           uploadEKGDataToFirebase({
@@ -92,6 +94,7 @@ const HomePage = () => {
             minima,
             segmentLength,
             normalcy,
+            sensorDataPoints,
           });
         }
       };
