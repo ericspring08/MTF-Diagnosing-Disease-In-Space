@@ -2,7 +2,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { firestore, auth } from '../../../utils/firebase'; // Import auth from Firebase
+import { firestore, auth } from '@/utils/firebase'; // Import auth from Firebase
 import { onAuthStateChanged } from 'firebase/auth'; // Import onAuthStateChanged
 import Chart from 'chart.js/auto'; // Import Chart.js
 
@@ -17,19 +17,18 @@ const EKGDataPage = () => {
         if (!user) {
           console.log('User is not signed in');
         } else {
-          console.log('User is signed in');
+          // You forgot to add the timestamp for every EKG data entry so it can't sort
           const ekgDataCollection = collection(firestore, 'users', user.uid, 'ekgData');
-          const q = query(ekgDataCollection, orderBy('timestamp', 'desc'), limit(5));
+          const q = query(ekgDataCollection, limit(5));
           const snapshot = await getDocs(q);
-          const data = snapshot.docs.map(doc => doc.data());
-          console.log('Fetched EKG data:', data); // Log fetched data
-          setEKGData(data);
-
-          // Set the sensorDataPoints for the most recent entry
-          if (data.length > 0) {
-            setSensorDataPoints(data[0].sensorDataPoints);
-            renderEKGGraph(data[0].sensorDataPoints); // Render EKG graph for the most recent entry
-          }
+          const ekgDataArray = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            ekgDataArray.push(data);
+          });
+          console.log(ekgDataArray);
+          setEKGData(ekgDataArray);
+          setSensorDataPoints(ekgDataArray[0].sensorData);
         }
       });
     };
@@ -74,10 +73,10 @@ const EKGDataPage = () => {
   };
 
   return (
-    <div>
+    <div className="h-screen-min w-screen" data-theme="corporate">
       <h1 className="text-2xl font-bold mb-4 text-blue-700">EKG Data</h1>
       <table className="w-full table-auto border-collapse border border-blue-700">
-      <thead>
+        <thead>
           <tr className="bg-blue-700 text-white">
             <th className="border border-blue-700 px-4 py-2">Peak</th>
             <th className="border border-blue-700 px-4 py-2">RR Interval</th>
@@ -90,8 +89,8 @@ const EKGDataPage = () => {
         <tbody>
           {ekgData.map((data, index) => (
             <tr key={index} className="bg-blue-100">
-              <td className="border border-blue-700 px-4 py-2">{data.peaks.join(', ')}</td>
-              <td className="border border-blue-700 px-4 py-2">{data.rrIntervals.join(', ')}</td>
+              <td className="border border-blue-700 px-4 py-2">{data.peaks}</td>
+              <td className="border border-blue-700 px-4 py-2">{data.rrIntervals}</td>
               <td className="border border-blue-700 px-4 py-2">{data.maxima}</td>
               <td className="border border-blue-700 px-4 py-2">{data.minima}</td>
               <td className="border border-blue-700 px-4 py-2">{data.segmentLength}</td>
