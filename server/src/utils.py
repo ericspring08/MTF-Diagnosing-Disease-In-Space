@@ -2,14 +2,15 @@ from src.info.hdd import hdd_features, hdd_categorical_features, hdd_numerical_f
 from src.info.kdd import kdd_features, kdd_categorical_features, kdd_numerical_features, kdd_types, form_kdd
 from src.info.ldd import ldd_features, ldd_categorical_features, ldd_numerical_features, ldd_types, form_ldd
 from src.info.tdd import tdd_features, tdd_categorical_features, tdd_numerical_features, tdd_types, form_tdd
+from src.info.lvd import lvd_features, lvd_categorical_features, lvd_numerical_features, lvd_types, lvd_form
 
 format_dict = {
     'hdd': {
         'name': 'Heart Disease',
         'features': hdd_features,
         'target': 'target',
-        'model': './src/models/hdd_model_accuracy.pkl',
-        'standard_scaler': './src/preprocessor/hdd_preprocessor_accuracy.pkl',
+        'model': './src/models/hdd_model.pkl',
+        'standard_scaler': './src/preprocessor/hdd_preprocessor.pkl',
         'categorical': hdd_categorical_features,
         'numerical': hdd_numerical_features,
         'type': hdd_types,
@@ -47,6 +48,17 @@ format_dict = {
         'numerical': tdd_numerical_features,
         'type': tdd_types,
         'form': form_tdd,
+    },
+    'lvd': {
+        'name': 'Liver Disease',
+        'features': lvd_features,
+        'target': 'Dataset',
+        'model': './src/models/lvd_model.pkl',
+        'standard_scaler': './src/preprocessor/lvd_preprocessor.pkl',
+        'categorical': lvd_categorical_features,
+        'numerical': lvd_numerical_features,
+        'type': lvd_types,
+        'form': lvd_form,
     }
 }
 diagnosis_options = [
@@ -77,6 +89,13 @@ diagnosis_options = [
         'description': 'Thyroid disease refers to conditions affecting the thyroid glands function, leading to hormonal imbalances that can impact metabolism, energy levels, and various bodily functions',
         'type': 'disease',
         'path': '/form/tdd'
+    },
+    {
+        'value': 'lvd',
+        'label': 'Liver Disease',
+        'description': 'Liver disease refers to a range of conditions affecting the liver’s function and structure. These conditions can cause liver inflammation, scarring, and damage, leading to liver failure and other complications. Common liver diseases include hepatitis, cirrhosis, and liver cancer.',
+        'type': 'disease',
+        'path': '/form/lvd'
     },
     {
         'value': 'ekg',

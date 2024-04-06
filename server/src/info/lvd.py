@@ -32,5 +32,56 @@ lvd_types = {
 }
 
 lvd_form = {
-
+    'Demographics': {
+        'Age': {
+            'title': 'Age',
+            'type': 'numerical'
+        },
+        'Gender': {
+            'title': 'Gender',
+            'type': 'categorical',
+            'options': {
+                'Male': 'Male',
+                'Female': 'Female'
+            }
+        }
+    },
+    'Liver Enzyme Tests': {
+        'Alkaline_Phosphotase': {
+            'title': 'Alkaline Phosphatase (IU/L)',
+            'type': 'numerical'
+        },
+        'Alamine_Aminotransferase': {
+            'title': 'Alamine Aminotransferase (IU/L)',
+            'type': 'numerical'
+        },
+        'Aspartate_Aminotransferase': {
+            'title': 'Aspartate Aminotransferase (IU/L)',
+            'type': 'numerical'
+        }
+    },
+    'Liver Protein Tests': {
+        'Total_Protiens': {
+            'title': 'Total Proteins (g/dL)',
+            'type': 'numerical'
+        },
+        'Albumin': {
+            'title': 'Albumin (g/dL)',
+            'type': 'numerical'
+        },
+        'Albumin_and_Globulin_Ratio': {
+            'title': 'Albumin and Globulin Ratio',
+            'type': 'numerical'
+        }
+    },
+    'Bilirubin Tests': {
+        'Total_Bilirubin': {
+            'title': 'Total Bilirubin (mg/dL)',
+            'type': 'numerical'
+        },
+        'Direct_Bilirubin': {
+            'title': 'Direct Bilirubin (mg/dL)',
+            'type': 'numerical'
+        }
+    }
 }
