@@ -141,3 +141,8 @@ form_tdd = {
     }
 
 }
+
+tdd_results_description = {
+    'negative': "Your recent diagnosis suggests that your thyroid function is moderate to above average, with no signs of hypothyroidism. This indicates a healthy thyroid status for now. However, it's still important to stay vigilant and schedule periodic check-ups to ensure ongoing thyroid health.",
+    'positive': "Your diagnosis indicates hypothyroidism, requiring prompt medical attention. It's crucial to consult with a healthcare professional for further evaluation and management. Early intervention and treatment can help address symptoms and prevent potential complications associated with hypothyroidism."
+}

@@ -172,3 +172,8 @@ form_kdd = {
         },
     }
 }
+
+kdd_results_description = {
+    'negative': "It's reassuring to confirm that you are not at high risk for Chronic Kidney Disease (CKD). However, it's still important to prioritize healthy lifestyle habits such as maintaining a balanced diet, staying hydrated, and monitoring blood pressure and blood sugar levels regularly. You may also benefit from consulting reputable sources like the Mayo Clinic's Chronic Kidney Disease resources for guidance on preventative measures and optimal kidney health.",
+    'positive': "Unfortunately, your results suggest a high risk of Chronic Kidney Disease (CKD). It's imperative to prioritize lifestyle modifications such as maintaining a healthy diet low in sodium, managing blood pressure and blood sugar levels, and avoiding excessive use of over-the-counter pain medications. We recommend consulting reputable sources such as the Mayo Clinic's Chronic Kidney Disease resources for comprehensive information on management strategies, treatment options, and lifestyle adjustments to preserve kidney function and overall health."
+}

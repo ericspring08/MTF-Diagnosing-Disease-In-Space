@@ -1,8 +1,8 @@
-from src.info.hdd import hdd_features, hdd_categorical_features, hdd_numerical_features, hdd_types, form_hdd
-from src.info.kdd import kdd_features, kdd_categorical_features, kdd_numerical_features, kdd_types, form_kdd
-from src.info.ldd import ldd_features, ldd_categorical_features, ldd_numerical_features, ldd_types, form_ldd
-from src.info.tdd import tdd_features, tdd_categorical_features, tdd_numerical_features, tdd_types, form_tdd
-from src.info.lvd import lvd_features, lvd_categorical_features, lvd_numerical_features, lvd_types, lvd_form
+from src.info.hdd import hdd_features, hdd_categorical_features, hdd_numerical_features, hdd_types, form_hdd, hdd_results_descriptions
+from src.info.kdd import kdd_features, kdd_categorical_features, kdd_numerical_features, kdd_types, form_kdd, kdd_results_description
+from src.info.ldd import ldd_features, ldd_categorical_features, ldd_numerical_features, ldd_types, form_ldd, ldd_results_descriptions
+from src.info.tdd import tdd_features, tdd_categorical_features, tdd_numerical_features, tdd_types, form_tdd, tdd_results_description
+from src.info.lvd import lvd_features, lvd_categorical_features, lvd_numerical_features, lvd_types, lvd_form, lvd_results_description
 
 format_dict = {
     'hdd': {
@@ -15,6 +15,7 @@ format_dict = {
         'numerical': hdd_numerical_features,
         'type': hdd_types,
         'form': form_hdd,
+        'results_description': hdd_results_descriptions
     },
     'kdd': {
         'name': 'Kidney Disease',
@@ -26,6 +27,7 @@ format_dict = {
         'numerical': kdd_numerical_features,
         'type': kdd_types,
         'form': form_kdd,
+        'results_description': kdd_results_description
     },
     'ldd': {
         'name': 'Lung Disease',
@@ -37,6 +39,7 @@ format_dict = {
         'numerical': ldd_numerical_features,
         'type': ldd_types,
         'form': form_ldd,
+        'results_description': ldd_results_descriptions
     },
     'tdd': {
         'name': 'Thyroid Disease',
@@ -48,6 +51,7 @@ format_dict = {
         'numerical': tdd_numerical_features,
         'type': tdd_types,
         'form': form_tdd,
+        'results_description': tdd_results_description
     },
     'lvd': {
         'name': 'Liver Disease',
@@ -59,6 +63,7 @@ format_dict = {
         'numerical': lvd_numerical_features,
         'type': lvd_types,
         'form': lvd_form,
+        'results_description': lvd_results_description
     }
 }
 diagnosis_options = [

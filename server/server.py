@@ -32,9 +32,16 @@ def predict(disease):
     predictor.preprocess()
     prediction, probability = predictor.predict()
     print(prediction, probability)
+    prediction_string = ""
+    if prediction.tolist()[0] == 1:
+        prediction_string = "positive"
+    else:
+        prediction_string = "negative"
+    result_description = format_dict[disease]['results_description'][prediction_string]
     return jsonify({
         'prediction': prediction.tolist()[0],
-        'probability': probability.tolist()[0][prediction.tolist()[0]]
+        'probability': probability.tolist()[0][prediction.tolist()[0]],
+        'description': result_description,
     })
 
 

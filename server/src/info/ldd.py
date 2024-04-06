@@ -107,3 +107,8 @@ form_ldd = {
         }
     }
 }
+
+ldd_results_descriptions = {
+    'negative': "Based on your diagnosis, it's reassuring to confirm that you are not at severe risk for Chronic Obstructive Pulmonary Disease (COPD). To maintain good lung health, it's essential to prioritize regular exercise, avoid smoking, and ensure proper nutrition. Consulting resources like the American Lung Association's Nutrition and COPD guide can provide valuable insights into dietary habits that support lung function and overall well-being.",
+    'positive': "Unfortunately, your results indicate a high risk of Chronic Obstructive Pulmonary Disease (COPD). It's crucial to prioritize quitting smoking immediately, adopt a healthy lifestyle including regular exercise and balanced nutrition, and seek prompt medical attention for further evaluation and management of your lung health.Additionally, we strongly advise consulting resources such as the American Lung Association's Nutrition and COPD guide for tailored nutritional advice and lifestyle strategies to help manage COPD symptoms and improve overall lung health."
+}

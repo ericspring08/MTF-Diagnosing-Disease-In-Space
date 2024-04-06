@@ -85,3 +85,8 @@ lvd_form = {
         }
     }
 }
+
+lvd_results_description = {
+    'negative': "It's reassuring to confirm that you are not at high risk for Hepatitis (A, B, C, D, or E). However, it's important to continue practicing preventive measures such as practicing good hygiene and avoiding sharing needles or personal items. For further information on Hepatitis and its prevention, you may find valuable insights from reputable sources like MedlinePlus's Hepatitis resources.",
+    'positive': "Your results indicate a potential risk of Hepatitis (A, B, C, D, or E). It's crucial to seek further evaluation from a healthcare professional for appropriate testing and diagnosis. Additionally, it's recommended to educate yourself about Hepatitis and its management strategies, which can be found in reliable resources such as MedlinePlus's Hepatitis materials."
+}

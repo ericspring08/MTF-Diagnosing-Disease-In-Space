@@ -73,14 +73,14 @@ const Page = ({ params }) => {
         `/api/predict/${params.disease}`,
         formData,
       );
-      const { prediction, probability } = res.data;
+      const { prediction, probability, description } = res.data;
       // upload results to firestore if logged in
       onAuthStateChanged(auth, (user) => {
         if (user) {
           uploadResults(formData, { prediction, probability });
         }
       });
-      setPredictionResults({ prediction, probability });
+      setPredictionResults({ prediction, probability, description });
     } catch (error) {
       console.error('Error fetching prediction:', error);
     }
@@ -188,32 +188,13 @@ const Page = ({ params }) => {
                 <a href="/" className="btn btn-info">Go To Home</a>
               </div>
               {/* Display diagnosis explanation based on prediction */}
-              {params.disease === 'hdd' && (
-                <div className="text-xl mt-5">
-                  {predictionResults.prediction === 0 ? (
-                    <div className="max-w-lg mx-auto">
-                      <p>
-                        Based on your diagnosis, it's reassuring to confirm that you are not currently at risk for significant heart conditions such as coronary artery disease, arrhythmia, or impending heart failure. However, your symptomatology is concerning as it suggests a potential risk for heart disease in the future. It's vital to consider lifestyle changes to mitigate this risk. This conclusion is supported by 90% of patients who present similar symptoms and are found to be in good health upon examination. This conclusion was made with the help of information from the National Heart, Lung, and Blood Institute’s publication Your Guide to a Healthy Heart.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="max-w-lg mx-auto">
-                      <p>
-                        Based on your diagnosis, it's concerning to note that you are at risk for significant heart conditions such as coronary artery disease, arrhythmia, or impending heart failure. Immediate medical attention is advised for a more in-depth diagnosis and exploration of treatment options. This conclusion is supported by a dataset of over 1000 patients with varying levels of symptoms of cardiovascular distress. This conclusion was made with the help of information from the National Heart, Lung, and Blood Institute’s publication Your Guide to a Healthy Heart.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Additional message based on specific criteria */}
-                  {formData.cholesterol >= 240 || formData.restingSystolicBloodPressure > 140 || formData.maxHeartRate > 155 ? (
-                    <div className="max-w-lg mx-auto mt-4">
-                      <p>
-                        Based on your diagnosis, it's reassuring to confirm that you are not currently at risk for significant heart conditions such as coronary artery disease, arrhythmia, or impending heart failure. However, your symptomatology is concerning as it suggests a potential risk for heart disease in the future. It's vital to consider lifestyle changes to mitigate this risk. This conclusion is supported by 90% of patients who present similar symptoms and are found to be in good health upon examination. This conclusion was made with the help of information from the National Heart, Lung, and Blood Institute’s publication Your Guide to a Healthy Heart.
-                      </p>
-                    </div>
-                  ) : null}
+              <div className="text-xl mt-5">
+                <div className="max-w-lg mx-auto">
+                  <p>
+                    {predictionResults.description}
+                  </p>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         )

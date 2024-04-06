@@ -117,3 +117,7 @@ form_hdd = {
         },
     },
 }
+hdd_results_descriptions = {
+    'negative': "Based on your diagnosis, it's reassuring to confirm that you are free from any significant heart conditions such as coronary artery disease, arrhythmia, or impending heart failure. Additionally, your symptoms suggest that you are in a satisfactory state of health, with no cause for immediate concern. This conclusion is supported by 90 % of patients who present similar symptoms and are found to be in good health upon examination. This conclusion was made with the help of information from the National Heart, Lung, and Blood Institute’s publication Your Guide to a Healthy Heart.",
+    'positive': "Based on your diagnosis, it's concerning to note that you are at risk for significant heart conditions such as coronary artery disease, arrhythmia, or impending heart failure. Immediate medical attention is advised for a more in-depth diagnosis and exploration of treatment options. This conclusion is supported by a dataset of over 1000 patients with varying levels of symptoms of cardiovascular distress. This conclusion was made with the help of information from the National Heart, Lung, and Blood Institute’s publication Your Guide to a Healthy Heart."
+}
