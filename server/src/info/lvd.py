@@ -1,23 +1,10 @@
-lvd_features = ["Age",
-                "Total_Bilirubin",
-                "Direct_Bilirubin",
-                "Alkaline_Phosphotase",
-                "Alamine_Aminotransferase",
-                "Aspartate_Aminotransferase",
-                "Total_Protiens",
-                "Albumin",
-                "Albumin_and_Globulin_Ratio",
-                "Gender"]
-lvd_numerical_features = ["Age",
-                          "Total_Bilirubin",
-                          "Direct_Bilirubin",
-                          "Alkaline_Phosphotase",
-                          "Alamine_Aminotransferase",
-                          "Aspartate_Aminotransferase",
-                          "Total_Protiens",
-                          "Albumin",
-                          "Albumin_and_Globulin_Ratio"]
+lvd_features = ["Age", "Total_Bilirubin", "Direct_Bilirubin", "Alkaline_Phosphotase",
+                "Alamine_Aminotransferase", "Aspartate_Aminotransferase", "Total_Protiens",
+                "Albumin", "Albumin_and_Globulin_Ratio", "Gender"]
 lvd_categorical_features = ["Gender"]
+lvd_numerical_features = ["Age", "Total_Bilirubin", "Direct_Bilirubin", "Alkaline_Phosphotase",
+                          "Alamine_Aminotransferase", "Aspartate_Aminotransferase", "Total_Protiens",
+                          "Albumin", "Albumin_and_Globulin_Ratio"]
 lvd_types = {
     "Age": int,
     "Total_Bilirubin": float,

@@ -108,16 +108,16 @@ const MyData = ({ params }) => {
 
   useEffect(() => {
     Chart.register(...registerables);
-
+  
     const ctx = document.getElementById('myChart');
-
+  
     const myChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: data.map((item, index) => index + 1), // Successful entries on the x-axis
+        labels: data.map((item, index) => data.length - index), // Reversed order of labels
         datasets: [{
           label: 'Confidence of negative prediction',
-          data: data.map(item => item.data.prediction.prediction === 1 ? (1 - item.data.prediction.probability) * 100 : item.data.prediction.probability * 100),
+          data: data.map(item => item.data.prediction.prediction === 1 ? (1 - item.data.prediction.probability) * 100 : item.data.prediction.probability * 100).reverse(), // Reversed order of dataset values
           borderColor: 'rgb(75, 192, 192)',
           tension: 0.1
         }]
@@ -139,7 +139,7 @@ const MyData = ({ params }) => {
         }
       }
     });
-
+  
     return () => {
       myChart.destroy();
     };
