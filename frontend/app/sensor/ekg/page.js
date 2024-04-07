@@ -152,8 +152,11 @@ const HomePage = () => {
       // Define the collection reference
       const collectionRef = collection(firestore, "users", user.uid, "ekgData");
   
-      // Exclude the 'graph' field from the document data
-      const { graph, ...docData } = ekgDataValues;
+      // Add the creation date to the document data
+      const docData = {
+        ...ekgDataValues,
+        createdAt: serverTimestamp() // Firestore server timestamp for creation date
+      };
   
       // Add the document to the collection
       await addDoc(collectionRef, docData);
@@ -163,6 +166,7 @@ const HomePage = () => {
       console.error('Error uploading EKG data to Firebase:', error);
     }
   };
+  
   
 
   // Inside handleValueChanged function

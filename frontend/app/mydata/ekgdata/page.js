@@ -11,24 +11,27 @@ const EKGDataPage = () => {
   const [sensorDataPoints, setSensorDataPoints] = useState([]);
 
   useEffect(() => {
-    // Function to fetch EKG data from Firestore
     const fetchEKGData = async () => {
-      onAuthStateChanged(auth, async (user) => { // Use auth here
+      onAuthStateChanged(auth, async (user) => {
         if (!user) {
           console.log('User is not signed in');
         } else {
-          // You forgot to add the timestamp for every EKG data entry so it can't sort
           const ekgDataCollection = collection(firestore, 'users', user.uid, 'ekgData');
-          const q = query(ekgDataCollection, limit(5));
+          const q = query(ekgDataCollection, orderBy('createdAt', 'desc'), limit(5)); // Limit to 5 most recent entries
           const snapshot = await getDocs(q);
           const ekgDataArray = [];
           snapshot.forEach((doc) => {
-            const data = doc.data();
+            const data = { ...doc.data(), id: doc.id }; // Include document ID for reference
             ekgDataArray.push(data);
           });
-          console.log(ekgDataArray);
+          console.log('EKG Data Array:', ekgDataArray); // Log the fetched EKG data array
           setEKGData(ekgDataArray);
-          setSensorDataPoints(ekgDataArray[0].sensorData);
+          if (ekgDataArray.length > 0) {
+            const latestSensorData = ekgDataArray[0].sensorData || [];
+            console.log('Latest Sensor Data:', latestSensorData); // Log the latest sensor data
+            setSensorDataPoints(latestSensorData);
+            renderEKGGraph(latestSensorData);
+          }
         }
       });
     };
@@ -36,13 +39,17 @@ const EKGDataPage = () => {
     fetchEKGData();
   }, []);
 
-  // Function to render EKG graph using Chart.js
   const renderEKGGraph = (sensorDataPoints) => {
+    if (sensorDataPoints.length === 0) {
+      console.log('No sensor data points to render graph.');
+      return;
+    }
+
     const ctx = document.getElementById('ekgGraph');
     const ekgChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: Array.from({ length: sensorDataPoints.length }, (_, i) => i + 1), // Generating labels from 1 to n for x-axis
+        labels: Array.from({ length: sensorDataPoints.length }, (_, i) => i + 1),
         datasets: [{
           label: 'EKG Graph',
           borderColor: 'rgb(75, 192, 192)',
