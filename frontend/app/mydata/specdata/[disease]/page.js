@@ -1,9 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, orderBy, where, limit, startAfter, endBefore, getCountFromServer } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, where, limit, startAfter, endBefore, getCountFromServer, doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from 'next/navigation';
-import { auth, firestore } from '../../../../utils/firebase';
+import { auth, firestore } from '@/utils/firebase';
 import { Chart, registerables } from 'chart.js';
 import { generateMyDataPDF } from '../../../../utils/pdfgen';
 import { DISEASES, DISEASE_NAMES } from '../../../../utils/constants';
@@ -11,10 +11,8 @@ import { DISEASES, DISEASE_NAMES } from '../../../../utils/constants';
 const MyData = ({ params }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [firstVisible, setFirstVisible] = useState(null);
-  const [lastVisible, setLastVisible] = useState(null);
-  const [firstVisibleIndex, setFirstVisibleIndex] = useState(0);
-  const [lastVisibleIndex, setLastVisibleIndex] = useState(0);
+  const [dataLimited, setDataLimited] = useState([]);
+  const [firstIndex, setFirstIndex] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
   const [disableNext, setDisableNext] = useState(false);
   const [disablePrevious, setDisablePrevious] = useState(true);
@@ -42,87 +40,72 @@ const MyData = ({ params }) => {
 
     setTotalEntries(totalEntries.data().count);
 
-    const q = query(collection(firestore, 'users', user.uid, 'results'), where('disease', '==', params.disease), orderBy('timestamp', 'desc'), limit(5));
-    const querySnapshot = await getDocs(q);
-    const newData = [];
-    querySnapshot.forEach((doc) => {
-      newData.push({ id: doc.id, data: doc.data() });
-    });
-
-    setData(newData);
-
-    setFirstVisible(querySnapshot.docs[0]);
-    setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
-    setFirstVisibleIndex(1);
-    setLastVisibleIndex(querySnapshot.docs.length);
-    setLoading(false);
-
-    if (querySnapshot.docs.length < 5) {
+    const q = doc(firestore, 'users', user.uid)
+    let data_temp = null;
+    await getDoc(q).then((doc) => {
+      // loop through params.disease-graphing array fild
+      data_temp = doc.data();
+      for (let i = 0; i < data_temp[params.disease + '-graphing'].length; i++) {
+        data_temp[params.disease + '-graphing'][i].timestamp = new Date(data_temp[params.disease + '-graphing'][i].timestamp.seconds * 1000).toLocaleString();
+        data_temp[params.disease + '-graphing'][i].prediction = Math.round(data_temp[params.disease + '-graphing'][i].probability);
+        if (data_temp[params.disease + '-graphing'][i].prediction === 0) {
+          data_temp[params.disease + '-graphing'][i].prediction = 'Negative';
+        } else {
+          data_temp[params.disease + '-graphing'][i].prediction = 'Positive';
+        }
+      }
+    })
+    setData(data_temp[params.disease + '-graphing']);
+    if (data_temp[params.disease + '-graphing'].length < 5) {
       setDisableNext(true);
     }
+    setDisablePrevious(true);
+    setDataLimited(data_temp[params.disease + '-graphing'].slice(0, 5));
+    setFirstIndex(0);
+    setTotalEntries(data_temp[params.disease + '-graphing'].length);
+    setLoading(false);
   }
 
   const fetchNextData = async (user) => {
-    const q = query(collection(firestore, 'users', user.uid, 'results'), where('disease', '==', params.disease), orderBy('timestamp', 'desc'), limit(5), startAfter(lastVisible));
-    const querySnapshot = await getDocs(q);
-    const newData = [];
-    querySnapshot.forEach((doc) => {
-      newData.push({ id: doc.id, data: doc.data() });
-    });
-
-    if (newData.length === 0) return;
-
-    setData(newData);
-    setFirstVisible(querySnapshot.docs[0]);
-    setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
-    setFirstVisibleIndex(firstVisibleIndex + 5);
-    setLastVisibleIndex(lastVisibleIndex + newData.length);
-
-    if (lastVisibleIndex + newData.length === totalEntries - 1) {
+    setDataLimited(data.slice(firstIndex + 5, firstIndex + 10));
+    setFirstIndex(firstIndex + 5);
+    if (firstIndex + 10 >= totalEntries) {
       setDisableNext(true);
     }
     setDisablePrevious(false);
   }
 
   const fetchPreviousData = async (user) => {
-    const q = query(collection(firestore, 'users', user.uid, 'results'), where('disease', '==', params.disease), orderBy('timestamp', 'desc'), limit(5), endBefore(firstVisible));
-    const querySnapshot = await getDocs(q);
-    const newData = [];
-    querySnapshot.forEach((doc) => {
-      newData.push({ id: doc.id, data: doc.data() });
-    });
-
-    if (newData.length === 0) return;
-
-    setData(newData);
-    setFirstVisible(querySnapshot.docs[0]);
-    setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
-    setFirstVisibleIndex(firstVisibleIndex - newData.length);
-    setLastVisibleIndex(lastVisibleIndex - 5);
-
-    if (firstVisibleIndex - newData.length === 1) {
+    setDataLimited(data.slice(firstIndex - 5, firstIndex));
+    setFirstIndex(firstIndex - 5);
+    if (firstIndex - 5 <= 0) {
       setDisablePrevious(true);
     }
     setDisableNext(false);
   }
 
   useEffect(() => {
+    if (data.length === 0) return;
     Chart.register(...registerables);
-  
+
     const ctx = document.getElementById('myChart');
-  
+
     const myChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: data.map((item, index) => data.length - index), // Reversed order of labels
+        // on timestamps only show the date
+        labels: data.map((item) => item.timestamp.split(',')[0]),
         datasets: [{
           label: 'Confidence of negative prediction',
-          data: data.map(item => item.data.prediction.prediction === 1 ? (1 - item.data.prediction.probability) * 100 : item.data.prediction.probability * 100).reverse(), // Reversed order of dataset values
+          data: data.map((item) => item.probability * 100), // Reversed order of dataset values
           borderColor: 'rgb(75, 192, 192)',
-          tension: 0.1
+          tension: 0.1,
+          fill: true,
         }]
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         scales: {
           x: {
             title: {
@@ -134,12 +117,14 @@ const MyData = ({ params }) => {
             title: {
               display: true,
               text: 'Confidence of Positive Prediction'
-            }
+            },
+            min: 0,
+            max: 100,
           }
         }
       }
     });
-  
+
     return () => {
       myChart.destroy();
     };
@@ -189,13 +174,13 @@ const MyData = ({ params }) => {
                 </tr>
               </thead>
               <tbody>
-                {data.map((item, index) => (
+                {dataLimited.map((item, index) => (
                   <tr key={index} className="hover:bg-gray-200" onClick={() => {
-                    router.push('/mydata/diagnosis/' + item.id)
+                    router.push('/mydata/diagnosis/' + item.docId)
                   }}>
-                    <td>{item.data.prediction.prediction}</td>
-                    <td>{((item.data.prediction.probability) * 100).toFixed(4)}%</td>
-                    <td>{new Date(item.data.timestamp.seconds * 1000).toLocaleString()}</td>
+                    <td>{item.prediction}</td>
+                    <td>{((item.probability) * 100).toFixed(4)}%</td>
+                    <td>{item.timestamp}</td>
                   </tr>
                 ))}
               </tbody>
@@ -210,7 +195,7 @@ const MyData = ({ params }) => {
             </div>
           </div>
         </div>
-        <div className="card card-bordered rounded h-min">
+        <div className="card card-bordered rounded h-[400px]">
           <h2 className="text-xl font-bold m-4">Chart: Confidence of Positive Prediction vs. Successful Entries</h2>
           <canvas id="myChart"></canvas>
         </div>
