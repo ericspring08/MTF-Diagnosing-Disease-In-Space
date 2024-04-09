@@ -90,7 +90,7 @@ export function measureSegmentSlope(ekgData, peaks) {
 export function detectEKGNormalcy(data, peaks, rrIntervals, maxima) {
     const rrIntervalThresholdMin = 50;
     const rrIntervalThresholdMax = 120;
-    const peakCountThreshold = 3;
+    const peakCountThreshold = 4;
     const maximaThreshold = 0.9;
 
     // Check RR interval criteria

@@ -166,6 +166,7 @@ const Page = ({ params }) => {
   }, []);
 
   const autoFillForm = async () => {
+  try {
     const user = auth.currentUser;
     if (user) {
       const ekgDataCollection = collection(firestore, 'users', user.uid, 'ekgData');
@@ -173,14 +174,18 @@ const Page = ({ params }) => {
       const snapshot = await getDocs(q);
       if (!snapshot.empty) {
         const latestData = snapshot.docs[0].data();
-        setFormData(prevFormData => ({
-          ...prevFormData,
-          'Slope of the Peak Exercise ST Segment': latestData.segmentLength || '',
-          'Resting Electrocardiographic Results': latestData.normalcy || ''
-        }));
+        console.log('Fetched EKG data:', latestData);
+      } else {
+        console.log('No EKG data found.');
       }
+    } else {
+      console.log('User not logged in.');
     }
-  };
+  } catch (error) {
+    console.error('Error fetching EKG data:', error);
+  }
+};
+
 
   return (
     <div className="w-screen min-h-screen flex flex-col justify-center items-center" data-theme="corporate">
