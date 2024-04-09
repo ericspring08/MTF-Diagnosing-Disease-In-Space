@@ -95,6 +95,7 @@ const HomePage = () => {
             segmentLength,
             normalcy,
             sensorDataPoints,
+            serverTimestamp: serverTimestamp(),
           });
         }
       };
@@ -148,26 +149,20 @@ const HomePage = () => {
         console.error('User not logged in.');
         return;
       }
-  
+
       // Define the collection reference
       const collectionRef = collection(firestore, "users", user.uid, "ekgData");
-  
-      // Add the creation date to the document data
-      const docData = {
-        ...ekgDataValues,
-        createdAt: serverTimestamp() // Firestore server timestamp for creation date
-      };
-  
+
       // Add the document to the collection
       await addDoc(collectionRef, docData);
-  
+
       console.log('EKG data uploaded to Firebase successfully.');
     } catch (error) {
       console.error('Error uploading EKG data to Firebase:', error);
     }
   };
-  
-  
+
+
 
   // Inside handleValueChanged function
   const handleValueChanged = (sensor) => {

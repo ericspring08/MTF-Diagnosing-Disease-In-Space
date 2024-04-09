@@ -165,26 +165,26 @@ const Page = ({ params }) => {
     fetchData();
   }, []);
 
-  const autoFillForm = async () => {
-  try {
-    const user = auth.currentUser;
-    if (user) {
-      const ekgDataCollection = collection(firestore, 'users', user.uid, 'ekgData');
-      const q = query(ekgDataCollection, orderBy('timestamp', 'desc'), limit(1));
-      const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        const latestData = snapshot.docs[0].data();
-        console.log('Fetched EKG data:', latestData);
+  const autoFillFormFromFirestore = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const ekgDataCollection = collection(firestore, 'users', user.uid, 'ekgData');
+        const q = query(ekgDataCollection, orderBy('timestamp', 'desc'), limit(1));
+        const snapshot = await getDocs(q);
+        if (!snapshot.empty) {
+          const latestData = snapshot.docs[0].data();
+          console.log('Fetched EKG data:', latestData);
+        } else {
+          console.log('No EKG data found.');
+        }
       } else {
-        console.log('No EKG data found.');
+        console.log('User not logged in.');
       }
-    } else {
-      console.log('User not logged in.');
+    } catch (error) {
+      console.error('Error fetching EKG data:', error);
     }
-  } catch (error) {
-    console.error('Error fetching EKG data:', error);
-  }
-};
+  };
 
 
   return (
@@ -268,7 +268,7 @@ const Page = ({ params }) => {
               <>
                 <button
                   className="btn btn-primary ml-5"
-                  onClick={autoFillForm} // Add onClick handler for auto fill button
+                  onClick={autoFillFormFromFirestore} // Add onClick handler for auto fill button
                 >
                   Auto Fill
                 </button>
