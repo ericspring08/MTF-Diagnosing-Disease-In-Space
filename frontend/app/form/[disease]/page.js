@@ -5,7 +5,7 @@ import { generateDiagnosisPDF } from '../../../utils/pdfgen';
 import Form from './form';
 import { auth, firestore } from '../../../utils/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, arrayUnion, doc, updateDoc, Timestamp } from 'firebase/firestore';
 import { query, orderBy, limit, getDocs } from 'firebase/firestore';
 
 const Page = ({ params }) => {
@@ -62,6 +62,18 @@ const Page = ({ params }) => {
       if (results.prediction == 0) {
         results.probability = 1 - results.probability;
       }
+      // upload to graphing Document
+      const userRef = doc(firestore, "users", user.uid);
+      const temp_id = params.disease + '-' + 'graphing';
+      // add to the array on field params.disease
+      // use temp_id as the key for the field
+      await updateDoc(userRef, {
+        [temp_id]: arrayUnion({
+          timestamp: Timestamp.now(),
+          probability: results.probability,
+          docId: docId
+        })
+      });
     } catch (error) {
       console.error('Error uploading results:', error);
     }
@@ -76,11 +88,7 @@ const Page = ({ params }) => {
       );
       const { prediction, probability, description } = res.data;
       // upload results to firestore if logged in
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          uploadResults(formData, { prediction, probability });
-        }
-      });
+      uploadResults(formData, { prediction, probability });
       setPredictionResults({ prediction, probability, description });
     } catch (error) {
       console.error('Error fetching prediction:', error);
