@@ -89,18 +89,18 @@ const EKGDataPage = () => {
             <th className="border border-blue-700 px-4 py-2">RR Interval</th>
             <th className="border border-blue-700 px-4 py-2">Maxima</th>
             <th className="border border-blue-700 px-4 py-2">Minima</th>
-            <th className="border border-blue-700 px-4 py-2">Segment Length</th>
+            <th className="border border-blue-700 px-4 py-2">ST Slope</th>
             <th className="border border-blue-700 px-4 py-2">Normalcy</th>
           </tr>
         </thead>
         <tbody>
           {ekgData.map((data, index) => (
             <tr key={index} className="bg-blue-100">
-              <td className="border border-blue-700 px-4 py-2">{data.peaks}</td>
+              <td className="border border-blue-700 px-4 py-2">{data.peaks.join(', ')}</td>
               <td className="border border-blue-700 px-4 py-2">{data.rrIntervals}</td>
               <td className="border border-blue-700 px-4 py-2">{data.maxima}</td>
               <td className="border border-blue-700 px-4 py-2">{data.minima}</td>
-              <td className="border border-blue-700 px-4 py-2">{data.segmentLength}</td>
+              <td className="border border-blue-700 px-4 py-2">{data.segmentLength * 100}</td>
               <td className="border border-blue-700 px-4 py-2">{data.normalcy}</td>
             </tr>
           ))}
