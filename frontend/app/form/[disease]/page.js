@@ -12,7 +12,6 @@ import axios from 'axios';
 
 const Page = ({ params }) => {
   // let ekgChart; // Initialize EKG chart
-  const [error, setError] = useState(null);
   const [formIndex, setFormIndex] = React.useState(0);
   const [formStructure, setFormStructure] = React.useState({});
   const [formHeaders, setFormHeaders] = React.useState([]);
@@ -21,9 +20,6 @@ const Page = ({ params }) => {
   const [submitted, setSubmitted] = React.useState(false);
   const [predictionResults, setPredictionResults] = React.useState(null);
   const [formName, setFormName] = React.useState('');
-  const [ekgDataValues, setEkgDataValues] = useState(null); // State variable to store calculated EKG data values
-  const [sensorDataPoints, setSensorDataPoints] = useState([]); // Array to store all sensor data points
-  const [numSensors, setNumSensors] = useState(null);
 
   useEffect(() => {
     if (formHeaders.length > 0 && formHeaders[formIndex]) {
@@ -264,31 +260,57 @@ const Page = ({ params }) => {
             {(formIndex === formHeaders.length - 1 && params.disease === "hdd") && (
               <AutoFillFormEKG setFormData={setFormData} />
             )}
-            <button
-              onClick={() => {
-                setFormIndex(formIndex + 1);
-              }}
-              className="btn btn-info mt-5 mb-5"
-              disabled={disableNext}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
+            {formIndex === formHeaders.length - 1 ? (
+              <>
+                <button
+                  onClick={handleSubmit}
+                  className="btn btn-success mt-5 mb-5"
+                  disabled={disableNext}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                    />
+                  </svg>
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setFormIndex(formIndex + 1);
+                }}
+                className="btn btn-info mt-5 mb-5"
+                disabled={disableNext}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z"
-                />
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
-      )}
+      )
+      }
       {
         !submitted && formHeaders.length > 0 && (
           <div className="flex flex-row flex-wrap justify-center gap-2 m-5">
@@ -297,13 +319,16 @@ const Page = ({ params }) => {
           </div>
         )
       }
-    </div>
+    </div >
   );
 };
 
 const AutoFillFormEKG = ({ setFormData }) => {
   const [error, setError] = useState(null);
   const [ekgDataValues, setEkgDataValues] = useState(null);
+  const [sensorDataPoints, setSensorDataPoints] = useState([]); // Array to store all sensor data points
+  const [numSensors, setNumSensors] = useState(null);
+
 
   const autoFillFormFromFirestore = async () => {
     try {
