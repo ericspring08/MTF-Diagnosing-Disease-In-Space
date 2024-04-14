@@ -1,5 +1,5 @@
 lvd_features = ["Age", "Total_Bilirubin", "Direct_Bilirubin", "Alkaline_Phosphotase",
-                "Alanine_Aminotransferase", "Aspartate_Aminotransferase", "Total_Protiens",
+                "Alanine_Aminotransferase", "Aspartate_Aminotransferase", "Alamine_Aminotransferase", "Total_Protiens",
                 "Albumin", "Albumin_and_Globulin_Ratio", "Gender"]
 lvd_categorical_features = ["Gender"]
 lvd_numerical_features = ["Age", "Total_Bilirubin", "Direct_Bilirubin", "Alkaline_Phosphotase",
