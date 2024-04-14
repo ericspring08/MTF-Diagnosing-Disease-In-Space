@@ -1,17 +1,17 @@
 'use client';
-import React, { useEffect, useState } from 'react'; 
-import Chart from 'chart.js/auto'; 
+import React, { useEffect, useState } from 'react';
+import Chart from 'chart.js/auto';
 import { generateDiagnosisPDF } from '../../../utils/pdfgen';
 import Form from './form';
 import { auth, firestore } from '../../../utils/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
 import { addDoc, collection, serverTimestamp, arrayUnion, doc, updateDoc, Timestamp } from 'firebase/firestore';
 import { query, orderBy, limit, getDocs } from 'firebase/firestore';
 import godirect from '@vernier/godirect';
 import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentSlope, detectEKGNormalcy } from '@/utils/ekgfunctions'; // Import functions from ekgfunctions.js
+import axios from 'axios';
 
 const Page = ({ params }) => {
- // let ekgChart; // Initialize EKG chart
+  // let ekgChart; // Initialize EKG chart
   const [error, setError] = useState(null);
   const [formIndex, setFormIndex] = React.useState(0);
   const [formStructure, setFormStructure] = React.useState({});
@@ -180,103 +180,9 @@ const Page = ({ params }) => {
     fetchData();
   }, []);
 
-  const autoFillFormFromFirestore = async () => {
-    try {
-      const ekgDevice = await godirect.selectDevice();
-      if (!ekgDevice) {
-        setError('Failed to select the EKG device.');
-        return;
-      }
-  
-      console.log('Available sensors:', ekgDevice.availableSensors);
-      setNumSensors(ekgDevice.availableSensors.length);
-  
-      const enabledSensors = ekgDevice.sensors.filter(s => s.enabled);
-  
-      let dataPointCount = 0;
-  
-      let peaks;
-      let rrIntervals;
-      let maxima;
-      let minima;
-      let segmentLength;
-      let normalcy;
-  
-      const ctx = document.getElementById('ekgChart'); // Move the chart initialization here
-      const ekgChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: [],
-          datasets: [{
-            label: 'EKG Data',
-            borderColor: 'rgb(75, 192, 192)',
-            borderWidth: 1,
-            data: [],
-            fill: false
-          }]
-        },
-        options: {
-          scales: {
-            x: {
-              display: false
-            }
-          }
-        }
-      });
-  
-      const handleValueChanged = (sensor) => {
-        // Use ekgChart inside handleValueChanged function
-        if (ekgChart.data.datasets[0].data.length < 300) {
-          console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
-  
-          ekgChart.data.labels.push('');
-          sensorDataPoints.push(sensor.value);
-          ekgChart.data.datasets[0].data.push(sensor.value);
-          ekgChart.update();
-  
-          const threshold = 0.275; // You can adjust this value as needed
-          const samplingRate = 1;
-          peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
-          rrIntervals = calculateRRIntervals(peaks, samplingRate);
-          maxima = findMaxima(ekgChart.data.datasets[0].data);
-          minima = findMinima(ekgChart.data.datasets[0].data);
-          segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks);
-          normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
-          dataPointCount++;
-  
-          if (dataPointCount === 300) {
-            setEkgDataValues({
-              peaks,
-              rrIntervals,
-              maxima,
-              minima,
-              segmentLength,
-              normalcy,
-            });
-            dataPointCount = 0;
-          }
-        } else {
-          console.log('Stopped logging after 300 data points.');
-          enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
-        }
-      };
-  
-      enabledSensors.forEach(sensor => sensor.on('value-changed', handleValueChanged));
-    } catch (error) {
-      console.error('Error:', error);
-      if (error.code === 'device_selection_failed') {
-        setError('Failed to select the EKG device.');
-      } else if (error.code === 'connection_failed') {
-        setError('Failed to connect to the EKG device.');
-      } else if (error.code === 'start_measurements_failed') {
-        setError('Failed to start EKG measurements.');
-      } else {
-        setError('An error occurred while connecting to the EKG device.');
-      }
-    }
-  };
-  
-  
+
+
+
 
   return (
     <div className="w-screen min-h-screen flex flex-col justify-center items-center" data-theme="corporate">
@@ -355,59 +261,31 @@ const Page = ({ params }) => {
                 />
               </svg>
             </button>
-            {formIndex === formHeaders.length - 1 ? (
-              <>
-                <button
-                  className="btn btn-primary ml-5"
-                  onClick={autoFillFormFromFirestore} // Add onClick handler for auto fill button
-                >
-                  Auto Fill
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  className="btn btn-success mt-5 mb-5"
-                  disabled={disableNext}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-                    />
-                  </svg>
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => {
-                  setFormIndex(formIndex + 1);
-                }}
-                className="btn btn-info mt-5 mb-5"
-                disabled={disableNext}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z"
-                  />
-                </svg>
-              </button>
+            {(formIndex === formHeaders.length - 1 && params.disease === "hdd") && (
+              <AutoFillFormEKG setFormData={setFormData} />
             )}
+            <button
+              onClick={() => {
+                setFormIndex(formIndex + 1);
+              }}
+              className="btn btn-info mt-5 mb-5"
+              disabled={disableNext}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       )}
@@ -423,5 +301,146 @@ const Page = ({ params }) => {
   );
 };
 
-export default Page;
+const AutoFillFormEKG = ({ setFormData }) => {
+  const [error, setError] = useState(null);
+  const [ekgDataValues, setEkgDataValues] = useState(null);
 
+  const autoFillFormFromFirestore = async () => {
+    try {
+      const ekgDevice = await godirect.selectDevice();
+      if (!ekgDevice) {
+        setError('Failed to select the EKG device.');
+        return;
+      }
+
+      console.log('Available sensors:', ekgDevice.availableSensors);
+      setNumSensors(ekgDevice.availableSensors.length);
+
+      const enabledSensors = ekgDevice.sensors.filter(s => s.enabled);
+
+      let dataPointCount = 0;
+
+      let peaks;
+      let rrIntervals;
+      let maxima;
+      let minima;
+      let segmentLength;
+      let normalcy;
+
+      const ctx = document.getElementById('ekgChart'); // Move the chart initialization here
+      const ekgChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'EKG Data',
+            borderColor: 'rgb(75, 192, 192)',
+            borderWidth: 1,
+            data: [],
+            fill: false
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              display: false
+            }
+          }
+        }
+      });
+
+      const handleValueChanged = (sensor) => {
+        // Use ekgChart inside handleValueChanged function
+        if (ekgChart.data.datasets[0].data.length < 300) {
+          console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
+
+          ekgChart.data.labels.push('');
+          sensorDataPoints.push(sensor.value);
+          ekgChart.data.datasets[0].data.push(sensor.value);
+          ekgChart.update();
+
+          const threshold = 0.275; // You can adjust this value as needed
+          const samplingRate = 1;
+          peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
+          rrIntervals = calculateRRIntervals(peaks, samplingRate);
+          maxima = findMaxima(ekgChart.data.datasets[0].data);
+          minima = findMinima(ekgChart.data.datasets[0].data);
+          segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks);
+          normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
+          dataPointCount++;
+
+          if (dataPointCount === 300) {
+            setEkgDataValues({
+              peaks,
+              rrIntervals,
+              maxima,
+              minima,
+              segmentLength,
+              normalcy,
+            });
+            dataPointCount = 0;
+          }
+
+          // Auto fill form data
+          // thalach: Maximum heart rate achieved
+          setFormData((prev) => {
+            return {
+              ...prev,
+              thalach: 3600 / rrIntervals[0],
+            };
+          });
+          // restecg: Resting electrocardiographic results
+          setFormData((prev) => {
+            return {
+              ...prev,
+              restecg: normalcy,
+            };
+          });
+
+        } else {
+          console.log('Stopped logging after 300 data points.');
+          enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
+        }
+      };
+
+      enabledSensors.forEach(sensor => sensor.on('value-changed', handleValueChanged));
+    } catch (error) {
+      console.error('Error:', error);
+      if (error.code === 'device_selection_failed') {
+        setError('Failed to select the EKG device.');
+      } else if (error.code === 'connection_failed') {
+        setError('Failed to connect to the EKG device.');
+      } else if (error.code === 'start_measurements_failed') {
+        setError('Failed to start EKG measurements.');
+      } else {
+        setError('An error occurred while connecting to the EKG device.');
+      }
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center">
+      <button
+        className="btn btn-primary w-36"
+        onClick={autoFillFormFromFirestore} // Add onClick handler for auto fill button
+      >
+        Auto Fill
+      </button>
+      {
+        error !== null && (
+          <div role="alert" className="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>Error! {error}</span>
+          </div>
+        )
+      }
+      {
+        ekgDataValues !== null && (
+          <canvas id="ekgChart" width="300" height="150"></canvas>
+        )
+      }
+    </div>
+  )
+}
+
+export default Page;
