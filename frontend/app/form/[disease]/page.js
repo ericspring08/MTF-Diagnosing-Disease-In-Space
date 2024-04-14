@@ -409,16 +409,37 @@ const AutoFillFormEKG = ({ setFormData }) => {
           // Auto fill form data
           // thalach: Maximum heart rate achieved
           setFormData((prev) => {
+            let slopeCategory;
+            if (segmentLength < 0.995) {
+              slopeCategory = 0;
+            } else if (segmentLength >= 0.995 && segmentLength <= 1.005) {
+              slopeCategory = 1;
+            } else {
+              slopeCategory = 2;
+            }
+          
             return {
               ...prev,
-              thalach: 3600 / rrIntervals[0],
+              slope: slopeCategory,
             };
           });
-          // restecg: Resting electrocardiographic results
           setFormData((prev) => {
+            const meanRRInterval = rrIntervals.reduce((acc, val) => acc + val, 0) / rrIntervals.length;
             return {
               ...prev,
-              restecg: normalcy,
+              thalach: 7200 / meanRRInterval,
+            };
+          });
+          setFormData((prev) => {
+            const normalcyMap = {
+              'Abnormal': 0,
+              'Normal': 1,
+              'Left Ventricular Hypertrophy': 2
+            };
+          
+            return {
+              ...prev,
+              restecg: normalcyMap[normalcy],
             };
           });
 
