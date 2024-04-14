@@ -358,12 +358,17 @@ const Page = ({ params }) => {
             </button>
             {formIndex === formHeaders.length - 1 ? (
               <>
-                <button
-                  className="btn btn-primary ml-5"
-                  onClick={autoFillFormFromFirestore} // Add onClick handler for auto fill button
-                >
-                  Auto Fill
-                </button>
+                {
+                  params.disease === 'hdd' && (
+                    <button
+                      className="btn btn-primary ml-5"
+                      onClick={autoFillFormFromFirestore} // Add onClick handler for auto fill button
+                    >
+                      Auto Fill
+                    </button>
+                  )
+                }
+
                 <button
                   onClick={handleSubmit}
                   className="btn btn-success mt-5 mb-5"

@@ -1,16 +1,14 @@
-lvd_features = ["Age", "Total_Bilirubin", "Direct_Bilirubin", "Alkaline_Phosphotase",
-                "Alanine_Aminotransferase", "Aspartate_Aminotransferase", "Alamine_Aminotransferase", "Total_Protiens",
+lvd_features = ["Age", "Total_Bilirubin", "Direct_Bilirubin", "Alkaline_Phosphotase", "Aspartate_Aminotransferase", "Alamine_Aminotransferase", "Total_Protiens",
                 "Albumin", "Albumin_and_Globulin_Ratio", "Gender"]
 lvd_categorical_features = ["Gender"]
 lvd_numerical_features = ["Age", "Total_Bilirubin", "Direct_Bilirubin", "Alkaline_Phosphotase",
-                          "Alanine_Aminotransferase", "Aspartate_Aminotransferase", "Total_Protiens",
+                          "Aspartate_Aminotransferase", "Total_Protiens",
                           "Albumin", "Albumin_and_Globulin_Ratio", "Alamine_Aminotransferase"]
 lvd_types = {
     "Age": int,
     "Total_Bilirubin": float,
     "Direct_Bilirubin": float,
     "Alkaline_Phosphotase": int,
-    "Alanine_Aminotransferase": int,
     "Aspartate_Aminotransferase": int,
     "Alamine_Aminotransferase": int,
     "Total_Protiens": float,
@@ -39,16 +37,12 @@ lvd_form = {
             'title': 'Alkaline Phosphatase (IU/L)',
             'type': 'numerical'
         },
-        'Alanine_Aminotransferase': {
-            'title': 'Alanine Aminotransferase (IU/L)',
-            'type': 'numerical'
-        },
         'Aspartate_Aminotransferase': {
             'title': 'Aspartate Aminotransferase (IU/L)',
             'type': 'numerical'
         },
         'Alamine_Aminotransferase': {
-            'title': 'Alamine Aminotransferase (IU/L)',
+            'title': 'Alanine Aminotransferase (IU/L)',
             'type': 'numerical'
         }
     },
