@@ -459,11 +459,7 @@ const AutoFillFormEKG = ({ setFormData }) => {
           </div>
         )
       }
-      {
-        ekgDataValues !== null && (
           <canvas id="ekgChart" width="300" height="150"></canvas>
-        )
-      }
     </div>
   )
 }
