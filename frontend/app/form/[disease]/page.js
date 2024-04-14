@@ -1,6 +1,6 @@
 'use client';
-import React, { useEffect, useState } from 'react'; 
-import Chart from 'chart.js/auto'; 
+import React, { useEffect, useState } from 'react';
+import Chart from 'chart.js/auto';
 import { generateDiagnosisPDF } from '../../../utils/pdfgen';
 import Form from './form';
 import { auth, firestore } from '../../../utils/firebase';
@@ -9,9 +9,10 @@ import { addDoc, collection, serverTimestamp, arrayUnion, doc, updateDoc, Timest
 import { query, orderBy, limit, getDocs } from 'firebase/firestore';
 import godirect from '@vernier/godirect';
 import { detectPeaks, calculateRRIntervals, findMaxima, findMinima, measureSegmentSlope, detectEKGNormalcy } from '@/utils/ekgfunctions'; // Import functions from ekgfunctions.js
+import axios from 'axios'
 
 const Page = ({ params }) => {
- // let ekgChart; // Initialize EKG chart
+  // let ekgChart; // Initialize EKG chart
   const [error, setError] = useState(null);
   const [formIndex, setFormIndex] = React.useState(0);
   const [formStructure, setFormStructure] = React.useState({});
@@ -187,21 +188,21 @@ const Page = ({ params }) => {
         setError('Failed to select the EKG device.');
         return;
       }
-  
+
       console.log('Available sensors:', ekgDevice.availableSensors);
       setNumSensors(ekgDevice.availableSensors.length);
-  
+
       const enabledSensors = ekgDevice.sensors.filter(s => s.enabled);
-  
+
       let dataPointCount = 0;
-  
+
       let peaks;
       let rrIntervals;
       let maxima;
       let minima;
       let segmentLength;
       let normalcy;
-  
+
       const ctx = document.getElementById('ekgChart'); // Move the chart initialization here
       const ekgChart = new Chart(ctx, {
         type: 'line',
@@ -223,17 +224,17 @@ const Page = ({ params }) => {
           }
         }
       });
-  
+
       const handleValueChanged = (sensor) => {
         // Use ekgChart inside handleValueChanged function
         if (ekgChart.data.datasets[0].data.length < 300) {
           console.log(`Sensor: ${sensor.name} value: ${sensor.value} units: ${sensor.unit}`);
-  
+
           ekgChart.data.labels.push('');
           sensorDataPoints.push(sensor.value);
           ekgChart.data.datasets[0].data.push(sensor.value);
           ekgChart.update();
-  
+
           const threshold = 0.275; // You can adjust this value as needed
           const samplingRate = 1;
           peaks = detectPeaks(ekgChart.data.datasets[0].data, threshold);
@@ -243,7 +244,7 @@ const Page = ({ params }) => {
           segmentLength = measureSegmentSlope(ekgChart.data.datasets[0].data, peaks);
           normalcy = detectEKGNormalcy(ekgChart.data.datasets[0].data, peaks, rrIntervals, maxima);
           dataPointCount++;
-  
+
           if (dataPointCount === 300) {
             setEkgDataValues({
               peaks,
@@ -260,7 +261,7 @@ const Page = ({ params }) => {
           enabledSensors.forEach(sensor => sensor.off('value-changed', handleValueChanged));
         }
       };
-  
+
       enabledSensors.forEach(sensor => sensor.on('value-changed', handleValueChanged));
     } catch (error) {
       console.error('Error:', error);
@@ -275,8 +276,8 @@ const Page = ({ params }) => {
       }
     }
   };
-  
-  
+
+
 
   return (
     <div className="w-screen min-h-screen flex flex-col justify-center items-center" data-theme="corporate">
