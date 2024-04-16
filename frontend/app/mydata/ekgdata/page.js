@@ -1,4 +1,3 @@
-// EKGDataPage.js
 'use client';
 import React, { useState, useEffect } from 'react';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
@@ -17,7 +16,7 @@ const EKGDataPage = () => {
           console.log('User is not signed in');
         } else {
           const ekgDataCollection = collection(firestore, 'users', user.uid, 'ekgData');
-          const q = query(ekgDataCollection, orderBy('createdAt', 'desc'), limit(5)); // Limit to 5 most recent entries
+          const q = query(ekgDataCollection, orderBy('createdAt', 'desc'), limit(1)); // Limit to 1 most recent entry
           const snapshot = await getDocs(q);
           const ekgDataArray = [];
           snapshot.forEach((doc) => {
@@ -30,11 +29,11 @@ const EKGDataPage = () => {
             const latestSensorData = ekgDataArray[0].sensorData || [];
             console.log('Latest Sensor Data:', latestSensorData); // Log the latest sensor data
             setSensorDataPoints(latestSensorData);
-            renderEKGGraph(latestSensorData);
+            renderEKGGraph(latestSensorData); // Render graph using latest sensor data
           }
         }
       });
-    };
+    }
 
     fetchEKGData();
   }, []);
@@ -49,19 +48,22 @@ const EKGDataPage = () => {
     const ekgChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: Array.from({ length: sensorDataPoints.length }, (_, i) => i + 1),
+        labels: sensorDataPoints.map(dataPoint => dataPoint.timestamp), // Use timestamps as labels
         datasets: [{
           label: 'EKG Graph',
           borderColor: 'rgb(75, 192, 192)',
           borderWidth: 1,
-          data: sensorDataPoints,
+          data: sensorDataPoints.map(dataPoint => dataPoint.value), // Use sensor data values
           fill: false
         }]
       },
       options: {
         scales: {
           x: {
-            display: true,
+            type: 'time', // Set x-axis to display timestamps as time
+            time: {
+              unit: 'millisecond' // Customize timestamp display unit if needed
+            },
             title: {
               display: true,
               text: 'Time'
@@ -106,8 +108,6 @@ const EKGDataPage = () => {
           ))}
         </tbody>
       </table>
-
-      {/* Most Recent Entry EKG Graph */}
       <div className="mt-5">
         <h2 className="text-lg font-bold mb-2 text-blue-700">Most Recent Entry EKG Graph</h2>
         <canvas id="ekgGraph" width="800" height="400"></canvas>
