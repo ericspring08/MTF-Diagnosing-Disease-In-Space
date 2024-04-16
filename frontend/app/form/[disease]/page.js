@@ -230,83 +230,84 @@ const Page = ({ params }) => {
             setFormData={setFormData}
           />
           <div className="flex flex-row justify-between">
-  <button
-    onClick={() => {
-      if (formIndex > 0) {
-        setFormIndex(formIndex - 1);
-      }
-    }}
-    className="btn btn-warning mt-5 mb-5"
-    disabled={formIndex === 0}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="w-6 h-6"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M21 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061A1.125 1.125 0 0 1 21 8.689v8.122ZM11.25 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061a1.125 1.125 0 0 1 1.683.977v8.122Z"
-      />
-    </svg>
-  </button>
-  {/* Conditional rendering for auto-fill button */}
-  {params.disease === "hdd" && (
-    <AutoFillFormEKG setFormData={setFormData} />
-  )}
-  {/* Rest of the buttons */}
-  {formIndex === formHeaders.length - 1 ? (
-    <>
-      <button
-        onClick={handleSubmit}
-        className="btn btn-success mt-5 mb-5"
-        disabled={disableNext}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="w-6 h-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-          />
-        </svg>
-      </button>
-    </>
-  ) : (
-    <button
-      onClick={() => {
-        setFormIndex(formIndex + 1);
-      }}
-      className="btn btn-info mt-5 mb-5"
-      disabled={disableNext}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="w-6 h-6"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z"
-        />
-      </svg>
-    </button>
-  )}
-</div>
+            <button
+              onClick={() => {
+                if (formIndex > 0) {
+                  setFormIndex(formIndex - 1);
+                }
+              }}
+              className="btn btn-warning mt-5 mb-5"
+              disabled={formIndex === 0}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061A1.125 1.125 0 0 1 21 8.689v8.122ZM11.25 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061a1.125 1.125 0 0 1 1.683.977v8.122Z"
+                />
+              </svg>
+            </button>
+            {/* Conditional rendering for auto-fill button */}
+
+            {/* Rest of the buttons */}
+            {formIndex === formHeaders.length - 1 ? (
+              <>
+                {params.disease === "hdd" && (
+                  <AutoFillFormEKG setFormData={setFormData} />
+                )}
+                <button
+                  onClick={handleSubmit}
+                  className="btn btn-success mt-5 mb-5"
+                  disabled={disableNext}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                    />
+                  </svg>
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setFormIndex(formIndex + 1);
+                }}
+                className="btn btn-info mt-5 mb-5"
+                disabled={disableNext}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
       )
       }
@@ -416,7 +417,7 @@ const AutoFillFormEKG = ({ setFormData }) => {
             } else {
               slopeCategory = 2;
             }
-          
+
             return {
               ...prev,
               slope: slopeCategory,
@@ -435,7 +436,7 @@ const AutoFillFormEKG = ({ setFormData }) => {
               'Normal': 1,
               'Left Ventricular Hypertrophy': 2
             };
-          
+
             return {
               ...prev,
               restecg: normalcyMap[normalcy],
