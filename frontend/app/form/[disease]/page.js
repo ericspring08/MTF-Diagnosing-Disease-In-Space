@@ -12,6 +12,7 @@ import axios from 'axios';
 
 const Page = ({ params }) => {
   // let ekgChart; // Initialize EKG chart
+  const [error, setError] = useState(null);
   const [formIndex, setFormIndex] = React.useState(0);
   const [formStructure, setFormStructure] = React.useState({});
   const [formHeaders, setFormHeaders] = React.useState([]);
@@ -175,10 +176,6 @@ const Page = ({ params }) => {
 
     fetchData();
   }, []);
-
-
-
-
 
   return (
     <div className="w-screen min-h-screen flex flex-col justify-center items-center" data-theme="corporate">
@@ -482,7 +479,7 @@ const AutoFillFormEKG = ({ setFormData }) => {
           </div>
         )
       }
-          <canvas id="ekgChart" width="300" height="150"></canvas>
+      <canvas id="ekgChart" width="300" height="150"></canvas>
     </div>
   )
 }
